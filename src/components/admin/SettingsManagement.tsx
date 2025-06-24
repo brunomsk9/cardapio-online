@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -341,7 +340,7 @@ const SettingsManagement = () => {
                 <DollarSign className="h-5 w-5" />
                 Formas de Pagamento
               </CardTitle>
-            </CardContent>
+            </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-3 border rounded-lg">
