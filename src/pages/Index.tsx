@@ -150,9 +150,10 @@ const Index = () => {
       <CheckoutModal
         isOpen={showCheckout}
         onClose={() => setShowCheckout(false)}
-        cartItems={cart}
-        total={getTotalPrice()}
-        clearCart={clearCart}
+        cart={cart}
+        totalPrice={getTotalPrice()}
+        user={user}
+        onClearCart={clearCart}
       />
 
       <AuthModal
