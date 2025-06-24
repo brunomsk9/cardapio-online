@@ -10,9 +10,10 @@ interface CartProps {
   onUpdateQuantity: (itemId: string, quantity: number) => void;
   onClose: () => void;
   totalPrice: number;
+  onCheckout: () => void;
 }
 
-const Cart = ({ cart, onUpdateQuantity, onClose, totalPrice }: CartProps) => {
+const Cart = ({ cart, onUpdateQuantity, onClose, totalPrice, onCheckout }: CartProps) => {
   if (cart.length === 0) {
     return (
       <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -95,7 +96,10 @@ const Cart = ({ cart, onUpdateQuantity, onClose, totalPrice }: CartProps) => {
               R$ {totalPrice.toFixed(2)}
             </span>
           </div>
-          <Button className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700">
+          <Button 
+            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+            onClick={onCheckout}
+          >
             Finalizar Pedido
           </Button>
         </div>

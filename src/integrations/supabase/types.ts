@@ -9,7 +9,131 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      addresses: {
+        Row: {
+          city: string
+          complement: string | null
+          created_at: string
+          id: string
+          is_default: boolean | null
+          neighborhood: string
+          number: string
+          state: string
+          street: string
+          user_id: string
+          zip_code: string
+        }
+        Insert: {
+          city: string
+          complement?: string | null
+          created_at?: string
+          id?: string
+          is_default?: boolean | null
+          neighborhood: string
+          number: string
+          state?: string
+          street: string
+          user_id: string
+          zip_code: string
+        }
+        Update: {
+          city?: string
+          complement?: string | null
+          created_at?: string
+          id?: string
+          is_default?: boolean | null
+          neighborhood?: string
+          number?: string
+          state?: string
+          street?: string
+          user_id?: string
+          zip_code?: string
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          address_id: string | null
+          created_at: string
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_address: string
+          id: string
+          items: Json
+          notes: string | null
+          payment_method: string
+          status: string
+          total: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          address_id?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_address: string
+          id?: string
+          items: Json
+          notes?: string | null
+          payment_method?: string
+          status?: string
+          total: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          address_id?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string
+          customer_phone?: string
+          delivery_address?: string
+          id?: string
+          items?: Json
+          notes?: string | null
+          payment_method?: string
+          status?: string
+          total?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_address_id_fkey"
+            columns: ["address_id"]
+            isOneToOne: false
+            referencedRelation: "addresses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

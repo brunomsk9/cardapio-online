@@ -3,25 +3,32 @@ import { useState } from 'react';
 import { MenuItem } from '@/types';
 import { mockMenuItems } from '@/data/mockData';
 import { useCart } from '@/hooks/useCart';
+import { useAuth } from '@/hooks/useAuth';
 import Header from '@/components/Header';
 import MenuCard from '@/components/MenuCard';
 import Cart from '@/components/Cart';
 import CategoryFilter from '@/components/CategoryFilter';
 import AdminPanel from '@/components/AdminPanel';
+import AuthModal from '@/components/auth/AuthModal';
+import CheckoutModal from '@/components/checkout/CheckoutModal';
 import { toast } from '@/hooks/use-toast';
 
 const Index = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>(mockMenuItems);
   const [activeCategory, setActiveCategory] = useState('all');
   const [showCart, setShowCart] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [isAdminMode, setIsAdminMode] = useState(false);
   
+  const { user, loading, signOut } = useAuth();
   const {
     cart,
     addToCart,
     updateQuantity,
     getTotalPrice,
-    getTotalItems
+    getTotalItems,
+    clearCart
   } = useCart();
 
   const categories = [
@@ -79,6 +86,39 @@ const Index = () => {
     });
   };
 
+  const handleCheckout = () => {
+    setShowCart(false);
+    if (!user) {
+      setShowAuthModal(true);
+    } else {
+      setShowCheckoutModal(true);
+    }
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false);
+    setShowCheckoutModal(true);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "Logout realizado",
+      description: "Você foi desconectado com sucesso.",
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (isAdminMode) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -86,6 +126,8 @@ const Index = () => {
           cartItemsCount={0}
           onCartClick={() => {}}
           onAdminClick={() => setIsAdminMode(false)}
+          user={user}
+          onSignOut={handleSignOut}
           isAdmin={true}
         />
         <AdminPanel
@@ -104,6 +146,8 @@ const Index = () => {
         cartItemsCount={getTotalItems()}
         onCartClick={() => setShowCart(true)}
         onAdminClick={() => setIsAdminMode(true)}
+        user={user}
+        onSignOut={handleSignOut}
       />
       
       <main className="container mx-auto px-4 py-8">
@@ -149,8 +193,24 @@ const Index = () => {
           onUpdateQuantity={updateQuantity}
           onClose={() => setShowCart(false)}
           totalPrice={getTotalPrice()}
+          onCheckout={handleCheckout}
         />
       )}
+
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={handleAuthSuccess}
+      />
+
+      <CheckoutModal
+        isOpen={showCheckoutModal}
+        onClose={() => setShowCheckoutModal(false)}
+        cart={cart}
+        totalPrice={getTotalPrice()}
+        user={user}
+        onClearCart={clearCart}
+      />
     </div>
   );
 };
