@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -23,11 +24,13 @@ const Index = () => {
   const navigate = useNavigate();
 
   const {
-    cartItems,
+    cart,
     addToCart,
     removeFromCart,
+    updateQuantity,
+    getTotalPrice,
+    getTotalItems,
     clearCart,
-    getTotal,
   } = useCart();
 
   const [showCheckout, setShowCheckout] = useState(false);
@@ -72,6 +75,14 @@ const Index = () => {
     });
   };
 
+  const categories = [
+    { key: 'all', label: 'Todos' },
+    { key: 'entrada', label: 'Entradas' },
+    { key: 'principal', label: 'Pratos Principais' },
+    { key: 'bebida', label: 'Bebidas' },
+    { key: 'sobremesa', label: 'Sobremesas' }
+  ];
+
   const filteredItems = activeCategory === 'all'
     ? mockMenuItems
     : mockMenuItems.filter(item => item.category === activeCategory);
@@ -88,7 +99,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header 
-        cartItemsCount={cartItems.length}
+        cartItemsCount={getTotalItems()}
         onCartClick={() => setShowCart(true)}
         onAdminClick={handleAdminToggle}
         user={user}
@@ -109,8 +120,9 @@ const Index = () => {
 
       <section className="container mx-auto mt-8">
         <CategoryFilter
+          categories={categories}
           activeCategory={activeCategory}
-          setActiveCategory={setActiveCategory}
+          onCategoryChange={setActiveCategory}
         />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -125,12 +137,10 @@ const Index = () => {
       </section>
 
       <Cart
-        isOpen={showCart}
+        cart={cart}
+        onUpdateQuantity={updateQuantity}
         onClose={() => setShowCart(false)}
-        cartItems={cartItems}
-        onAddToCart={addToCart}
-        onRemoveFromCart={removeFromCart}
-        onClearCart={clearCart}
+        totalPrice={getTotalPrice()}
         onCheckout={() => {
           setShowCart(false);
           setShowCheckout(true);
@@ -140,8 +150,8 @@ const Index = () => {
       <CheckoutModal
         isOpen={showCheckout}
         onClose={() => setShowCheckout(false)}
-        cartItems={cartItems}
-        total={getTotal()}
+        cartItems={cart}
+        total={getTotalPrice()}
         clearCart={clearCart}
       />
 

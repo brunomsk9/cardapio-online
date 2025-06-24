@@ -41,12 +41,10 @@ export const useUserRole = () => {
   }, [user]);
 
   const isAdmin = userRole === 'admin';
-  const isKitchen = userRole === 'kitchen';
 
   return {
     userRole,
     isAdmin,
-    isKitchen,
     loading
   };
 };
