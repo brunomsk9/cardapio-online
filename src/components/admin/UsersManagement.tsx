@@ -7,14 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { User, Mail, Phone, Calendar, Shield } from 'lucide-react';
+import { Database } from '@/integrations/supabase/types';
 
-interface UserProfile {
-  id: string;
-  full_name: string;
-  phone: string;
-  created_at: string;
-  user_roles?: { role: string }[];
-}
+type UserProfile = Database['public']['Tables']['profiles']['Row'] & {
+  user_roles?: Array<{ role: string }>;
+};
 
 const UsersManagement = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
@@ -26,16 +23,28 @@ const UsersManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase
+      // First get all profiles
+      const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select(`
-          *,
-          user_roles (role)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setUsers(data || []);
+      if (profilesError) throw profilesError;
+
+      // Then get all user roles
+      const { data: userRoles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('*');
+
+      if (rolesError) throw rolesError;
+
+      // Combine the data
+      const usersWithRoles = profiles?.map(profile => ({
+        ...profile,
+        user_roles: userRoles?.filter(role => role.user_id === profile.id).map(role => ({ role: role.role })) || []
+      })) || [];
+
+      setUsers(usersWithRoles);
     } catch (error: any) {
       toast({
         title: "Erro ao carregar usuários",

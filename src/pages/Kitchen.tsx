@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,16 +6,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Clock, User, CheckCircle, XCircle, Utensils } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { Database } from '@/integrations/supabase/types';
 
-interface Order {
-  id: string;
-  customer_name: string;
-  items: any[];
-  total: number;
-  status: string;
-  created_at: string;
-  notes: string;
-}
+type Order = Database['public']['Tables']['orders']['Row'];
 
 const Kitchen = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -190,7 +182,7 @@ const Kitchen = () => {
                 <div>
                   <h4 className="font-medium mb-3">Itens do Pedido:</h4>
                   <div className="space-y-2">
-                    {order.items.map((item: any, index: number) => (
+                    {Array.isArray(order.items) && order.items.map((item: any, index: number) => (
                       <div 
                         key={index} 
                         className="flex justify-between items-center p-2 bg-gray-50 rounded"

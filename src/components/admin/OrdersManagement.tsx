@@ -7,20 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Clock, Phone, MapPin, User, DollarSign } from 'lucide-react';
+import { Database } from '@/integrations/supabase/types';
 
-interface Order {
-  id: string;
-  customer_name: string;
-  customer_phone: string;
-  customer_email: string;
-  delivery_address: string;
-  items: any[];
-  total: number;
-  status: string;
-  payment_method: string;
-  notes: string;
-  created_at: string;
-}
+type Order = Database['public']['Tables']['orders']['Row'];
 
 const OrdersManagement = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -173,7 +162,7 @@ const OrdersManagement = () => {
               <div>
                 <h4 className="font-medium mb-2">Itens do Pedido:</h4>
                 <div className="space-y-1">
-                  {order.items.map((item: any, index: number) => (
+                  {Array.isArray(order.items) && order.items.map((item: any, index: number) => (
                     <div key={index} className="flex justify-between text-sm">
                       <span>{item.quantity}x {item.name}</span>
                       <span>R$ {(item.price * item.quantity).toFixed(2)}</span>
