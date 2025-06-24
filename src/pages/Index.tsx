@@ -75,6 +75,11 @@ const Index = () => {
     });
   };
 
+  const handleCheckout = () => {
+    setShowCart(false);
+    setShowCheckout(true);
+  };
+
   const categories = [
     { key: 'all', label: 'Todos' },
     { key: 'entrada', label: 'Entradas' },
@@ -136,16 +141,16 @@ const Index = () => {
         </div>
       </section>
 
-      <Cart
-        cart={cart}
-        onUpdateQuantity={updateQuantity}
-        onClose={() => setShowCart(false)}
-        totalPrice={getTotalPrice()}
-        onCheckout={() => {
-          setShowCart(false);
-          setShowCheckout(true);
-        }}
-      />
+      {/* Mostrar carrinho apenas quando showCart for true */}
+      {showCart && (
+        <Cart
+          cart={cart}
+          onUpdateQuantity={updateQuantity}
+          onClose={() => setShowCart(false)}
+          totalPrice={getTotalPrice()}
+          onCheckout={handleCheckout}
+        />
+      )}
 
       <CheckoutModal
         isOpen={showCheckout}

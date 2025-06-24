@@ -14,28 +14,9 @@ interface CartProps {
 }
 
 const Cart = ({ cart, onUpdateQuantity, onClose, totalPrice, onCheckout }: CartProps) => {
+  // Se o carrinho estiver vazio, não mostrar o modal
   if (cart.length === 0) {
-    return (
-      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center">
-              <ShoppingBag className="h-5 w-5 mr-2" />
-              Carrinho
-            </CardTitle>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
-          </CardHeader>
-          <CardContent className="text-center py-8">
-            <p className="text-gray-500 mb-4">Seu carrinho está vazio</p>
-            <Button onClick={onClose} variant="outline">
-              Continuar comprando
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return null;
   }
 
   return (
