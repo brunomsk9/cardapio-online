@@ -1,5 +1,5 @@
 
-import { ShoppingCart, User, ChefHat, LogOut, Utensils } from 'lucide-react';
+import { ShoppingCart, User, ChefHat, LogOut, Utensils, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { User as SupabaseUser } from '@supabase/supabase-js';
@@ -76,7 +76,7 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
             onClick={onAdminClick}
             className="text-white hover:bg-white/20"
           >
-            <User className="h-5 w-5" />
+            {isAdmin ? <User className="h-5 w-5" /> : <Settings className="h-5 w-5" />}
             {isAdmin ? 'Cliente' : 'Admin'}
           </Button>
         </div>
