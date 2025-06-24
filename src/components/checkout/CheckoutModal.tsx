@@ -65,7 +65,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
         customer_phone: customerPhone,
         customer_email: customerEmail,
         delivery_address: deliveryAddress,
-        items: cart,
+        items: JSON.parse(JSON.stringify(cart)), // Convert CartItem[] to Json
         total: totalPrice,
         notes: notes || null,
         status: 'pending',
