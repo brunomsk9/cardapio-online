@@ -10,11 +10,16 @@ import { toast } from '@/hooks/use-toast';
 const Admin = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { isAdmin, loading: roleLoading } = useUserRole();
+  const { isAdmin, loading: roleLoading, userRole } = useUserRole();
+
+  console.log('Admin page - Auth state:', { user: user?.id, authLoading, isAdmin, roleLoading, userRole });
 
   useEffect(() => {
+    console.log('Admin useEffect triggered:', { authLoading, roleLoading, user: !!user, isAdmin });
+    
     if (!authLoading && !roleLoading) {
       if (!user) {
+        console.log('No user, redirecting to home');
         toast({
           title: "Acesso negado",
           description: "Você precisa estar logado para acessar esta página.",
@@ -25,6 +30,7 @@ const Admin = () => {
       }
 
       if (!isAdmin) {
+        console.log('User is not admin, redirecting to home. Current role:', userRole);
         toast({
           title: "Acesso negado",
           description: "Você não tem permissão para acessar o painel administrativo.",
@@ -33,11 +39,14 @@ const Admin = () => {
         navigate('/');
         return;
       }
+      
+      console.log('User has admin access, showing admin panel');
     }
-  }, [user, isAdmin, authLoading, roleLoading, navigate]);
+  }, [user, isAdmin, authLoading, roleLoading, navigate, userRole]);
 
   // Show loading while checking authentication and role
   if (authLoading || roleLoading) {
+    console.log('Showing loading spinner');
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
@@ -47,8 +56,11 @@ const Admin = () => {
 
   // Don't render admin panel if user is not admin
   if (!user || !isAdmin) {
+    console.log('Not rendering admin panel - user or admin check failed');
     return null;
   }
+
+  console.log('Rendering admin panel');
 
   // Mock functions for menu management (these would connect to your actual backend)
   const handleUpdateMenuItem = (item: any) => {

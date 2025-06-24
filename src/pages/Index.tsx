@@ -15,13 +15,14 @@ import { toast } from '@/hooks/use-toast';
 import { ChefHat, Clock, Star, MapPin } from 'lucide-react';
 
 const Index = () => {
-  const [isAdminMode, setIsAdminMode] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
   const { user, loading: authLoading, signOut } = useAuth();
   const { isAdmin, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
+
+  console.log('Index page - Auth state:', { user: user?.id, authLoading, isAdmin, roleLoading });
 
   const {
     cart,
@@ -36,23 +37,20 @@ const Index = () => {
   const [showCheckout, setShowCheckout] = useState(false);
 
   const handleAdminToggle = () => {
-    if (isAdminMode) {
-      // If currently in admin mode, go back to customer view
-      setIsAdminMode(false);
+    console.log('Admin toggle clicked, current isAdmin:', isAdmin, 'user:', !!user);
+    
+    if (user && isAdmin) {
+      // If user is admin, redirect to admin route
+      navigate('/admin');
+    } else if (user && !isAdmin) {
+      toast({
+        title: "Acesso negado",
+        description: "Você não tem permissão para acessar o painel administrativo.",
+        variant: "destructive",
+      });
     } else {
-      // If trying to access admin, redirect to admin route
-      if (user && isAdmin) {
-        navigate('/admin');
-      } else if (user && !isAdmin) {
-        toast({
-          title: "Acesso negado",
-          description: "Você não tem permissão para acessar o painel administrativo.",
-          variant: "destructive",
-        });
-      } else {
-        // Not logged in, show auth modal
-        setShowAuthModal(true);
-      }
+      // Not logged in, show auth modal
+      setShowAuthModal(true);
     }
   };
 
@@ -63,7 +61,6 @@ const Index = () => {
         title: "Logout realizado com sucesso!",
         description: "Até mais!",
       });
-      setIsAdminMode(false);
     }
   };
 
@@ -109,7 +106,7 @@ const Index = () => {
         onAdminClick={handleAdminToggle}
         user={user}
         onSignOut={handleSignOut}
-        isAdmin={isAdminMode}
+        isAdmin={isAdmin}
       />
 
       <section className="bg-orange-100 py-16">

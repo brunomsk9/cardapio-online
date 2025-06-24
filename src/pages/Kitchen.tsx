@@ -1,4 +1,6 @@
+
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -6,19 +8,51 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Clock, User, CheckCircle, XCircle, Utensils } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRole } from '@/hooks/useUserRole';
 import { Database } from '@/integrations/supabase/types';
 
 type Order = Database['public']['Tables']['orders']['Row'];
 
 const Kitchen = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { isAdmin, loading: roleLoading } = useUserRole();
+
+  console.log('Kitchen page - Auth state:', { user: user?.id, authLoading, isAdmin, roleLoading });
 
   useEffect(() => {
-    fetchOrders();
-    setupRealtimeSubscription();
-  }, []);
+    console.log('Kitchen useEffect triggered:', { authLoading, roleLoading, user: !!user, isAdmin });
+    
+    if (!authLoading && !roleLoading) {
+      if (!user) {
+        console.log('No user, redirecting to home');
+        toast({
+          title: "Acesso negado",
+          description: "Você precisa estar logado para acessar a cozinha.",
+          variant: "destructive",
+        });
+        navigate('/');
+        return;
+      }
+
+      if (!isAdmin) {
+        console.log('User is not admin, redirecting to home');
+        toast({
+          title: "Acesso negado",
+          description: "Apenas administradores podem acessar a cozinha.",
+          variant: "destructive",
+        });
+        navigate('/');
+        return;
+      }
+      
+      console.log('User has admin access, loading kitchen orders');
+      fetchOrders();
+      setupRealtimeSubscription();
+    }
+  }, [user, isAdmin, authLoading, roleLoading, navigate]);
 
   const fetchOrders = async () => {
     try {
@@ -113,17 +147,21 @@ const Kitchen = () => {
     }
   };
 
-  if (!user) {
+  // Show loading while checking authentication and role
+  if (authLoading || roleLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="w-96">
-          <CardContent className="p-6 text-center">
-            <h2 className="text-xl font-bold mb-2">Acesso Restrito</h2>
-            <p className="text-gray-600">Esta área é apenas para funcionários da cozinha.</p>
-          </CardContent>
-        </Card>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Carregando...</p>
+        </div>
       </div>
     );
+  }
+
+  // Don't render kitchen if user is not admin
+  if (!user || !isAdmin) {
+    return null;
   }
 
   if (loading) {

@@ -17,6 +17,12 @@ interface HeaderProps {
 const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, isAdmin = false }: HeaderProps) => {
   const navigate = useNavigate();
 
+  const handleKitchenClick = () => {
+    if (isAdmin) {
+      navigate('/kitchen');
+    }
+  };
+
   return (
     <header className="bg-gradient-to-r from-orange-500 to-red-500 shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -44,15 +50,17 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
           
           {user && (
             <>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/kitchen')}
-                className="text-white hover:bg-white/20"
-              >
-                <Utensils className="h-5 w-5 mr-2" />
-                <span className="hidden sm:block">Cozinha</span>
-              </Button>
+              {isAdmin && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleKitchenClick}
+                  className="text-white hover:bg-white/20"
+                >
+                  <Utensils className="h-5 w-5 mr-2" />
+                  <span className="hidden sm:block">Cozinha</span>
+                </Button>
+              )}
               
               <div className="flex items-center space-x-2">
                 <span className="text-white text-sm hidden sm:block">
