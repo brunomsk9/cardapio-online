@@ -1,8 +1,9 @@
 
 import { useState } from 'react';
-import { ChefHat, Users, ShoppingBag, UtensilsCrossed, Settings, Menu, X, Building2, UserCircle } from 'lucide-react';
+import { ChefHat, Users, ShoppingBag, UtensilsCrossed, Settings, Menu, X, Building2, UserCircle, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { Link } from 'react-router-dom';
 import RestaurantSelector from '@/components/RestaurantSelector';
 import { useUserRole } from '@/hooks/useUserRole';
 
@@ -48,8 +49,16 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
         </div>
         
         {!isCollapsed && (
-          <div className="mt-4">
+          <div className="mt-4 space-y-3">
             <RestaurantSelector />
+            {isSuperAdmin && (
+              <Link to="/super-admin">
+                <Button variant="outline" size="sm" className="w-full justify-start">
+                  <Crown className="h-4 w-4 mr-2" />
+                  Super Admin
+                </Button>
+              </Link>
+            )}
           </div>
         )}
       </div>

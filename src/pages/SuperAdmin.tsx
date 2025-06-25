@@ -3,8 +3,9 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Building2, Users, Settings } from 'lucide-react';
+import { Plus, Building2, Users, Settings, ArrowRight } from 'lucide-react';
 import { useUserRole } from '@/hooks/useUserRole';
+import { Link } from 'react-router-dom';
 import RestaurantsManagement from '@/components/admin/RestaurantsManagement';
 import UsersManagement from '@/components/admin/UsersManagement';
 
@@ -45,9 +46,17 @@ const SuperAdmin = () => {
                 <p className="text-gray-600">Gerenciamento global do sistema</p>
               </div>
             </div>
-            <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-              Super Administrador
-            </Badge>
+            <div className="flex items-center space-x-4">
+              <Link to="/admin">
+                <Button variant="outline" className="flex items-center space-x-2">
+                  <span>Acessar Admin</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+              <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                Super Administrador
+              </Badge>
+            </div>
           </div>
         </div>
       </div>
@@ -80,4 +89,3 @@ const SuperAdmin = () => {
 };
 
 export default SuperAdmin;
-
