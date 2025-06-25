@@ -2,12 +2,11 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Building2, Users, Settings } from 'lucide-react';
 import { useUserRole } from '@/hooks/useUserRole';
-import { toast } from '@/hooks/use-toast';
+import RestaurantsManagement from '@/components/admin/RestaurantsManagement';
+import UsersManagement from '@/components/admin/UsersManagement';
 
 const SuperAdmin = () => {
   const { isSuperAdmin, loading } = useUserRole();
@@ -73,57 +72,12 @@ const SuperAdmin = () => {
           </Button>
         </div>
 
-        {activeTab === 'restaurants' && (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Gerenciar Restaurantes</h2>
-              <Button className="bg-gradient-to-r from-green-500 to-green-600">
-                <Plus className="h-4 w-4 mr-2" />
-                Novo Restaurante
-              </Button>
-            </div>
-            
-            <Card>
-              <CardContent className="p-6">
-                <div className="text-center py-12">
-                  <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Nenhum restaurante encontrado
-                  </h3>
-                  <p className="text-gray-500 mb-4">
-                    Comece criando seu primeiro restaurante no sistema.
-                  </p>
-                  <Button>Criar Primeiro Restaurante</Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {activeTab === 'users' && (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Usuários do Sistema</h2>
-            </div>
-            
-            <Card>
-              <CardContent className="p-6">
-                <div className="text-center py-12">
-                  <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Carregando usuários...
-                  </h3>
-                  <p className="text-gray-500">
-                    Funcionalidade de gestão de usuários será implementada em breve.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        {activeTab === 'restaurants' && <RestaurantsManagement />}
+        {activeTab === 'users' && <UsersManagement />}
       </div>
     </div>
   );
 };
 
 export default SuperAdmin;
+

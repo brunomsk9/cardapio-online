@@ -2,12 +2,14 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useUserRole } from './useUserRole';
 import { Database } from '@/integrations/supabase/types';
 
 type Restaurant = Database['public']['Tables']['restaurants']['Row'];
 
 export const useUserRestaurant = () => {
   const { user, loading: authLoading } = useAuth();
+  const { isSuperAdmin, loading: roleLoading } = useUserRole();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(true);
@@ -27,20 +29,43 @@ export const useUserRestaurant = () => {
         setLoading(true);
         setError(null);
 
-        const { data, error: restaurantError } = await supabase
-          .from('restaurants')
-          .select('*')
-          .order('name');
+        // Super admins podem ver todos os restaurantes
+        if (isSuperAdmin) {
+          const { data, error: restaurantError } = await supabase
+            .from('restaurants')
+            .select('*')
+            .order('name');
 
-        if (restaurantError) {
-          throw restaurantError;
-        }
+          if (restaurantError) {
+            throw restaurantError;
+          }
 
-        setRestaurants(data || []);
-        
-        // Se há apenas um restaurante, seleciona automaticamente
-        if (data && data.length === 1) {
-          setSelectedRestaurant(data[0]);
+          setRestaurants(data || []);
+          
+          // Se há apenas um restaurante, seleciona automaticamente
+          if (data && data.length === 1) {
+            setSelectedRestaurant(data[0]);
+          }
+        } else {
+          // Para outros usuários, buscar apenas restaurantes associados
+          const { data: userRestaurants, error: userRestaurantsError } = await supabase
+            .from('user_restaurants')
+            .select(`
+              restaurant:restaurants(*)
+            `)
+            .eq('user_id', user.id);
+
+          if (userRestaurantsError) {
+            throw userRestaurantsError;
+          }
+
+          const restaurantData = userRestaurants?.map(ur => ur.restaurant).filter(Boolean) as Restaurant[] || [];
+          setRestaurants(restaurantData);
+          
+          // Se há apenas um restaurante, seleciona automaticamente
+          if (restaurantData && restaurantData.length === 1) {
+            setSelectedRestaurant(restaurantData[0]);
+          }
         }
       } catch (err) {
         console.error('Error fetching user restaurants:', err);
@@ -51,10 +76,10 @@ export const useUserRestaurant = () => {
       }
     };
 
-    if (!authLoading) {
+    if (!authLoading && !roleLoading) {
       fetchUserRestaurants();
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, isSuperAdmin, roleLoading]);
 
   const selectRestaurant = (restaurant: Restaurant) => {
     setSelectedRestaurant(restaurant);
@@ -79,8 +104,9 @@ export const useUserRestaurant = () => {
     restaurants,
     selectedRestaurant,
     selectRestaurant,
-    loading: authLoading || loading,
+    loading: authLoading || roleLoading || loading,
     error,
     hasMultipleRestaurants: restaurants.length > 1
   };
 };
+

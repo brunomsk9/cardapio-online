@@ -3,6 +3,7 @@ import { useState } from 'react';
 import AdminSidebar from './admin/AdminSidebar';
 import OrdersManagement from './admin/OrdersManagement';
 import UsersManagement from './admin/UsersManagement';
+import RestaurantsManagement from './admin/RestaurantsManagement';
 import SettingsManagement from './admin/SettingsManagement';
 import { Plus, Edit, Trash2, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -205,6 +206,8 @@ const AdminPanel = ({ menuItems, onUpdateMenuItem, onDeleteMenuItem, onAddMenuIt
         );
       case 'orders':
         return <OrdersManagement />;
+      case 'restaurants':
+        return <RestaurantsManagement />;
       case 'users':
         return <UsersManagement />;
       case 'settings':
@@ -230,3 +233,4 @@ const AdminPanel = ({ menuItems, onUpdateMenuItem, onDeleteMenuItem, onAddMenuIt
 };
 
 export default AdminPanel;
+

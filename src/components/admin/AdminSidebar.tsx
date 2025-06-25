@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { ChefHat, Users, ShoppingBag, UtensilsCrossed, Settings, Menu, X } from 'lucide-react';
+import { ChefHat, Users, ShoppingBag, UtensilsCrossed, Settings, Menu, X, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import RestaurantSelector from '@/components/RestaurantSelector';
@@ -16,6 +16,7 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
   const menuItems = [
     { id: 'menu', label: 'Cardápio', icon: UtensilsCrossed },
     { id: 'orders', label: 'Pedidos', icon: ShoppingBag },
+    { id: 'restaurants', label: 'Restaurantes', icon: Building2 },
     { id: 'users', label: 'Usuários', icon: Users },
     { id: 'settings', label: 'Configurações', icon: Settings },
   ];
@@ -75,3 +76,4 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
 };
 
 export default AdminSidebar;
+
