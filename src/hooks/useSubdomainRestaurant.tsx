@@ -24,6 +24,7 @@ export const useSubdomainRestaurant = () => {
         // Verificar se é um dos domínios principais
         const mainDomains = ['koombo.online', 'ko-ombo.online', 'localhost'];
         if (mainDomains.includes(hostname)) {
+          console.log('Main domain detected, showing general menu');
           setIsMainDomain(true);
           setRestaurant(null);
           setLoading(false);
@@ -43,6 +44,7 @@ export const useSubdomainRestaurant = () => {
         console.log('Detected subdomain:', subdomain);
 
         if (!subdomain) {
+          console.log('No subdomain detected, treating as main domain');
           setIsMainDomain(true);
           setRestaurant(null);
           setLoading(false);
@@ -50,6 +52,7 @@ export const useSubdomainRestaurant = () => {
         }
 
         // Buscar restaurante pelo subdomínio
+        console.log('Searching for restaurant with subdomain:', subdomain);
         const { data, error: fetchError } = await supabase
           .from('restaurants')
           .select('*')
@@ -63,10 +66,18 @@ export const useSubdomainRestaurant = () => {
         }
 
         if (!data) {
+          console.log('No restaurant found for subdomain:', subdomain);
+          // Listar todos os restaurantes disponíveis para debug
+          const { data: allRestaurants } = await supabase
+            .from('restaurants')
+            .select('name, subdomain')
+            .eq('is_active', true);
+          
+          console.log('Available restaurants:', allRestaurants);
           throw new Error(`Restaurante não encontrado para o subdomínio: ${subdomain}`);
         }
 
-        console.log('Found restaurant:', data.name);
+        console.log('Found restaurant:', data.name, 'with subdomain:', data.subdomain);
         setRestaurant(data);
         setIsMainDomain(false);
       } catch (err) {
