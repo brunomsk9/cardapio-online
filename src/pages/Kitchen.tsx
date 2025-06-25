@@ -9,6 +9,7 @@ import { Clock, User, CheckCircle, XCircle, Utensils } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { Database } from '@/integrations/supabase/types';
+import NotificationManager from '@/components/NotificationManager';
 
 type Order = Database['public']['Tables']['orders']['Row'];
 
@@ -176,6 +177,9 @@ const Kitchen = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Gerenciador de notificações */}
+      <NotificationManager />
+      
       <header className="bg-gradient-to-r from-orange-500 to-red-500 shadow-lg">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center space-x-3">
