@@ -78,41 +78,30 @@ const OrdersManagement = () => {
     const restaurantName = selectedRestaurant?.name || 'Sabor & Arte';
     const cleanPhone = order.customer_phone.replace(/\D/g, '');
     
-    let message = `🍽️ *${restaurantName}*\n\n`;
-    message += `Olá ${order.customer_name}! 👋\n\n`;
-    message += `Seu pedido foi recebido com sucesso!\n\n`;
-    message += `📋 *Detalhes do Pedido #${order.id.slice(0, 8)}*\n`;
-    message += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    // Buscar configurações do restaurante para usar mensagem personalizada
+    // Por enquanto, usar a mensagem padrão
+    let message = `🍽️ *NOVO PEDIDO - ${restaurantName}*\n\n`;
+    message += `📋 *Pedido:* ${order.id}\n`;
+    message += `👤 *Cliente:* ${order.customer_name}\n`;
+    message += `📱 *Telefone:* ${order.customer_phone}\n`;
+    message += `📧 *Email:* ${order.customer_email}\n`;
+    message += `📍 *Endereço:* ${order.delivery_address}\n\n`;
     
-    message += `🛒 *Seus Itens:*\n`;
+    message += `🛒 *Itens do Pedido:*\n`;
     if (Array.isArray(order.items)) {
       order.items.forEach((item: any, index: number) => {
-        message += `${index + 1}. ${item.quantity}x ${item.name}\n`;
-        message += `   💰 R$ ${(item.price * item.quantity).toFixed(2)}\n\n`;
+        message += `• ${item.quantity}x ${item.name} - R$ ${(item.price * item.quantity).toFixed(2)}\n`;
       });
     }
     
-    message += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    message += `💵 *Total: R$ ${order.total.toFixed(2)}*\n`;
-    message += `💳 *Pagamento:* ${getPaymentMethodLabel(order.payment_method)}\n\n`;
-    
-    message += `📍 *Endereço de Entrega:*\n${order.delivery_address}\n\n`;
+    message += `\n💰 *Total: R$ ${order.total.toFixed(2)}*\n\n`;
+    message += `💳 *Forma de Pagamento:* ${getPaymentMethodLabel(order.payment_method)}\n\n`;
     
     if (order.notes) {
-      message += `📝 *Suas Observações:*\n${order.notes}\n\n`;
+      message += `📝 *Observações:* ${order.notes}\n\n`;
     }
     
-    message += `⏰ *Status Atual:* ${getStatusLabel(order.status)}\n`;
-    message += `📅 *Pedido feito em:* ${new Date(order.created_at).toLocaleString('pt-BR')}\n\n`;
-    
-    message += `🚀 *Acompanhe seu pedido:*\n`;
-    message += `• Pedido confirmado ✅\n`;
-    message += `• Em preparação 👨‍🍳\n`;
-    message += `• Pronto para entrega 📦\n`;
-    message += `• A caminho 🚚\n\n`;
-    
-    message += `Em breve entraremos em contato para confirmar a entrega!\n\n`;
-    message += `Obrigado pela preferência! 🙏❤️`;
+    message += `Obrigado pela preferência! 🙏`;
 
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/55${cleanPhone}?text=${encodedMessage}`;
@@ -166,6 +155,22 @@ const OrdersManagement = () => {
     };
     return statusLabels[status as keyof typeof statusLabels] || status;
   };
+
+  const getStatusButtonColor = (status: string, currentStatus: string) => {
+    if (status === currentStatus) {
+      return 'bg-orange-500 text-white hover:bg-orange-600';
+    }
+    return 'bg-gray-100 text-gray-700 hover:bg-gray-200';
+  };
+
+  const statusButtons = [
+    { status: 'pending', label: 'Pendente', icon: Clock },
+    { status: 'confirmed', label: 'Confirmado', icon: CheckCircle },
+    { status: 'preparing', label: 'Preparando', icon: Utensils },
+    { status: 'ready', label: 'Pronto', icon: Play },
+    { status: 'delivered', label: 'Entregue', icon: CheckCircle },
+    { status: 'cancelled', label: 'Cancelado', icon: Ban },
+  ];
 
   const filteredOrders = statusFilter === 'all' 
     ? orders 
@@ -276,34 +281,35 @@ const OrdersManagement = () => {
                 </div>
               )}
 
-              <div className="flex justify-between items-center pt-2">
-                <div className="flex gap-2">
-                  <Select
-                    value={order.status}
-                    onValueChange={(newStatus) => updateOrderStatus(order.id, newStatus)}
-                  >
-                    <SelectTrigger className="w-48">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pending">Pendente</SelectItem>
-                      <SelectItem value="confirmed">Confirmado</SelectItem>
-                      <SelectItem value="preparing">Preparando</SelectItem>
-                      <SelectItem value="ready">Pronto</SelectItem>
-                      <SelectItem value="delivered">Entregue</SelectItem>
-                      <SelectItem value="cancelled">Cancelado</SelectItem>
-                    </SelectContent>
-                  </Select>
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-medium mb-2">Alterar Status:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {statusButtons.map(({ status, label, icon: Icon }) => (
+                      <Button
+                        key={status}
+                        size="sm"
+                        className={getStatusButtonColor(status, order.status)}
+                        onClick={() => updateOrderStatus(order.id, status)}
+                      >
+                        <Icon className="h-4 w-4 mr-1" />
+                        {label}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
-                <Button
-                  onClick={() => sendOrderToCustomer(order)}
-                  variant="outline"
-                  size="sm"
-                  className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
-                >
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Enviar ao Cliente
-                </Button>
+                
+                <div className="flex justify-end">
+                  <Button
+                    onClick={() => sendOrderToCustomer(order)}
+                    variant="outline"
+                    size="sm"
+                    className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                  >
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Enviar ao Cliente
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
