@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Building2, Plus, Edit, Trash2, Phone, Mail, MapPin } from 'lucide-react';
+import { Building2, Plus, Edit, Trash2, Phone, Mail, MapPin, Globe } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -23,7 +23,8 @@ const restaurantSchema = z.object({
   address: z.string().optional(),
   phone: z.string().optional(),
   email: z.string().email('Email inválido').optional().or(z.literal('')),
-  logo_url: z.string().url('URL inválida').optional().or(z.literal(''))
+  logo_url: z.string().url('URL inválida').optional().or(z.literal('')),
+  subdomain: z.string().min(1, 'Subdomínio é obrigatório').regex(/^[a-z0-9-]+$/, 'Apenas letras minúsculas, números e hífens são permitidos')
 });
 
 type RestaurantFormData = z.infer<typeof restaurantSchema>;
@@ -42,7 +43,8 @@ const RestaurantsManagement = () => {
       address: '',
       phone: '',
       email: '',
-      logo_url: ''
+      logo_url: '',
+      subdomain: ''
     }
   });
 
@@ -71,6 +73,12 @@ const RestaurantsManagement = () => {
     }
   };
 
+  const handleSubdomainChange = (value: string) => {
+    // Permitir apenas letras minúsculas, números e hífens
+    const sanitized = value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    return sanitized;
+  };
+
   const handleSubmit = async (data: RestaurantFormData) => {
     try {
       if (editingRestaurant) {
@@ -83,11 +91,17 @@ const RestaurantsManagement = () => {
             phone: data.phone || null,
             email: data.email || null,
             logo_url: data.logo_url || null,
+            subdomain: data.subdomain,
             updated_at: new Date().toISOString()
           })
           .eq('id', editingRestaurant.id);
 
-        if (error) throw error;
+        if (error) {
+          if (error.code === '23505' && error.message.includes('subdomain')) {
+            throw new Error('Este subdomínio já está sendo usado por outro restaurante. Escolha um diferente.');
+          }
+          throw error;
+        }
 
         toast({
           title: "Restaurante atualizado!",
@@ -102,10 +116,16 @@ const RestaurantsManagement = () => {
             address: data.address || null,
             phone: data.phone || null,
             email: data.email || null,
-            logo_url: data.logo_url || null
+            logo_url: data.logo_url || null,
+            subdomain: data.subdomain
           });
 
-        if (error) throw error;
+        if (error) {
+          if (error.code === '23505' && error.message.includes('subdomain')) {
+            throw new Error('Este subdomínio já está sendo usado por outro restaurante. Escolha um diferente.');
+          }
+          throw error;
+        }
 
         toast({
           title: "Restaurante criado!",
@@ -187,7 +207,8 @@ const RestaurantsManagement = () => {
       address: restaurant.address || '',
       phone: restaurant.phone || '',
       email: restaurant.email || '',
-      logo_url: restaurant.logo_url || ''
+      logo_url: restaurant.logo_url || '',
+      subdomain: restaurant.subdomain || ''
     });
     setIsDialogOpen(true);
   };
@@ -241,6 +262,40 @@ const RestaurantsManagement = () => {
                     </FormItem>
                   )}
                 />
+                
+                <FormField
+                  control={form.control}
+                  name="subdomain"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Subdomínio *</FormLabel>
+                      <FormControl>
+                        <div className="flex items-center space-x-2">
+                          <Input 
+                            placeholder="meurestaurante" 
+                            {...field}
+                            onChange={(e) => {
+                              const sanitized = handleSubdomainChange(e.target.value);
+                              field.onChange(sanitized);
+                            }}
+                            className="flex-1"
+                          />
+                          <span className="text-sm text-gray-500">.koombo.online</span>
+                        </div>
+                      </FormControl>
+                      <div className="text-xs text-gray-500">
+                        <p>Apenas letras minúsculas, números e hífens são permitidos</p>
+                        {field.value && (
+                          <p className="text-blue-600 mt-1">
+                            Será acessível em: <strong>{field.value}.koombo.online</strong>
+                          </p>
+                        )}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
                 <FormField
                   control={form.control}
                   name="description"
@@ -341,6 +396,12 @@ const RestaurantsManagement = () => {
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {restaurant.subdomain && (
+                      <div className="flex items-center text-sm">
+                        <Globe className="h-4 w-4 mr-2 text-gray-500" />
+                        <span className="text-blue-600">{restaurant.subdomain}.koombo.online</span>
+                      </div>
+                    )}
                     {restaurant.phone && (
                       <div className="flex items-center text-sm">
                         <Phone className="h-4 w-4 mr-2 text-gray-500" />
@@ -415,4 +476,3 @@ const RestaurantsManagement = () => {
 };
 
 export default RestaurantsManagement;
-
