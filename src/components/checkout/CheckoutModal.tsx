@@ -68,7 +68,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
         customer_phone: customerPhone,
         customer_email: customerEmail,
         delivery_address: deliveryAddress,
-        items: JSON.parse(JSON.stringify(cart)), // Convert CartItem[] to Json
+        items: JSON.parse(JSON.stringify(cart)),
         total: totalPrice,
         notes: notes || null,
         status: 'pending',
@@ -91,12 +91,20 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
       // Redirecionar baseado no método de pagamento
       if (paymentMethod === 'whatsapp' || paymentMethod === 'pix') {
         redirectToWhatsApp(data, cart, totalPrice);
-      } else {
-        // Para cartão de crédito, poderia integrar com gateway de pagamento
+      } else if (paymentMethod === 'credit_card' || paymentMethod === 'debit_card') {
+        // Para cartões, mostrar mensagem de que será processado na entrega
         toast({
-          title: "Método de pagamento selecionado",
-          description: "Pedido será processado na entrega.",
+          title: "Pedido confirmado!",
+          description: `Pagamento no ${getPaymentMethodLabel(paymentMethod)} será processado na entrega.`,
         });
+        redirectToWhatsApp(data, cart, totalPrice);
+      } else if (paymentMethod === 'cash') {
+        // Para dinheiro, processar normalmente
+        toast({
+          title: "Pedido confirmado!",
+          description: "Pagamento em dinheiro na entrega.",
+        });
+        redirectToWhatsApp(data, cart, totalPrice);
       }
       
       onClearCart();
@@ -221,7 +229,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
                 <RadioGroupItem value="credit_card" id="credit_card" />
                 <Label htmlFor="credit_card" className="flex items-center cursor-pointer">
                   <CreditCard className="h-4 w-4 mr-2 text-blue-600" />
-                  Cartão de Crédito
+                  Cartão de Crédito (Na entrega)
                 </Label>
               </div>
               
@@ -229,7 +237,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
                 <RadioGroupItem value="debit_card" id="debit_card" />
                 <Label htmlFor="debit_card" className="flex items-center cursor-pointer">
                   <CreditCard className="h-4 w-4 mr-2 text-purple-600" />
-                  Cartão de Débito
+                  Cartão de Débito (Na entrega)
                 </Label>
               </div>
               

@@ -8,10 +8,12 @@ import {
   Menu, 
   UserCheck,
   ClipboardList,
-  Eye
+  Eye,
+  ChefHat
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useNavigate } from 'react-router-dom';
 
 interface AdminSidebarProps {
   activeSection: string;
@@ -20,6 +22,7 @@ interface AdminSidebarProps {
 
 const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => {
   const { isSuperAdmin } = useUserRole();
+  const navigate = useNavigate();
 
   const menuItems = [
     { id: 'menu', label: 'Cardápio', icon: Menu },
@@ -35,6 +38,10 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
     { id: 'profile', label: 'Perfil', icon: Users },
     { id: 'settings', label: 'Configurações', icon: Settings },
   ];
+
+  const handleKitchenAccess = () => {
+    navigate('/kitchen');
+  };
 
   return (
     <div className="w-64 bg-white shadow-lg h-screen sticky top-0">
@@ -59,6 +66,17 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
             </Button>
           );
         })}
+        
+        <div className="border-t mt-4 pt-4">
+          <Button
+            variant="ghost"
+            className="w-full justify-start px-6 py-3 text-left mb-1 text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+            onClick={handleKitchenAccess}
+          >
+            <ChefHat className="h-5 w-5 mr-3" />
+            Ir para Cozinha
+          </Button>
+        </div>
       </nav>
     </div>
   );
