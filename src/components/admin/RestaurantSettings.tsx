@@ -16,6 +16,7 @@ const RestaurantSettings = () => {
     address: '',
     phone: '',
     email: '',
+    subdomain: '',
     whatsapp_message: ''
   });
   const [saving, setSaving] = useState(false);
@@ -47,6 +48,7 @@ Obrigado pela preferência! 🙏`;
         address: selectedRestaurant.address || '',
         phone: selectedRestaurant.phone || '',
         email: selectedRestaurant.email || '',
+        subdomain: selectedRestaurant.subdomain || '',
         whatsapp_message: selectedRestaurant.whatsapp_message || defaultWhatsAppMessage
       });
     }
@@ -64,6 +66,16 @@ Obrigado pela preferência! 🙏`;
       return;
     }
 
+    // Validar subdomain
+    if (!formData.subdomain.trim()) {
+      toast({
+        title: "Erro",
+        description: "O subdomínio é obrigatório.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -75,12 +87,16 @@ Obrigado pela preferência! 🙏`;
           address: formData.address,
           phone: formData.phone,
           email: formData.email,
+          subdomain: formData.subdomain,
           whatsapp_message: formData.whatsapp_message,
           updated_at: new Date().toISOString()
         })
         .eq('id', selectedRestaurant.id);
 
       if (error) {
+        if (error.code === '23505' && error.message.includes('subdomain')) {
+          throw new Error('Este subdomínio já está sendo usado por outro restaurante. Escolha um diferente.');
+        }
         throw error;
       }
 

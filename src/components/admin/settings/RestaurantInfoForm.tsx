@@ -12,6 +12,7 @@ interface RestaurantInfoFormProps {
     address: string;
     phone: string;
     email: string;
+    subdomain: string;
   };
   saving: boolean;
   onInputChange: (field: string, value: string) => void;
@@ -19,6 +20,12 @@ interface RestaurantInfoFormProps {
 }
 
 const RestaurantInfoForm = ({ formData, saving, onInputChange, onSubmit }: RestaurantInfoFormProps) => {
+  const handleSubdomainChange = (value: string) => {
+    // Permitir apenas letras minúsculas, números e hífens
+    const sanitized = value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    onInputChange('subdomain', sanitized);
+  };
+
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -42,6 +49,29 @@ const RestaurantInfoForm = ({ formData, saving, onInputChange, onSubmit }: Resta
             placeholder="(11) 99999-9999"
           />
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="subdomain">Subdomínio *</Label>
+        <div className="flex items-center space-x-2">
+          <Input
+            id="subdomain"
+            value={formData.subdomain}
+            onChange={(e) => handleSubdomainChange(e.target.value)}
+            placeholder="meurestaurante"
+            className="flex-1"
+            required
+          />
+          <span className="text-sm text-gray-500">.koombo.online</span>
+        </div>
+        <p className="text-xs text-gray-500">
+          Apenas letras minúsculas, números e hífens são permitidos
+        </p>
+        {formData.subdomain && (
+          <p className="text-sm text-blue-600">
+            Seu restaurante será acessível em: <strong>{formData.subdomain}.koombo.online</strong>
+          </p>
+        )}
       </div>
 
       <div className="space-y-2">
