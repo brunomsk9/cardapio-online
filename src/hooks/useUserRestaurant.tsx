@@ -29,43 +29,27 @@ export const useUserRestaurant = () => {
         setLoading(true);
         setError(null);
 
-        // Super admins podem ver todos os restaurantes
-        if (isSuperAdmin) {
-          const { data, error: restaurantError } = await supabase
-            .from('restaurants')
-            .select('*')
-            .order('name');
+        console.log('Fetching restaurants for user:', user.id, 'is super admin:', isSuperAdmin);
 
-          if (restaurantError) {
-            throw restaurantError;
-          }
+        // Com as novas políticas RLS, podemos buscar diretamente
+        // A política já filtra baseado no papel do usuário
+        const { data, error: restaurantError } = await supabase
+          .from('restaurants')
+          .select('*')
+          .eq('is_active', true)
+          .order('name');
 
-          setRestaurants(data || []);
-          
-          // Se há apenas um restaurante, seleciona automaticamente
-          if (data && data.length === 1) {
-            setSelectedRestaurant(data[0]);
-          }
-        } else {
-          // Para outros usuários, buscar apenas restaurantes associados
-          const { data: userRestaurants, error: userRestaurantsError } = await supabase
-            .from('user_restaurants')
-            .select(`
-              restaurant:restaurants(*)
-            `)
-            .eq('user_id', user.id);
+        if (restaurantError) {
+          console.error('Error fetching restaurants:', restaurantError);
+          throw restaurantError;
+        }
 
-          if (userRestaurantsError) {
-            throw userRestaurantsError;
-          }
-
-          const restaurantData = userRestaurants?.map(ur => ur.restaurant).filter(Boolean) as Restaurant[] || [];
-          setRestaurants(restaurantData);
-          
-          // Se há apenas um restaurante, seleciona automaticamente
-          if (restaurantData && restaurantData.length === 1) {
-            setSelectedRestaurant(restaurantData[0]);
-          }
+        console.log('Fetched restaurants:', data?.length || 0);
+        setRestaurants(data || []);
+        
+        // Se há apenas um restaurante, seleciona automaticamente
+        if (data && data.length === 1) {
+          setSelectedRestaurant(data[0]);
         }
       } catch (err) {
         console.error('Error fetching user restaurants:', err);
@@ -109,4 +93,3 @@ export const useUserRestaurant = () => {
     hasMultipleRestaurants: restaurants.length > 1
   };
 };
-

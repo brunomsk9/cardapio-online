@@ -22,18 +22,27 @@ export const useUserRole = () => {
         setLoading(true);
         setError(null);
 
+        // Usando a nova função security definer
         const { data, error: roleError } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .maybeSingle();
+          .rpc('get_current_user_role');
 
         if (roleError) {
-          throw roleError;
-        }
+          console.error('Error fetching user role:', roleError);
+          // Se der erro, tenta buscar diretamente (fallback)
+          const { data: fallbackData, error: fallbackError } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', user.id)
+            .maybeSingle();
 
-        // Se não encontrou role, assume 'user' como padrão
-        setUserRole(data?.role || 'user');
+          if (fallbackError) {
+            throw fallbackError;
+          }
+
+          setUserRole(fallbackData?.role || 'user');
+        } else {
+          setUserRole(data || 'user');
+        }
       } catch (err) {
         console.error('Error fetching user role:', err);
         setError(err as Error);

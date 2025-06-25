@@ -29,19 +29,34 @@ const UsersManagement = () => {
 
   const fetchUsers = async () => {
     try {
+      console.log('Fetching users with new RLS policies...');
+      
+      // Com as novas políticas RLS, podemos buscar diretamente
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (profilesError) throw profilesError;
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw profilesError;
+      }
 
+      console.log('Fetched profiles:', profiles?.length || 0);
+
+      // Buscar roles - agora sem RLS na tabela user_roles
       const { data: userRoles, error: rolesError } = await supabase
         .from('user_roles')
         .select('*');
 
-      if (rolesError) throw rolesError;
+      if (rolesError) {
+        console.error('Error fetching user roles:', rolesError);
+        throw rolesError;
+      }
 
+      console.log('Fetched user roles:', userRoles?.length || 0);
+
+      // Buscar associações de restaurantes
       const { data: userRestaurants, error: userRestaurantsError } = await supabase
         .from('user_restaurants')
         .select(`
@@ -49,7 +64,12 @@ const UsersManagement = () => {
           restaurant:restaurants(name)
         `);
 
-      if (userRestaurantsError) throw userRestaurantsError;
+      if (userRestaurantsError) {
+        console.error('Error fetching user restaurants:', userRestaurantsError);
+        throw userRestaurantsError;
+      }
+
+      console.log('Fetched user restaurants:', userRestaurants?.length || 0);
 
       const usersWithRoles = profiles?.map(profile => ({
         ...profile,
@@ -59,6 +79,7 @@ const UsersManagement = () => {
 
       setUsers(usersWithRoles);
     } catch (error: any) {
+      console.error('Error in fetchUsers:', error);
       toast({
         title: "Erro ao carregar usuários",
         description: error.message,
@@ -71,6 +92,8 @@ const UsersManagement = () => {
 
   const updateUserRole = async (userId: string, newRole: 'user' | 'admin' | 'kitchen' | 'super_admin') => {
     try {
+      console.log('Updating user role:', userId, 'to', newRole);
+      
       if (!isSuperAdmin && newRole === 'super_admin') {
         toast({
           title: "Acesso negado",
@@ -99,11 +122,13 @@ const UsersManagement = () => {
         }
       }
 
+      // Remover role existente
       await supabase
         .from('user_roles')
         .delete()
         .eq('user_id', userId);
 
+      // Inserir nova role
       const { error } = await supabase
         .from('user_roles')
         .insert({ user_id: userId, role: newRole });
@@ -127,6 +152,7 @@ const UsersManagement = () => {
         description: "O papel do usuário foi atualizado com sucesso.",
       });
     } catch (error: any) {
+      console.error('Error updating user role:', error);
       toast({
         title: "Erro ao atualizar papel",
         description: error.message,
