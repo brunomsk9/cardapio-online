@@ -5,10 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { CartItem } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { User } from '@supabase/supabase-js';
+import { CreditCard, Smartphone, DollarSign } from 'lucide-react';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -25,6 +27,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
   const [customerEmail, setCustomerEmail] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [notes, setNotes] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('pix');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -69,7 +72,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
         total: totalPrice,
         notes: notes || null,
         status: 'pending',
-        payment_method: 'pix'
+        payment_method: paymentMethod
       };
 
       const { data, error } = await supabase
@@ -82,11 +85,19 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
 
       toast({
         title: "Pedido criado com sucesso!",
-        description: "Redirecionando para WhatsApp...",
+        description: `Redirecionando para ${getPaymentMethodLabel(paymentMethod)}...`,
       });
 
-      // Redirecionar para WhatsApp
-      redirectToWhatsApp(data, cart, totalPrice);
+      // Redirecionar baseado no método de pagamento
+      if (paymentMethod === 'whatsapp' || paymentMethod === 'pix') {
+        redirectToWhatsApp(data, cart, totalPrice);
+      } else {
+        // Para cartão de crédito, poderia integrar com gateway de pagamento
+        toast({
+          title: "Método de pagamento selecionado",
+          description: "Pedido será processado na entrega.",
+        });
+      }
       
       onClearCart();
       onClose();
@@ -99,6 +110,17 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
     } finally {
       setLoading(false);
     }
+  };
+
+  const getPaymentMethodLabel = (method: string) => {
+    const labels = {
+      pix: 'PIX',
+      credit_card: 'Cartão de Crédito',
+      debit_card: 'Cartão de Débito',
+      cash: 'Dinheiro',
+      whatsapp: 'WhatsApp'
+    };
+    return labels[method as keyof typeof labels] || method;
   };
 
   const redirectToWhatsApp = (order: any, items: CartItem[], total: number) => {
@@ -122,7 +144,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
       message += `\n📝 *Observações:* ${notes}\n`;
     }
     
-    message += `\n🔗 *Forma de Pagamento:* PIX\n`;
+    message += `\n💳 *Forma de Pagamento:* ${getPaymentMethodLabel(paymentMethod)}\n`;
     message += `\nObrigado pela preferência! 🙏`;
 
     const encodedMessage = encodeURIComponent(message);
@@ -183,6 +205,43 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
               required
             />
           </div>
+
+          <div>
+            <Label>Forma de Pagamento</Label>
+            <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="mt-2">
+              <div className="flex items-center space-x-2 p-3 border rounded-lg">
+                <RadioGroupItem value="pix" id="pix" />
+                <Label htmlFor="pix" className="flex items-center cursor-pointer">
+                  <Smartphone className="h-4 w-4 mr-2 text-green-600" />
+                  PIX (Instantâneo)
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2 p-3 border rounded-lg">
+                <RadioGroupItem value="credit_card" id="credit_card" />
+                <Label htmlFor="credit_card" className="flex items-center cursor-pointer">
+                  <CreditCard className="h-4 w-4 mr-2 text-blue-600" />
+                  Cartão de Crédito
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2 p-3 border rounded-lg">
+                <RadioGroupItem value="debit_card" id="debit_card" />
+                <Label htmlFor="debit_card" className="flex items-center cursor-pointer">
+                  <CreditCard className="h-4 w-4 mr-2 text-purple-600" />
+                  Cartão de Débito
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2 p-3 border rounded-lg">
+                <RadioGroupItem value="cash" id="cash" />
+                <Label htmlFor="cash" className="flex items-center cursor-pointer">
+                  <DollarSign className="h-4 w-4 mr-2 text-yellow-600" />
+                  Dinheiro (Na entrega)
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
           
           <div>
             <Label htmlFor="notes">Observações (opcional)</Label>
@@ -203,7 +262,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
             </div>
             
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Processando...' : 'Finalizar Pedido via WhatsApp'}
+              {loading ? 'Processando...' : 'Finalizar Pedido'}
             </Button>
           </div>
         </form>

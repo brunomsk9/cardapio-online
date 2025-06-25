@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import RestaurantsManagement from '@/components/admin/RestaurantsManagement';
@@ -9,6 +8,7 @@ import OrdersManagement from '@/components/admin/OrdersManagement';
 import SettingsManagement from '@/components/admin/SettingsManagement';
 import RestaurantUsersManagement from '@/components/admin/RestaurantUsersManagement';
 import RestaurantSettings from '@/components/admin/RestaurantSettings';
+import CustomersManagement from '@/components/admin/CustomersManagement';
 import { useUserRole } from '@/hooks/useUserRole';
 
 const Admin = () => {
@@ -26,6 +26,8 @@ const Admin = () => {
       case 'users':
         // Super admins veem todos os usuários, admins veem usuários do restaurante
         return isSuperAdmin ? <UsersManagement /> : <RestaurantUsersManagement />;
+      case 'customers':
+        return <CustomersManagement />;
       case 'profile':
         return <UserProfile />;
       case 'settings':

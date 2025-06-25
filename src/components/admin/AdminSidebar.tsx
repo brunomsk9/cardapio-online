@@ -21,6 +21,7 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
     { id: 'orders', label: 'Pedidos', icon: ShoppingBag },
     ...(isSuperAdmin ? [{ id: 'restaurants', label: 'Restaurantes', icon: Building2 }] : []),
     { id: 'users', label: 'Usuários', icon: Users },
+    { id: 'customers', label: 'Clientes', icon: UserCircle },
     { id: 'profile', label: 'Meu Perfil', icon: UserCircle },
     { id: 'settings', label: 'Configurações', icon: Settings },
   ];
