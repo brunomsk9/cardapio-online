@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +7,7 @@ import Index from "./pages/Index";
 import Kitchen from "./pages/Kitchen";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute"; // Importar o componente
 
 const queryClient = new QueryClient();
 
@@ -19,8 +19,17 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/kitchen" element={<Kitchen />} />
-          <Route path="/admin" element={<Admin />} />
+          
+          {/* Rota protegida para Kitchen */}
+          <Route element={<ProtectedRoute allowedRoles={["kitchen", "admin"]} />}>
+            <Route path="/kitchen" element={<Kitchen />} />
+          </Route>
+
+          {/* Rota protegida para Admin */}
+          <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+            <Route path="/admin" element={<Admin />} />
+          </Route>
+
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
@@ -30,3 +39,5 @@ const App = () => (
 );
 
 export default App;
+
+
