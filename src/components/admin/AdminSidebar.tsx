@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ChefHat, Users, ShoppingBag, UtensilsCrossed, Settings, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import RestaurantSelector from '@/components/RestaurantSelector';
 
 interface AdminSidebarProps {
   activeSection: string;
@@ -41,6 +42,12 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
             {isCollapsed ? <Menu className="h-4 w-4" /> : <X className="h-4 w-4" />}
           </Button>
         </div>
+        
+        {!isCollapsed && (
+          <div className="mt-4">
+            <RestaurantSelector />
+          </div>
+        )}
       </div>
       
       <nav className="p-4">

@@ -1,31 +1,42 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
 import { Database } from '@/integrations/supabase/types';
+import { toast } from '@/hooks/use-toast';
+import { useUserRestaurant } from './useUserRestaurant';
 
 type Order = Database['public']['Tables']['orders']['Row'];
 
 export const useKitchenOrders = () => {
+  const { selectedRestaurant } = useUserRestaurant();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchOrders();
-    setupRealtimeSubscription();
-  }, []);
-
   const fetchOrders = async () => {
+    if (!selectedRestaurant) {
+      setOrders([]);
+      setLoading(false);
+      return;
+    }
+
     try {
+      setLoading(true);
+      
+      // Por enquanto, buscamos todos os pedidos já que não temos ainda o campo restaurant_id
+      // TODO: Adicionar filtro por restaurant_id quando o campo for adicionado à tabela orders
       const { data, error } = await supabase
         .from('orders')
         .select('*')
-        .in('status', ['confirmed', 'preparing'])
-        .order('created_at', { ascending: true });
+        .in('status', ['pending', 'confirmed', 'preparing', 'ready'])
+        .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
+
       setOrders(data || []);
     } catch (error: any) {
+      console.error('Error fetching orders:', error);
       toast({
         title: "Erro ao carregar pedidos",
         description: error.message,
@@ -36,26 +47,9 @@ export const useKitchenOrders = () => {
     }
   };
 
-  const setupRealtimeSubscription = () => {
-    const channel = supabase
-      .channel('kitchen-orders')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'orders'
-        },
-        () => {
-          fetchOrders();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  };
+  useEffect(() => {
+    fetchOrders();
+  }, [selectedRestaurant]);
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
@@ -66,9 +60,13 @@ export const useKitchenOrders = () => {
 
       if (error) throw error;
 
+      setOrders(prev => prev.map(order => 
+        order.id === orderId ? { ...order, status: newStatus } : order
+      ));
+
       toast({
         title: "Status atualizado!",
-        description: `Pedido marcado como ${newStatus === 'preparing' ? 'em preparo' : 'pronto'}.`,
+        description: "O status do pedido foi atualizado com sucesso.",
       });
     } catch (error: any) {
       toast({

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -8,20 +7,30 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Clock, Phone, MapPin, User, DollarSign } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
+import { useUserRestaurant } from '@/hooks/useUserRestaurant';
 
 type Order = Database['public']['Tables']['orders']['Row'];
 
 const OrdersManagement = () => {
+  const { selectedRestaurant } = useUserRestaurant();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [selectedRestaurant]);
 
   const fetchOrders = async () => {
+    if (!selectedRestaurant) {
+      setOrders([]);
+      setLoading(false);
+      return;
+    }
+
     try {
+      // Por enquanto, buscamos todos os pedidos já que não temos ainda o campo restaurant_id
+      // TODO: Adicionar filtro por restaurant_id quando o campo for adicionado à tabela orders
       const { data, error } = await supabase
         .from('orders')
         .select('*')
@@ -89,6 +98,16 @@ const OrdersManagement = () => {
     ? orders 
     : orders.filter(order => order.status === statusFilter);
 
+  if (!selectedRestaurant) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500 text-lg">
+          Selecione um restaurante para visualizar os pedidos.
+        </p>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -100,7 +119,10 @@ const OrdersManagement = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-2xl font-bold">Gerenciar Pedidos</h3>
+        <div>
+          <h3 className="text-2xl font-bold">Gerenciar Pedidos</h3>
+          <p className="text-sm text-gray-600 mt-1">Restaurante: {selectedRestaurant.name}</p>
+        </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-48">
             <SelectValue placeholder="Filtrar por status" />
@@ -204,7 +226,7 @@ const OrdersManagement = () => {
       {filteredOrders.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500 text-lg">
-            Nenhum pedido encontrado.
+            Nenhum pedido encontrado para este restaurante.
           </p>
         </div>
       )}
