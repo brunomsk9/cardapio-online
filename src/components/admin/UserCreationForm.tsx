@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from '@/hooks/use-toast';
 import { UserPlus, X, AlertTriangle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { createUser } from '@/utils/userCreationUtils';
 
 interface UserCreationFormProps {
   isOpen: boolean;
@@ -29,52 +29,7 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
     setLoading(true);
 
     try {
-      console.log('Creating user with data:', { ...formData, password: '[HIDDEN]' });
-      
-      // 1. Criar usuário via signUp (sem especificar papel)
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            full_name: formData.fullName,
-            phone: formData.phone
-          },
-          emailRedirectTo: `${window.location.origin}/`
-        }
-      });
-
-      if (authError) {
-        console.error('Auth error:', authError);
-        throw authError;
-      }
-
-      if (!authData.user) {
-        throw new Error('Falha ao criar usuário');
-      }
-
-      console.log('User created successfully:', authData.user.id);
-
-      // 2. Aguardar um pouco para os triggers serem executados
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // 3. Atualizar perfil
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert({
-          id: authData.user.id,
-          full_name: formData.fullName,
-          phone: formData.phone
-        }, {
-          onConflict: 'id'
-        });
-
-      if (profileError) {
-        console.error('Error updating profile:', profileError);
-        throw new Error('Usuário criado, mas não foi possível atualizar o perfil');
-      } else {
-        console.log('Profile updated successfully');
-      }
+      await createUser(formData);
 
       toast({
         title: "Usuário criado com sucesso!",
