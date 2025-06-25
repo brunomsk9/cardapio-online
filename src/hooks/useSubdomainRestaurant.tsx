@@ -31,13 +31,11 @@ export const useSubdomainRestaurant = () => {
           return;
         }
 
-        // Verificar se é subdomínio de koombo.online
+        // Extrair subdomínio de qualquer um dos domínios suportados
         let subdomain = '';
-        if (hostname.endsWith('.koombo.online')) {
+        if (hostname.includes('.koombo.online')) {
           subdomain = hostname.replace('.koombo.online', '');
-        } 
-        // Verificar se é subdomínio de ko-ombo.online
-        else if (hostname.endsWith('.ko-ombo.online')) {
+        } else if (hostname.includes('.ko-ombo.online')) {
           subdomain = hostname.replace('.ko-ombo.online', '');
         }
 
@@ -51,7 +49,7 @@ export const useSubdomainRestaurant = () => {
           return;
         }
 
-        // Buscar restaurante pelo subdomínio
+        // Buscar restaurante pelo subdomínio (sem considerar o domínio principal)
         console.log('Searching for restaurant with subdomain:', subdomain);
         const { data, error: fetchError } = await supabase
           .from('restaurants')
