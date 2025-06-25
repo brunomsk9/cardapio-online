@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,10 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { User, Phone, Calendar, Shield, Building2, Link } from 'lucide-react';
+import { Users, Phone, Calendar, Shield, Building2, Link, Plus } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 import { useUserRole } from '@/hooks/useUserRole';
 import UserRestaurantAssignment from './UserRestaurantAssignment';
+import UserCreationForm from './UserCreationForm';
 
 type UserProfile = Database['public']['Tables']['profiles']['Row'] & {
   user_roles?: Array<{ role: string }>;
@@ -22,6 +24,7 @@ const UsersManagement = () => {
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [showAssignmentDialog, setShowAssignmentDialog] = useState(false);
+  const [showCreationForm, setShowCreationForm] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -31,7 +34,6 @@ const UsersManagement = () => {
     try {
       console.log('Fetching users with new RLS policies...');
       
-      // Com as novas políticas RLS, podemos buscar diretamente
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
@@ -44,7 +46,6 @@ const UsersManagement = () => {
 
       console.log('Fetched profiles:', profiles?.length || 0);
 
-      // Buscar roles - agora sem RLS na tabela user_roles
       const { data: userRoles, error: rolesError } = await supabase
         .from('user_roles')
         .select('*');
@@ -56,7 +57,6 @@ const UsersManagement = () => {
 
       console.log('Fetched user roles:', userRoles?.length || 0);
 
-      // Buscar associações de restaurantes
       const { data: userRestaurants, error: userRestaurantsError } = await supabase
         .from('user_restaurants')
         .select(`
@@ -103,7 +103,6 @@ const UsersManagement = () => {
         return;
       }
 
-      // Verificar se é mudança para kitchen e usuário tem múltiplos restaurantes
       if (newRole === 'kitchen') {
         const { data: userRestaurants, error: restaurantError } = await supabase
           .from('user_restaurants')
@@ -122,13 +121,11 @@ const UsersManagement = () => {
         }
       }
 
-      // Remover role existente
       await supabase
         .from('user_roles')
         .delete()
         .eq('user_id', userId);
 
-      // Inserir nova role
       const { error } = await supabase
         .from('user_roles')
         .insert({ user_id: userId, role: newRole });
@@ -197,7 +194,11 @@ const UsersManagement = () => {
   const handleCloseAssignment = () => {
     setShowAssignmentDialog(false);
     setSelectedUser(null);
-    fetchUsers(); // Refresh data
+    fetchUsers();
+  };
+
+  const handleUserCreated = () => {
+    fetchUsers();
   };
 
   if (loading) {
@@ -212,8 +213,17 @@ const UsersManagement = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-2xl font-bold">Gerenciar Usuários</h3>
-        <div className="text-sm text-gray-600">
-          Total: {users.length} usuários
+        <div className="flex items-center gap-4">
+          <div className="text-sm text-gray-600">
+            Total: {users.length} usuários
+          </div>
+          <Button
+            onClick={() => setShowCreationForm(true)}
+            className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Criar Usuário
+          </Button>
         </div>
       </div>
 
@@ -225,7 +235,7 @@ const UsersManagement = () => {
                 <div className="space-y-3 flex-1">
                   <div className="flex items-center space-x-3">
                     <div className="bg-orange-100 p-2 rounded-full">
-                      <User className="h-4 w-4 text-orange-600" />
+                      <Users className="h-4 w-4 text-orange-600" />
                     </div>
                     <div>
                       <h4 className="font-semibold">{user.full_name || 'Nome não informado'}</h4>
@@ -326,6 +336,12 @@ const UsersManagement = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <UserCreationForm 
+        isOpen={showCreationForm}
+        onClose={() => setShowCreationForm(false)}
+        onUserCreated={handleUserCreated}
+      />
     </div>
   );
 };
