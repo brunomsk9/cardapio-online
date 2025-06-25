@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -74,23 +73,66 @@ const OrdersManagement = () => {
     }
   };
 
-  const sendToWhatsApp = (order: Order) => {
-    const message = `🍽️ *Novo Pedido #${order.id.slice(0, 8)}*\n\n` +
-      `👤 *Cliente:* ${order.customer_name}\n` +
-      `📱 *Telefone:* ${order.customer_phone}\n` +
-      `📍 *Endereço:* ${order.delivery_address}\n\n` +
-      `🛒 *Itens:*\n` +
-      `${Array.isArray(order.items) ? order.items.map((item: any) => 
-        `• ${item.quantity}x ${item.name} - R$ ${(item.price * item.quantity).toFixed(2)}`
-      ).join('\n') : ''}\n\n` +
-      `💰 *Total:* R$ ${order.total.toFixed(2)}\n` +
-      `💳 *Pagamento:* ${order.payment_method.toUpperCase()}\n` +
-      `${order.notes ? `📝 *Observações:* ${order.notes}\n` : ''}\n` +
-      `⏰ *Pedido feito em:* ${new Date(order.created_at).toLocaleString('pt-BR')}`;
+  const sendOrderToCustomer = (order: Order) => {
+    const restaurantName = selectedRestaurant?.name || 'Sabor & Arte';
+    const cleanPhone = order.customer_phone.replace(/\D/g, '');
+    
+    let message = `🍽️ *${restaurantName}*\n\n`;
+    message += `Olá ${order.customer_name}! 👋\n\n`;
+    message += `Seu pedido foi recebido com sucesso!\n\n`;
+    message += `📋 *Detalhes do Pedido #${order.id.slice(0, 8)}*\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    
+    message += `🛒 *Seus Itens:*\n`;
+    if (Array.isArray(order.items)) {
+      order.items.forEach((item: any, index: number) => {
+        message += `${index + 1}. ${item.quantity}x ${item.name}\n`;
+        message += `   💰 R$ ${(item.price * item.quantity).toFixed(2)}\n\n`;
+      });
+    }
+    
+    message += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `💵 *Total: R$ ${order.total.toFixed(2)}*\n`;
+    message += `💳 *Pagamento:* ${getPaymentMethodLabel(order.payment_method)}\n\n`;
+    
+    message += `📍 *Endereço de Entrega:*\n${order.delivery_address}\n\n`;
+    
+    if (order.notes) {
+      message += `📝 *Suas Observações:*\n${order.notes}\n\n`;
+    }
+    
+    message += `⏰ *Status Atual:* ${getStatusLabel(order.status)}\n`;
+    message += `📅 *Pedido feito em:* ${new Date(order.created_at).toLocaleString('pt-BR')}\n\n`;
+    
+    message += `🚀 *Acompanhe seu pedido:*\n`;
+    message += `• Pedido confirmado ✅\n`;
+    message += `• Em preparação 👨‍🍳\n`;
+    message += `• Pronto para entrega 📦\n`;
+    message += `• A caminho 🚚\n\n`;
+    
+    message += `Em breve entraremos em contato para confirmar a entrega!\n\n`;
+    message += `Obrigado pela preferência! 🙏❤️`;
 
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${order.customer_phone.replace(/\D/g, '')}?text=${encodedMessage}`;
+    const whatsappUrl = `https://wa.me/55${cleanPhone}?text=${encodedMessage}`;
+    
     window.open(whatsappUrl, '_blank');
+    
+    toast({
+      title: "WhatsApp aberto!",
+      description: `Mensagem preparada para ${order.customer_name}`,
+    });
+  };
+
+  const getPaymentMethodLabel = (method: string) => {
+    const labels = {
+      pix: 'PIX',
+      credit_card: 'Cartão de Crédito',
+      debit_card: 'Cartão de Débito',
+      cash: 'Dinheiro',
+      whatsapp: 'WhatsApp'
+    };
+    return labels[method as keyof typeof labels] || method;
   };
 
   const getStatusBadge = (status: string) => {
@@ -311,13 +353,13 @@ const OrdersManagement = () => {
               <div className="flex gap-2 pt-2">
                 {getActionButtons(order)}
                 <Button
-                  onClick={() => sendToWhatsApp(order)}
+                  onClick={() => sendOrderToCustomer(order)}
                   variant="outline"
                   size="sm"
                   className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
                 >
                   <MessageSquare className="h-4 w-4 mr-2" />
-                  WhatsApp
+                  Enviar ao Cliente
                 </Button>
               </div>
             </CardContent>
