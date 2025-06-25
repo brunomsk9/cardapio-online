@@ -9,7 +9,7 @@ interface WhatsAppMessageFormProps {
   saving: boolean;
   onMessageChange: (value: string) => void;
   onResetMessage: () => void;
-  onSubmit: () => void;
+  onSubmit: (e: React.FormEvent) => void;
 }
 
 const WhatsAppMessageForm = ({ 
