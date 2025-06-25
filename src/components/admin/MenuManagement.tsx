@@ -1,14 +1,14 @@
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogTrigger } from '@/components/ui/dialog';
-import { Plus } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useMenuItems } from '@/hooks/useMenuItems';
 import { useUserRestaurant } from '@/hooks/useUserRestaurant';
 import MenuItemForm from './MenuItemForm';
-import MenuItemCard from './MenuItemCard';
 import MenuEmptyState from './MenuEmptyState';
+import MenuHeader from './menu/MenuHeader';
+import MenuCategories from './menu/MenuCategories';
+import MenuEmptyMessage from './menu/MenuEmptyMessage';
+import MenuLoadingState from './menu/MenuLoadingState';
 
 interface MenuItem {
   id: string;
@@ -45,7 +45,6 @@ const MenuManagement = () => {
   const handleSubmit = async (data: MenuItemFormData) => {
     try {
       if (editingItem) {
-        // Atualizar item existente
         await updateMenuItem(editingItem.id, {
           name: data.name,
           description: data.description,
@@ -59,7 +58,6 @@ const MenuManagement = () => {
           description: "O item do cardápio foi atualizado com sucesso.",
         });
       } else {
-        // Criar novo item
         await createMenuItem({
           name: data.name,
           description: data.description,
@@ -140,50 +138,22 @@ const MenuManagement = () => {
   };
 
   if (!selectedRestaurant) {
-    return (
-      <div className="space-y-6">
-        <div className="text-center py-8">
-          <h3 className="text-2xl font-bold mb-4">Gerenciar Cardápio</h3>
-          <p className="text-gray-600">
-            Selecione um restaurante para gerenciar o cardápio.
-          </p>
-        </div>
-      </div>
-    );
+    return <MenuEmptyMessage />;
   }
 
   if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h3 className="text-2xl font-bold">Gerenciar Cardápio</h3>
-        </div>
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
-          <p className="ml-4 text-gray-600">Carregando cardápio...</p>
-        </div>
-      </div>
-    );
+    return <MenuLoadingState />;
   }
 
   const categories = [...new Set(menuItems.map(item => item.category))];
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h3 className="text-2xl font-bold">Gerenciar Cardápio</h3>
-          <p className="text-gray-600">Restaurante: {selectedRestaurant.name}</p>
-        </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-orange-500 to-orange-600">
-              <Plus className="h-4 w-4 mr-2" />
-              Novo Item
-            </Button>
-          </DialogTrigger>
-        </Dialog>
-      </div>
+      <MenuHeader 
+        restaurantName={selectedRestaurant.name}
+        isDialogOpen={isDialogOpen}
+        onDialogChange={setIsDialogOpen}
+      />
 
       <MenuItemForm
         isOpen={isDialogOpen}
@@ -193,26 +163,13 @@ const MenuManagement = () => {
       />
 
       {categories.length > 0 ? (
-        <div className="space-y-6">
-          {categories.map(category => (
-            <div key={category}>
-              <h4 className="text-lg font-semibold mb-4">{category}</h4>
-              <div className="grid gap-4">
-                {menuItems
-                  .filter(item => item.category === category)
-                  .map(item => (
-                    <MenuItemCard
-                      key={item.id}
-                      item={item}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
-                      onToggleAvailability={handleToggleAvailability}
-                    />
-                  ))}
-              </div>
-            </div>
-          ))}
-        </div>
+        <MenuCategories
+          categories={categories}
+          menuItems={menuItems}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onToggleAvailability={handleToggleAvailability}
+        />
       ) : (
         <MenuEmptyState onCreateFirst={handleOpenNewItemDialog} />
       )}
