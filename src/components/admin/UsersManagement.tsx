@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -32,31 +31,45 @@ const UsersManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      console.log('Fetching users with new RLS policies...');
+      console.log('Iniciando busca de usuários...');
+      setLoading(true);
       
+      // Buscar todos os perfis de usuários
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-        throw profilesError;
+        console.error('Erro ao buscar perfis:', profilesError);
+        toast({
+          title: "Erro ao carregar perfis",
+          description: profilesError.message,
+          variant: "destructive",
+        });
+        return;
       }
 
-      console.log('Fetched profiles:', profiles?.length || 0);
+      console.log('Perfis encontrados:', profiles?.length || 0, profiles);
 
+      // Buscar papéis dos usuários
       const { data: userRoles, error: rolesError } = await supabase
         .from('user_roles')
         .select('*');
 
       if (rolesError) {
-        console.error('Error fetching user roles:', rolesError);
-        throw rolesError;
+        console.error('Erro ao buscar papéis:', rolesError);
+        toast({
+          title: "Erro ao carregar papéis",
+          description: rolesError.message,
+          variant: "destructive",
+        });
+        return;
       }
 
-      console.log('Fetched user roles:', userRoles?.length || 0);
+      console.log('Papéis encontrados:', userRoles?.length || 0, userRoles);
 
+      // Buscar associações usuário-restaurante
       const { data: userRestaurants, error: userRestaurantsError } = await supabase
         .from('user_restaurants')
         .select(`
@@ -65,24 +78,42 @@ const UsersManagement = () => {
         `);
 
       if (userRestaurantsError) {
-        console.error('Error fetching user restaurants:', userRestaurantsError);
-        throw userRestaurantsError;
+        console.error('Erro ao buscar associações usuário-restaurante:', userRestaurantsError);
+        console.log('Continuando sem as associações de restaurantes...');
       }
 
-      console.log('Fetched user restaurants:', userRestaurants?.length || 0);
+      console.log('Associações usuário-restaurante encontradas:', userRestaurants?.length || 0, userRestaurants);
 
+      // Combinar dados
       const usersWithRoles = profiles?.map(profile => ({
         ...profile,
         user_roles: userRoles?.filter(role => role.user_id === profile.id).map(role => ({ role: role.role })) || [],
         user_restaurants: userRestaurants?.filter(ur => ur.user_id === profile.id) || []
       })) || [];
 
+      console.log('Usuários processados:', usersWithRoles.length, usersWithRoles);
       setUsers(usersWithRoles);
+
+      if (usersWithRoles.length === 0) {
+        console.log('Nenhum usuário encontrado. Verificando se há dados nas tabelas...');
+        
+        // Verificar se há dados nas tabelas
+        const { count: profilesCount } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true });
+          
+        const { count: rolesCount } = await supabase
+          .from('user_roles')
+          .select('*', { count: 'exact', head: true });
+          
+        console.log('Contadores - Perfis:', profilesCount, 'Papéis:', rolesCount);
+      }
+
     } catch (error: any) {
-      console.error('Error in fetchUsers:', error);
+      console.error('Erro geral na busca de usuários:', error);
       toast({
         title: "Erro ao carregar usuários",
-        description: error.message,
+        description: "Ocorreu um erro inesperado ao carregar os usuários.",
         variant: "destructive",
       });
     } finally {
@@ -227,6 +258,14 @@ const UsersManagement = () => {
         </div>
       </div>
 
+      {/* Debug info - temporário */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
+        <p><strong>Debug Info:</strong></p>
+        <p>Usuários carregados: {users.length}</p>
+        <p>Loading: {loading.toString()}</p>
+        <p>Super Admin: {isSuperAdmin.toString()}</p>
+      </div>
+
       <div className="grid gap-4">
         {users.map((user) => (
           <Card key={user.id}>
@@ -314,6 +353,9 @@ const UsersManagement = () => {
         <div className="text-center py-12">
           <p className="text-gray-500 text-lg">
             Nenhum usuário encontrado.
+          </p>
+          <p className="text-sm text-gray-400 mt-2">
+            Verifique os logs do console para mais detalhes.
           </p>
         </div>
       )}
