@@ -10,6 +10,8 @@ import AuthModal from '@/components/auth/AuthModal';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useSubdomainRestaurant } from '@/hooks/useSubdomainRestaurant';
+import { useRestaurantMenu } from '@/hooks/useRestaurantMenu';
 import { mockMenuItems } from '@/data/mockData';
 import { toast } from '@/hooks/use-toast';
 
@@ -19,6 +21,8 @@ const Index = () => {
   const [activeCategory, setActiveCategory] = useState('all');
   const { user, loading: authLoading, signOut } = useAuth();
   const { isAdmin, isKitchen, loading: roleLoading } = useUserRole();
+  const { restaurant, loading: restaurantLoading, error: restaurantError, isMainDomain } = useSubdomainRestaurant();
+  const { menuItems: restaurantMenuItems, loading: menuLoading } = useRestaurantMenu(restaurant);
   const navigate = useNavigate();
 
   const {
@@ -86,12 +90,15 @@ const Index = () => {
     { key: 'sobremesa', label: 'Sobremesas' }
   ];
 
-  const filteredItems = activeCategory === 'all'
-    ? mockMenuItems
-    : mockMenuItems.filter(item => item.category === activeCategory);
+  // Determinar quais itens do menu usar
+  const menuItems = isMainDomain ? mockMenuItems : restaurantMenuItems;
 
-  // Mostrar loading apenas se estiver carregando auth
-  if (authLoading) {
+  const filteredItems = activeCategory === 'all'
+    ? menuItems
+    : menuItems.filter(item => item.category === activeCategory);
+
+  // Mostrar loading se estiver carregando dados críticos
+  if (authLoading || restaurantLoading || (restaurant && menuLoading)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -101,6 +108,27 @@ const Index = () => {
       </div>
     );
   }
+
+  // Mostrar erro se houver problema ao carregar restaurante
+  if (restaurantError) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Restaurante não encontrado</h2>
+          <p className="text-gray-600 mb-4">{restaurantError.message}</p>
+          <p className="text-sm text-gray-500">
+            Verifique se o endereço está correto ou entre em contato conosco.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Título e descrição baseados no contexto
+  const pageTitle = restaurant ? restaurant.name : 'Sabor & Arte';
+  const pageDescription = restaurant 
+    ? (restaurant.description || `Descubra os deliciosos pratos do ${restaurant.name}`)
+    : 'Descubra os melhores sabores da nossa cozinha.';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -117,10 +145,10 @@ const Index = () => {
       <section className="bg-orange-100 py-16">
         <div className="container mx-auto text-center">
           <h2 className="text-4xl font-bold text-orange-700 mb-4">
-            Bem-vindo ao Sabor & Arte!
+            Bem-vindo ao {pageTitle}!
           </h2>
           <p className="text-lg text-gray-700">
-            Descubra os melhores sabores da nossa cozinha.
+            {pageDescription}
           </p>
         </div>
       </section>
@@ -132,15 +160,26 @@ const Index = () => {
           onCategoryChange={setActiveCategory}
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredItems.map(item => (
-            <MenuCard
-              key={item.id}
-              item={item}
-              onAddToCart={() => addToCart(item)}
-            />
-          ))}
-        </div>
+        {filteredItems.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filteredItems.map(item => (
+              <MenuCard
+                key={item.id}
+                item={item}
+                onAddToCart={() => addToCart(item)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">
+              {restaurant 
+                ? `${restaurant.name} ainda não possui itens no cardápio.`
+                : 'Nenhum item encontrado nesta categoria.'
+              }
+            </p>
+          </div>
+        )}
       </section>
 
       {showCart && (
