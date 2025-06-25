@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -78,30 +77,49 @@ const OrdersManagement = () => {
     const restaurantName = selectedRestaurant?.name || 'Sabor & Arte';
     const cleanPhone = order.customer_phone.replace(/\D/g, '');
     
-    // Buscar configurações do restaurante para usar mensagem personalizada
-    // Por enquanto, usar a mensagem padrão
-    let message = `🍽️ *NOVO PEDIDO - ${restaurantName}*\n\n`;
-    message += `📋 *Pedido:* ${order.id}\n`;
-    message += `👤 *Cliente:* ${order.customer_name}\n`;
-    message += `📱 *Telefone:* ${order.customer_phone}\n`;
-    message += `📧 *Email:* ${order.customer_email}\n`;
-    message += `📍 *Endereço:* ${order.delivery_address}\n\n`;
+    // Use the restaurant's custom WhatsApp message or fallback to default
+    let message = selectedRestaurant?.whatsapp_message || `🍽️ *NOVO PEDIDO - {restaurant_name}*
+
+📋 *Pedido:* {order_id}
+👤 *Cliente:* {customer_name}
+📱 *Telefone:* {customer_phone}
+📧 *Email:* {customer_email}
+📍 *Endereço:* {delivery_address}
+
+🛒 *Itens do Pedido:*
+{order_items}
+
+💰 *Total: R$ {total}*
+
+💳 *Forma de Pagamento:* {payment_method}
+
+{notes}
+
+Obrigado pela preferência! 🙏`;
+
+    // Replace placeholders with actual order data
+    message = message
+      .replace('{restaurant_name}', restaurantName)
+      .replace('{order_id}', order.id)
+      .replace('{customer_name}', order.customer_name)
+      .replace('{customer_phone}', order.customer_phone)
+      .replace('{customer_email}', order.customer_email || '')
+      .replace('{delivery_address}', order.delivery_address)
+      .replace('{total}', order.total.toFixed(2))
+      .replace('{payment_method}', getPaymentMethodLabel(order.payment_method));
     
-    message += `🛒 *Itens do Pedido:*\n`;
+    // Replace order items
+    let itemsText = '';
     if (Array.isArray(order.items)) {
-      order.items.forEach((item: any, index: number) => {
-        message += `• ${item.quantity}x ${item.name} - R$ ${(item.price * item.quantity).toFixed(2)}\n`;
+      order.items.forEach((item: any) => {
+        itemsText += `• ${item.quantity}x ${item.name} - R$ ${(item.price * item.quantity).toFixed(2)}\n`;
       });
     }
+    message = message.replace('{order_items}', itemsText);
     
-    message += `\n💰 *Total: R$ ${order.total.toFixed(2)}*\n\n`;
-    message += `💳 *Forma de Pagamento:* ${getPaymentMethodLabel(order.payment_method)}\n\n`;
-    
-    if (order.notes) {
-      message += `📝 *Observações:* ${order.notes}\n\n`;
-    }
-    
-    message += `Obrigado pela preferência! 🙏`;
+    // Replace notes
+    const notesText = order.notes ? `📝 *Observações:* ${order.notes}` : '';
+    message = message.replace('{notes}', notesText);
 
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/55${cleanPhone}?text=${encodedMessage}`;
