@@ -1,12 +1,15 @@
 
 export interface MenuItem {
   id: string;
+  restaurant_id: string;
   name: string;
-  description: string;
+  description: string | null;
   price: number;
-  category: 'entrada' | 'principal' | 'bebida' | 'sobremesa';
-  image: string;
+  category: string;
+  image_url: string | null;
   available: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CartItem extends MenuItem {

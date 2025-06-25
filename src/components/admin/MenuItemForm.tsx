@@ -12,11 +12,11 @@ import { Textarea } from '@/components/ui/textarea';
 interface MenuItem {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   price: number;
   category: string;
   available: boolean;
-  image_url?: string;
+  image_url?: string | null;
 }
 
 const menuItemSchema = z.object({
@@ -52,7 +52,7 @@ const MenuItemForm = ({ isOpen, onClose, onSubmit, editingItem }: MenuItemFormPr
     if (editingItem) {
       form.reset({
         name: editingItem.name,
-        description: editingItem.description,
+        description: editingItem.description || '',
         price: editingItem.price,
         category: editingItem.category,
         image_url: editingItem.image_url || ''

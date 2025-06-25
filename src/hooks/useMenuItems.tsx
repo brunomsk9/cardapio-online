@@ -36,13 +36,12 @@ export const useMenuItems = () => {
 
       console.log('Fetching menu items for restaurant:', selectedRestaurant.id);
 
-      // Use explicit typing to handle the query result properly
       const { data, error: fetchError } = await supabase
-        .from('menu_items' as any)
+        .from('menu_items')
         .select('*')
         .eq('restaurant_id', selectedRestaurant.id)
         .order('category')
-        .order('name') as { data: MenuItem[] | null; error: any };
+        .order('name');
 
       if (fetchError) {
         console.error('Error fetching menu items:', fetchError);
@@ -71,13 +70,13 @@ export const useMenuItems = () => {
 
     try {
       const { data, error } = await supabase
-        .from('menu_items' as any)
+        .from('menu_items')
         .insert({
           ...itemData,
           restaurant_id: selectedRestaurant.id
         })
         .select()
-        .single() as { data: MenuItem | null; error: any };
+        .single();
 
       if (error) throw error;
 
@@ -94,14 +93,14 @@ export const useMenuItems = () => {
   const updateMenuItem = async (id: string, updates: Partial<Omit<MenuItem, 'id' | 'restaurant_id' | 'created_at'>>) => {
     try {
       const { data, error } = await supabase
-        .from('menu_items' as any)
+        .from('menu_items')
         .update({
           ...updates,
           updated_at: new Date().toISOString()
         })
         .eq('id', id)
         .select()
-        .single() as { data: MenuItem | null; error: any };
+        .single();
 
       if (error) throw error;
 
@@ -120,7 +119,7 @@ export const useMenuItems = () => {
   const deleteMenuItem = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('menu_items' as any)
+        .from('menu_items')
         .delete()
         .eq('id', id);
 
