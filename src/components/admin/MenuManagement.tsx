@@ -57,7 +57,14 @@ const MenuManagement = () => {
         // Atualizar item existente
         setMenuItems(items => items.map(item => 
           item.id === editingItem.id 
-            ? { ...item, ...data }
+            ? { 
+                ...item, 
+                name: data.name,
+                description: data.description,
+                price: data.price,
+                category: data.category,
+                image_url: data.image_url || undefined
+              }
             : item
         ));
         toast({
@@ -68,8 +75,12 @@ const MenuManagement = () => {
         // Criar novo item
         const newItem: MenuItem = {
           id: Date.now().toString(),
-          ...data,
-          available: true
+          name: data.name,
+          description: data.description,
+          price: data.price,
+          category: data.category,
+          available: true,
+          image_url: data.image_url || undefined
         };
         setMenuItems(items => [...items, newItem]);
         toast({
