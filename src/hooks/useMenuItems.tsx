@@ -36,13 +36,13 @@ export const useMenuItems = () => {
 
       console.log('Fetching menu items for restaurant:', selectedRestaurant.id);
 
-      // Use rpc call or direct query with any type casting to bypass type issues
+      // Use explicit typing to handle the query result properly
       const { data, error: fetchError } = await supabase
         .from('menu_items' as any)
         .select('*')
         .eq('restaurant_id', selectedRestaurant.id)
         .order('category')
-        .order('name');
+        .order('name') as { data: MenuItem[] | null; error: any };
 
       if (fetchError) {
         console.error('Error fetching menu items:', fetchError);
@@ -77,11 +77,13 @@ export const useMenuItems = () => {
           restaurant_id: selectedRestaurant.id
         })
         .select()
-        .single();
+        .single() as { data: MenuItem | null; error: any };
 
       if (error) throw error;
 
-      setMenuItems(prev => [...prev, data]);
+      if (data) {
+        setMenuItems(prev => [...prev, data]);
+      }
       return data;
     } catch (error) {
       console.error('Error creating menu item:', error);
@@ -99,13 +101,15 @@ export const useMenuItems = () => {
         })
         .eq('id', id)
         .select()
-        .single();
+        .single() as { data: MenuItem | null; error: any };
 
       if (error) throw error;
 
-      setMenuItems(prev => prev.map(item => 
-        item.id === id ? data : item
-      ));
+      if (data) {
+        setMenuItems(prev => prev.map(item => 
+          item.id === id ? data : item
+        ));
+      }
       return data;
     } catch (error) {
       console.error('Error updating menu item:', error);
