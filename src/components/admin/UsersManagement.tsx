@@ -42,8 +42,12 @@ const UsersManagement = () => {
 
       if (authError) {
         console.error('Erro ao buscar usuários auth:', authError);
-        // Fallback: tentar buscar diretamente da tabela profiles
-        return await fetchUsers();
+        toast({
+          title: "Erro na sincronização",
+          description: "Não foi possível acessar os usuários da tabela de autenticação.",
+          variant: "destructive",
+        });
+        return;
       }
 
       console.log('Usuários auth encontrados:', authUsers?.length || 0);
@@ -76,6 +80,11 @@ const UsersManagement = () => {
 
         if (insertError) {
           console.error('Erro ao criar perfis:', insertError);
+          toast({
+            title: "Erro na sincronização",  
+            description: "Alguns perfis não puderam ser criados.",
+            variant: "destructive",
+          });
         } else {
           console.log('Perfis criados com sucesso:', profilesToCreate.length);
         }
@@ -122,7 +131,7 @@ const UsersManagement = () => {
         return;
       }
 
-      console.log('Perfis encontrados:', profiles?.length || 0, profiles);
+      console.log('Perfis encontrados:', profiles?.length || 0);
 
       // Buscar papéis dos usuários
       const { data: userRoles, error: rolesError } = await supabase
@@ -139,7 +148,7 @@ const UsersManagement = () => {
         return;
       }
 
-      console.log('Papéis encontrados:', userRoles?.length || 0, userRoles);
+      console.log('Papéis encontrados:', userRoles?.length || 0);
 
       // Buscar associações usuário-restaurante
       const { data: userRestaurants, error: userRestaurantsError } = await supabase
@@ -154,7 +163,7 @@ const UsersManagement = () => {
         console.log('Continuando sem as associações de restaurantes...');
       }
 
-      console.log('Associações usuário-restaurante encontradas:', userRestaurants?.length || 0, userRestaurants);
+      console.log('Associações usuário-restaurante encontradas:', userRestaurants?.length || 0);
 
       // Buscar emails dos usuários via RPC
       const { data: userEmails, error: emailsError } = await supabase
@@ -164,6 +173,8 @@ const UsersManagement = () => {
         console.error('Erro ao buscar emails:', emailsError);
       }
 
+      console.log('Emails encontrados:', userEmails?.length || 0);
+
       // Combinar dados
       const usersWithRoles = profiles?.map(profile => ({
         ...profile,
@@ -172,23 +183,8 @@ const UsersManagement = () => {
         email: userEmails?.find(email => email.user_id === profile.id)?.email || null
       })) || [];
 
-      console.log('Usuários processados:', usersWithRoles.length, usersWithRoles);
+      console.log('Usuários processados:', usersWithRoles.length);
       setUsers(usersWithRoles);
-
-      if (usersWithRoles.length === 0) {
-        console.log('Nenhum usuário encontrado. Verificando se há dados nas tabelas...');
-        
-        // Verificar se há dados nas tabelas
-        const { count: profilesCount } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true });
-          
-        const { count: rolesCount } = await supabase
-          .from('user_roles')
-          .select('*', { count: 'exact', head: true });
-          
-        console.log('Contadores - Perfis:', profilesCount, 'Papéis:', rolesCount);
-      }
 
     } catch (error: any) {
       console.error('Erro geral na busca de usuários:', error);
@@ -346,15 +342,6 @@ const UsersManagement = () => {
             Criar Usuário
           </Button>
         </div>
-      </div>
-
-      {/* Debug info - temporário */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
-        <p><strong>Debug Info:</strong></p>
-        <p>Usuários carregados: {users.length}</p>
-        <p>Loading: {loading.toString()}</p>
-        <p>Super Admin: {isSuperAdmin.toString()}</p>
-        <p>Syncing: {syncing.toString()}</p>
       </div>
 
       <div className="grid gap-4">

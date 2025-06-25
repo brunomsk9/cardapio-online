@@ -316,9 +316,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_all_users_profiles: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          email: string
+          created_at: string
+        }[]
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_users_emails: {
+        Args: { user_ids: string[] }
+        Returns: {
+          user_id: string
+          email: string
+        }[]
       }
       has_role: {
         Args:
