@@ -31,6 +31,8 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
     setLoading(true);
 
     try {
+      console.log('Creating user with data:', { ...formData, password: '[HIDDEN]' });
+      
       // Criar usuário usando signUp normal
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
@@ -45,6 +47,7 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
       });
 
       if (authError) {
+        console.error('Auth error:', authError);
         throw authError;
       }
 
@@ -52,43 +55,86 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
         throw new Error('Falha ao criar usuário');
       }
 
+      console.log('User created successfully:', authData.user.id);
+
       // Aguardar um pouco para garantir que o usuário foi criado
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Criar perfil do usuário
-      const { error: profileError } = await supabase
+      // Criar perfil do usuário (só se não existir)
+      const { data: existingProfile, error: profileCheckError } = await supabase
         .from('profiles')
-        .insert({
-          id: authData.user.id,
-          full_name: formData.fullName,
-          phone: formData.phone
-        });
+        .select('id')
+        .eq('id', authData.user.id)
+        .single();
 
-      if (profileError) {
-        console.error('Error creating profile:', profileError);
-        // Não bloqueia o fluxo, pois o perfil pode ser criado pelo trigger
+      if (profileCheckError && profileCheckError.code !== 'PGRST116') {
+        console.error('Error checking profile existence:', profileCheckError);
       }
 
-      // Atribuir papel se não for 'user' (padrão)
-      if (formData.role !== 'user') {
-        // Primeiro, remover papel padrão se existir
-        await supabase
-          .from('user_roles')
-          .delete()
-          .eq('user_id', authData.user.id);
-
-        // Inserir novo papel
-        const { error: roleError } = await supabase
-          .from('user_roles')
+      if (!existingProfile) {
+        const { error: profileError } = await supabase
+          .from('profiles')
           .insert({
-            user_id: authData.user.id,
-            role: formData.role
+            id: authData.user.id,
+            full_name: formData.fullName,
+            phone: formData.phone
           });
 
-        if (roleError) {
-          console.error('Error assigning role:', roleError);
-          // Continua mesmo com erro de papel, pois o usuário foi criado
+        if (profileError) {
+          console.error('Error creating profile:', profileError);
+        } else {
+          console.log('Profile created successfully');
         }
+      } else {
+        console.log('Profile already exists');
+      }
+
+      // Verificar se já existe papel para o usuário
+      const { data: existingRole, error: roleCheckError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', authData.user.id)
+        .single();
+
+      if (roleCheckError && roleCheckError.code !== 'PGRST116') {
+        console.error('Error checking existing role:', roleCheckError);
+      }
+
+      // Só inserir papel se não existir ou se for diferente do desejado
+      if (!existingRole || existingRole.role !== formData.role) {
+        // Se existe um papel diferente, remover primeiro
+        if (existingRole) {
+          const { error: deleteError } = await supabase
+            .from('user_roles')
+            .delete()
+            .eq('user_id', authData.user.id)
+            .eq('role', existingRole.role);
+
+          if (deleteError) {
+            console.error('Error removing existing role:', deleteError);
+          } else {
+            console.log('Removed existing role:', existingRole.role);
+          }
+        }
+
+        // Inserir novo papel (só se não for 'user', que é o padrão)
+        if (formData.role !== 'user') {
+          const { error: roleError } = await supabase
+            .from('user_roles')
+            .insert({
+              user_id: authData.user.id,
+              role: formData.role
+            });
+
+          if (roleError) {
+            console.error('Error assigning role:', roleError);
+            // Não bloqueia o fluxo, pois o usuário foi criado
+          } else {
+            console.log('Role assigned successfully:', formData.role);
+          }
+        }
+      } else {
+        console.log('User already has the correct role');
       }
 
       toast({
@@ -118,6 +164,8 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
         errorMessage = 'A senha deve ter pelo menos 6 caracteres.';
       } else if (error.message?.includes('Invalid email')) {
         errorMessage = 'Por favor, insira um email válido.';
+      } else if (error.message?.includes('duplicate key value')) {
+        errorMessage = 'Erro interno: dados duplicados no sistema. Tente novamente.';
       }
       
       toast({
