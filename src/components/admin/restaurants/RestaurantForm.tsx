@@ -1,31 +1,31 @@
 
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import { Database } from '@/integrations/supabase/types';
+import { restaurantSchema, RestaurantFormData } from './restaurantSchema';
 import RestaurantFormFields from './RestaurantFormFields';
+import RestaurantFormActions from './RestaurantFormActions';
 
-type Restaurant = Database['public']['Tables']['restaurants']['Row'];
-
-const restaurantSchema = z.object({
-  name: z.string().min(1, 'Nome é obrigatório'),
-  description: z.string().optional(),
-  address: z.string().optional(),
-  phone: z.string().optional(),
-  email: z.string().email('Email inválido').optional().or(z.literal('')),
-  logo_url: z.string().url('URL inválida').optional().or(z.literal('')),
-  subdomain: z.string().min(1, 'Subdomínio é obrigatório').regex(/^[a-z0-9-]+$/, 'Apenas letras minúsculas, números e hífens são permitidos')
-});
-
-type RestaurantFormData = z.infer<typeof restaurantSchema>;
+interface Restaurant {
+  id: string;
+  name: string;
+  description: string | null;
+  address: string | null;
+  phone: string | null;
+  email: string | null;
+  logo_url: string | null;
+  subdomain: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
 
 interface RestaurantFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: RestaurantFormData) => Promise<void>;
+  onSubmit: (data: RestaurantFormData) => void;
   editingRestaurant: Restaurant | null;
 }
 
@@ -43,8 +43,32 @@ const RestaurantForm = ({ isOpen, onClose, onSubmit, editingRestaurant }: Restau
     }
   });
 
-  const handleFormSubmit = async (data: RestaurantFormData) => {
-    await onSubmit(data);
+  React.useEffect(() => {
+    if (editingRestaurant) {
+      form.reset({
+        name: editingRestaurant.name,
+        description: editingRestaurant.description || '',
+        address: editingRestaurant.address || '',
+        phone: editingRestaurant.phone || '',
+        email: editingRestaurant.email || '',
+        logo_url: editingRestaurant.logo_url || '',
+        subdomain: editingRestaurant.subdomain || ''
+      });
+    } else {
+      form.reset({
+        name: '',
+        description: '',
+        address: '',
+        phone: '',
+        email: '',
+        logo_url: '',
+        subdomain: ''
+      });
+    }
+  }, [editingRestaurant, form]);
+
+  const handleSubmit = (data: RestaurantFormData) => {
+    onSubmit(data);
     form.reset();
   };
 
@@ -56,20 +80,16 @@ const RestaurantForm = ({ isOpen, onClose, onSubmit, editingRestaurant }: Restau
             {editingRestaurant ? 'Editar Restaurante' : 'Novo Restaurante'}
           </DialogTitle>
           <DialogDescription>
-            Preencha as informações do restaurante abaixo.
+            Preencha as informações do restaurante.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
-            <RestaurantFormFields form={form} />
-            <div className="flex gap-2 pt-4">
-              <Button type="submit" className="bg-green-500 hover:bg-green-600">
-                {editingRestaurant ? 'Atualizar' : 'Criar'} Restaurante
-              </Button>
-              <Button type="button" variant="outline" onClick={onClose}>
-                Cancelar
-              </Button>
-            </div>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <RestaurantFormFields control={form.control} />
+            <RestaurantFormActions 
+              isEditing={!!editingRestaurant} 
+              onCancel={onClose} 
+            />
           </form>
         </Form>
       </DialogContent>
