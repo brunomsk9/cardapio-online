@@ -151,6 +151,7 @@ export type Database = {
           items: Json
           notes: string | null
           payment_method: string
+          restaurant_id: string | null
           status: string
           total: number
           updated_at: string
@@ -167,6 +168,7 @@ export type Database = {
           items: Json
           notes?: string | null
           payment_method?: string
+          restaurant_id?: string | null
           status?: string
           total: number
           updated_at?: string
@@ -183,6 +185,7 @@ export type Database = {
           items?: Json
           notes?: string | null
           payment_method?: string
+          restaurant_id?: string | null
           status?: string
           total?: number
           updated_at?: string
@@ -194,6 +197,13 @@ export type Database = {
             columns: ["address_id"]
             isOneToOne: false
             referencedRelation: "addresses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
             referencedColumns: ["id"]
           },
         ]

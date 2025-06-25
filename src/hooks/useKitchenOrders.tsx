@@ -21,21 +21,27 @@ export const useKitchenOrders = () => {
 
     try {
       setLoading(true);
+      console.log('Fetching kitchen orders for restaurant:', selectedRestaurant.name);
       
-      const { data, error } = await supabase
+      let query = supabase
         .from('orders')
         .select('*')
         .in('status', ['pending', 'confirmed', 'preparing', 'ready'])
         .order('created_at', { ascending: false });
 
+      // Filter by restaurant_id or include orders without restaurant_id (legacy orders)
+      query = query.or(`restaurant_id.eq.${selectedRestaurant.id},restaurant_id.is.null`);
+
+      const { data, error } = await query;
+
       if (error) {
         throw error;
       }
 
-      console.log(`Loaded ${data?.length || 0} orders for restaurant ${selectedRestaurant.name}`);
+      console.log(`Loaded ${data?.length || 0} kitchen orders for restaurant ${selectedRestaurant.name}`);
       setOrders(data || []);
     } catch (error: any) {
-      console.error('Error fetching orders:', error);
+      console.error('Error fetching kitchen orders:', error);
       toast({
         title: "Erro ao carregar pedidos",
         description: error.message,

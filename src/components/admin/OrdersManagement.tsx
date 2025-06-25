@@ -29,14 +29,24 @@ const OrdersManagement = () => {
     }
 
     try {
-      const { data, error } = await supabase
+      console.log('Fetching orders for restaurant:', selectedRestaurant.name);
+      
+      let query = supabase
         .from('orders')
         .select('*')
         .order('created_at', { ascending: false });
 
+      // Filter by restaurant_id or include orders without restaurant_id (legacy orders)
+      query = query.or(`restaurant_id.eq.${selectedRestaurant.id},restaurant_id.is.null`);
+
+      const { data, error } = await query;
+
       if (error) throw error;
+      
+      console.log('Fetched orders:', data?.length || 0);
       setOrders(data || []);
     } catch (error: any) {
+      console.error('Error fetching orders:', error);
       toast({
         title: "Erro ao carregar pedidos",
         description: error.message,
