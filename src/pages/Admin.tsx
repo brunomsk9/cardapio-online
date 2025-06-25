@@ -37,6 +37,7 @@ const Admin = () => {
     if (!authLoading && !roleLoading) {
       console.log('✅ Loading complete, performing access checks...');
       
+      // If no user, redirect immediately
       if (!user) {
         console.log('❌ No user authenticated, redirecting to home');
         toast({
@@ -48,12 +49,11 @@ const Admin = () => {
         return;
       }
 
-      console.log('👤 User authenticated:', user.email, 'Role:', userRole, 'Is Admin:', isAdmin);
-
-      if (!isAdmin) {
+      // If user exists but role is not admin, redirect
+      if (user && !isAdmin) {
         console.log('🚫 User is not admin, redirecting to home. Current role:', userRole);
         toast({
-          title: "Acesso negado",
+          title: "Acesso negado",  
           description: `Você não tem permissão para acessar o painel administrativo. Papel atual: ${userRole || 'indefinido'}`,
           variant: "destructive",
         });
@@ -88,16 +88,7 @@ const Admin = () => {
   // Don't render admin panel if user is not admin
   if (!user || !isAdmin) {
     console.log('🚫 Not rendering admin panel - access denied');
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-800">Verificando acesso...</h2>
-          <p className="text-gray-600">
-            {user?.email && `Usuário: ${user.email} | Papel: ${userRole || 'carregando...'}`}
-          </p>
-        </div>
-      </div>
-    );
+    return null; // Return null instead of showing verification message
   }
 
   console.log('🎯 Rendering admin panel for user:', user.email);

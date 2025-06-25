@@ -13,7 +13,7 @@ export const useUserRole = () => {
       console.log('🔍 Fetching user role for user:', user?.id, 'email:', user?.email);
       
       if (!user) {
-        console.log('❌ No user found, setting role to null');
+        console.log('❌ No user found, resetting role immediately');
         setUserRole(null);
         setLoading(false);
         return;
@@ -26,13 +26,12 @@ export const useUserRole = () => {
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
-          .maybeSingle(); // Use maybeSingle instead of single to avoid errors when no data
+          .maybeSingle();
 
         console.log('📊 User roles query result:', { data, error, userEmail: user.email });
 
         if (error) {
           console.error('❌ Error fetching user role:', error);
-          // If there's an error, default to 'user' role
           console.log('⚠️ Defaulting to user role due to error');
           setUserRole('user');
         } else if (!data) {
@@ -51,6 +50,14 @@ export const useUserRole = () => {
     };
 
     fetchUserRole();
+  }, [user]);
+
+  // Reset role immediately when user changes
+  useEffect(() => {
+    if (!user) {
+      console.log('🔄 User logged out, resetting role state immediately');
+      setUserRole(null);
+    }
   }, [user]);
 
   const isAdmin = userRole === 'admin';
