@@ -6,10 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { UserPlus, X, AlertTriangle } from 'lucide-react';
 import { useUserRestaurant } from '@/hooks/useUserRestaurant';
+import { createUserWithRestaurant } from '@/utils/userCreationUtils';
 
 interface RestaurantUserCreationProps {
   isOpen: boolean;
@@ -43,145 +43,7 @@ const RestaurantUserCreation = ({ isOpen, onClose, onUserCreated }: RestaurantUs
     setLoading(true);
 
     try {
-      console.log('Creating restaurant user with data:', { ...formData, password: '[HIDDEN]' });
-      
-      // Criar usuário usando signUp normal
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            full_name: formData.fullName,
-            phone: formData.phone
-          },
-          emailRedirectTo: `${window.location.origin}/`
-        }
-      });
-
-      if (authError) {
-        console.error('Auth error:', authError);
-        throw authError;
-      }
-
-      if (!authData.user) {
-        throw new Error('Falha ao criar usuário');
-      }
-
-      console.log('User created successfully:', authData.user.id);
-
-      // Aguardar um pouco para garantir que o usuário foi criado
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Criar perfil do usuário (só se não existir)
-      const { data: existingProfile, error: profileCheckError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', authData.user.id)
-        .single();
-
-      if (profileCheckError && profileCheckError.code !== 'PGRST116') {
-        console.error('Error checking profile existence:', profileCheckError);
-      }
-
-      if (!existingProfile) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            full_name: formData.fullName,
-            phone: formData.phone
-          });
-
-        if (profileError) {
-          console.error('Error creating profile:', profileError);
-        } else {
-          console.log('Profile created successfully');
-        }
-      } else {
-        console.log('Profile already exists');
-      }
-
-      // Verificar se já existe papel para o usuário
-      const { data: existingRole, error: roleCheckError } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', authData.user.id)
-        .single();
-
-      if (roleCheckError && roleCheckError.code !== 'PGRST116') {
-        console.error('Error checking existing role:', roleCheckError);
-      }
-
-      // Só inserir papel se não existir ou se for diferente do desejado
-      if (!existingRole || existingRole.role !== formData.role) {
-        // Se existe um papel diferente, remover primeiro
-        if (existingRole) {
-          const { error: deleteError } = await supabase
-            .from('user_roles')
-            .delete()
-            .eq('user_id', authData.user.id)
-            .eq('role', existingRole.role);
-
-          if (deleteError) {
-            console.error('Error removing existing role:', deleteError);
-          } else {
-            console.log('Removed existing role:', existingRole.role);
-          }
-        }
-
-        // Inserir novo papel (só se não for 'user', que é o padrão)
-        if (formData.role !== 'user') {
-          const { error: roleError } = await supabase
-            .from('user_roles')
-            .insert({
-              user_id: authData.user.id,
-              role: formData.role
-            });
-
-          if (roleError) {
-            console.error('Error assigning role:', roleError);
-            // Não bloqueia o fluxo, pois o usuário foi criado
-          } else {
-            console.log('Role assigned successfully:', formData.role);
-          }
-        }
-      } else {
-        console.log('User already has the correct role');
-      }
-
-      // Associar usuário ao restaurante atual
-      const { data: existingAssociation, error: associationCheckError } = await supabase
-        .from('user_restaurants')
-        .select('id')
-        .eq('user_id', authData.user.id)
-        .eq('restaurant_id', selectedRestaurant.id)
-        .single();
-
-      if (associationCheckError && associationCheckError.code !== 'PGRST116') {
-        console.error('Error checking restaurant association:', associationCheckError);
-      }
-
-      if (!existingAssociation) {
-        const { error: restaurantError } = await supabase
-          .from('user_restaurants')
-          .insert({
-            user_id: authData.user.id,
-            restaurant_id: selectedRestaurant.id
-          });
-
-        if (restaurantError) {
-          console.error('Error associating user to restaurant:', restaurantError);
-          toast({
-            title: "Aviso",
-            description: "Usuário criado, mas não foi possível associá-lo ao restaurante. Faça a associação manualmente.",
-            variant: "destructive",
-          });
-        } else {
-          console.log('User associated to restaurant successfully');
-        }
-      } else {
-        console.log('User already associated to restaurant');
-      }
+      await createUserWithRestaurant(formData, selectedRestaurant.id);
 
       toast({
         title: "Usuário criado com sucesso!",
@@ -212,6 +74,8 @@ const RestaurantUserCreation = ({ isOpen, onClose, onUserCreated }: RestaurantUs
         errorMessage = 'Por favor, insira um email válido.';
       } else if (error.message?.includes('duplicate key value')) {
         errorMessage = 'Erro interno: dados duplicados no sistema. Tente novamente.';
+      } else if (error.message?.includes('Database error saving new user')) {
+        errorMessage = 'Erro interno do banco de dados. Tente novamente em alguns segundos.';
       }
       
       toast({
