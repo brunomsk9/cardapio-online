@@ -42,7 +42,8 @@ const RestaurantForm = ({ isOpen, onClose, onSubmit, editingRestaurant }: Restau
 
   const form = useForm<RestaurantFormData>({
     resolver: zodResolver(restaurantSchema),
-    defaultValues: getDefaultValues()
+    defaultValues: getDefaultValues(),
+    mode: 'onChange'
   });
 
   React.useEffect(() => {
