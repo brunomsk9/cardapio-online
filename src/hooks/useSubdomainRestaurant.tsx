@@ -17,23 +17,32 @@ export const useSubdomainRestaurant = () => {
         setLoading(true);
         setError(null);
 
-        // Detectar o subdomínio atual
+        // Detectar o hostname atual
         const hostname = window.location.hostname;
         console.log('Current hostname:', hostname);
 
-        // Verificar se é o domínio principal
-        if (hostname === 'ko-ombo.online' || hostname === 'localhost') {
+        // Verificar se é um dos domínios principais
+        const mainDomains = ['koombo.online', 'ko-ombo.online', 'localhost'];
+        if (mainDomains.includes(hostname)) {
           setIsMainDomain(true);
           setRestaurant(null);
           setLoading(false);
           return;
         }
 
-        // Extrair subdomínio (ex: restaurante.ko-ombo.online -> restaurante)
-        const subdomain = hostname.split('.')[0];
+        // Verificar se é subdomínio de koombo.online
+        let subdomain = '';
+        if (hostname.endsWith('.koombo.online')) {
+          subdomain = hostname.replace('.koombo.online', '');
+        } 
+        // Verificar se é subdomínio de ko-ombo.online
+        else if (hostname.endsWith('.ko-ombo.online')) {
+          subdomain = hostname.replace('.ko-ombo.online', '');
+        }
+
         console.log('Detected subdomain:', subdomain);
 
-        if (!subdomain || subdomain === 'ko-ombo') {
+        if (!subdomain) {
           setIsMainDomain(true);
           setRestaurant(null);
           setLoading(false);
