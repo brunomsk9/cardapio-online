@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { X, ShoppingBag, Clock } from 'lucide-react';
+import { X, ShoppingBag, Clock, Timer } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 
 type Notification = Database['public']['Tables']['notifications']['Row'];
@@ -12,15 +12,40 @@ interface NotificationPopupProps {
   notification: Notification;
   onClose: () => void;
   onMarkAsRead: (id: string) => void;
+  autoClose?: boolean;
+  autoCloseDelay?: number;
 }
 
-const NotificationPopup = ({ notification, onClose, onMarkAsRead }: NotificationPopupProps) => {
+const NotificationPopup = ({ 
+  notification, 
+  onClose, 
+  onMarkAsRead, 
+  autoClose = false,
+  autoCloseDelay = 5000 
+}: NotificationPopupProps) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [countdown, setCountdown] = useState(autoClose ? autoCloseDelay / 1000 : 0);
 
   useEffect(() => {
     // Animate in
     setTimeout(() => setIsVisible(true), 100);
-  }, []);
+
+    // Auto close logic
+    if (autoClose) {
+      const countdownInterval = setInterval(() => {
+        setCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(countdownInterval);
+            handleClose();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(countdownInterval);
+    }
+  }, [autoClose, autoCloseDelay]);
 
   const handleClose = () => {
     setIsVisible(false);
@@ -68,9 +93,17 @@ const NotificationPopup = ({ notification, onClose, onMarkAsRead }: Notification
                 <p className="text-sm text-gray-600 mt-1">
                   {notification.message}
                 </p>
-                <p className="text-xs text-gray-400 mt-2">
-                  {new Date(notification.created_at || '').toLocaleTimeString('pt-BR')}
-                </p>
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-xs text-gray-400">
+                    {new Date(notification.created_at || '').toLocaleTimeString('pt-BR')}
+                  </p>
+                  {autoClose && countdown > 0 && (
+                    <div className="flex items-center text-xs text-gray-500">
+                      <Timer className="h-3 w-3 mr-1" />
+                      <span>{countdown}s</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <Button

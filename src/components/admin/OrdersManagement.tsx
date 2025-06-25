@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -5,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Clock, Phone, MapPin, User, DollarSign } from 'lucide-react';
+import { Clock, Phone, MapPin, User, DollarSign, CheckCircle, Utensils, Play, Ban, MessageSquare } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 import { useUserRestaurant } from '@/hooks/useUserRestaurant';
 
@@ -29,8 +30,6 @@ const OrdersManagement = () => {
     }
 
     try {
-      // Por enquanto, buscamos todos os pedidos já que não temos ainda o campo restaurant_id
-      // TODO: Adicionar filtro por restaurant_id quando o campo for adicionado à tabela orders
       const { data, error } = await supabase
         .from('orders')
         .select('*')
@@ -64,7 +63,7 @@ const OrdersManagement = () => {
 
       toast({
         title: "Status atualizado!",
-        description: "O status do pedido foi atualizado com sucesso.",
+        description: `Pedido marcado como: ${getStatusLabel(newStatus)}`,
       });
     } catch (error: any) {
       toast({
@@ -73,6 +72,25 @@ const OrdersManagement = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const sendToWhatsApp = (order: Order) => {
+    const message = `🍽️ *Novo Pedido #${order.id.slice(0, 8)}*\n\n` +
+      `👤 *Cliente:* ${order.customer_name}\n` +
+      `📱 *Telefone:* ${order.customer_phone}\n` +
+      `📍 *Endereço:* ${order.delivery_address}\n\n` +
+      `🛒 *Itens:*\n` +
+      `${Array.isArray(order.items) ? order.items.map((item: any) => 
+        `• ${item.quantity}x ${item.name} - R$ ${(item.price * item.quantity).toFixed(2)}`
+      ).join('\n') : ''}\n\n` +
+      `💰 *Total:* R$ ${order.total.toFixed(2)}\n` +
+      `💳 *Pagamento:* ${order.payment_method.toUpperCase()}\n` +
+      `${order.notes ? `📝 *Observações:* ${order.notes}\n` : ''}\n` +
+      `⏰ *Pedido feito em:* ${new Date(order.created_at).toLocaleString('pt-BR')}`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${order.customer_phone.replace(/\D/g, '')}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   const getStatusBadge = (status: string) => {
@@ -92,6 +110,93 @@ const OrdersManagement = () => {
         {config.label}
       </Badge>
     );
+  };
+
+  const getStatusLabel = (status: string) => {
+    const statusLabels = {
+      pending: 'Pendente',
+      confirmed: 'Confirmado',
+      preparing: 'Preparando',
+      ready: 'Pronto',
+      delivered: 'Entregue',
+      cancelled: 'Cancelado'
+    };
+    return statusLabels[status as keyof typeof statusLabels] || status;
+  };
+
+  const getActionButtons = (order: Order) => {
+    switch (order.status) {
+      case 'pending':
+        return (
+          <div className="flex gap-2">
+            <Button
+              onClick={() => updateOrderStatus(order.id, 'confirmed')}
+              className="flex-1 bg-blue-500 hover:bg-blue-600"
+              size="sm"
+            >
+              <Play className="h-4 w-4 mr-2" />
+              Confirmar
+            </Button>
+            <Button
+              onClick={() => updateOrderStatus(order.id, 'cancelled')}
+              variant="destructive"
+              size="sm"
+            >
+              <Ban className="h-4 w-4 mr-2" />
+              Cancelar
+            </Button>
+          </div>
+        );
+      
+      case 'confirmed':
+        return (
+          <div className="flex gap-2">
+            <Button
+              onClick={() => updateOrderStatus(order.id, 'preparing')}
+              className="flex-1 bg-orange-500 hover:bg-orange-600"
+              size="sm"
+            >
+              <Utensils className="h-4 w-4 mr-2" />
+              Iniciar Preparo
+            </Button>
+            <Button
+              onClick={() => updateOrderStatus(order.id, 'cancelled')}
+              variant="destructive"
+              size="sm"
+            >
+              <Ban className="h-4 w-4 mr-2" />
+              Cancelar
+            </Button>
+          </div>
+        );
+      
+      case 'preparing':
+        return (
+          <Button
+            onClick={() => updateOrderStatus(order.id, 'ready')}
+            className="w-full bg-green-500 hover:bg-green-600"
+            size="sm"
+          >
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Marcar como Pronto
+          </Button>
+        );
+      
+      case 'ready':
+        return (
+          <Button
+            onClick={() => updateOrderStatus(order.id, 'delivered')}
+            className="w-full bg-gray-500 hover:bg-gray-600"
+            size="sm"
+          >
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Marcar como Entregue
+          </Button>
+        );
+      
+      default:
+        return null;
+    }
   };
 
   const filteredOrders = statusFilter === 'all' 
@@ -141,7 +246,7 @@ const OrdersManagement = () => {
 
       <div className="grid gap-4">
         {filteredOrders.map((order) => (
-          <Card key={order.id} className="overflow-hidden">
+          <Card key={order.id} className="overflow-hidden border-l-4 border-l-orange-500">
             <CardHeader className="pb-3">
               <div className="flex justify-between items-start">
                 <CardTitle className="text-lg">
@@ -185,38 +290,35 @@ const OrdersManagement = () => {
                 <h4 className="font-medium mb-2">Itens do Pedido:</h4>
                 <div className="space-y-1">
                   {Array.isArray(order.items) && order.items.map((item: any, index: number) => (
-                    <div key={index} className="flex justify-between text-sm">
+                    <div key={index} className="flex justify-between text-sm p-2 bg-gray-50 rounded">
                       <span>{item.quantity}x {item.name}</span>
                       <span>R$ {(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                   ))}
+                  <div className="text-right font-bold text-lg pt-2 border-t">
+                    Total: R$ {order.total.toFixed(2)}
+                  </div>
                 </div>
               </div>
 
               {order.notes && (
                 <div>
                   <h4 className="font-medium mb-1">Observações:</h4>
-                  <p className="text-sm text-gray-600">{order.notes}</p>
+                  <p className="text-sm text-gray-600 bg-yellow-50 p-2 rounded">{order.notes}</p>
                 </div>
               )}
 
               <div className="flex gap-2 pt-2">
-                <Select
-                  value={order.status}
-                  onValueChange={(value) => updateOrderStatus(order.id, value)}
+                {getActionButtons(order)}
+                <Button
+                  onClick={() => sendToWhatsApp(order)}
+                  variant="outline"
+                  size="sm"
+                  className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
                 >
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">Pendente</SelectItem>
-                    <SelectItem value="confirmed">Confirmado</SelectItem>
-                    <SelectItem value="preparing">Preparando</SelectItem>
-                    <SelectItem value="ready">Pronto</SelectItem>
-                    <SelectItem value="delivered">Entregue</SelectItem>
-                    <SelectItem value="cancelled">Cancelado</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  WhatsApp
+                </Button>
               </div>
             </CardContent>
           </Card>

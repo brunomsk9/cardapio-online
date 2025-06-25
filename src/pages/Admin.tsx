@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import RestaurantsManagement from '@/components/admin/RestaurantsManagement';
@@ -5,6 +6,7 @@ import UsersManagement from '@/components/admin/UsersManagement';
 import UserProfile from '@/components/UserProfile';
 import MenuManagement from '@/components/admin/MenuManagement';
 import OrdersManagement from '@/components/admin/OrdersManagement';
+import OrdersTracking from '@/components/admin/OrdersTracking';
 import SettingsManagement from '@/components/admin/SettingsManagement';
 import RestaurantUsersManagement from '@/components/admin/RestaurantUsersManagement';
 import RestaurantSettings from '@/components/admin/RestaurantSettings';
@@ -21,6 +23,8 @@ const Admin = () => {
         return <MenuManagement />;
       case 'orders':
         return <OrdersManagement />;
+      case 'tracking':
+        return <OrdersTracking />;
       case 'restaurants':
         return <RestaurantsManagement />;
       case 'users':

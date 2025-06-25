@@ -52,6 +52,8 @@ const NotificationManager = () => {
             notification={notification}
             onClose={() => handleCloseNotification(notification.id)}
             onMarkAsRead={handleMarkAsRead}
+            autoClose={true}
+            autoCloseDelay={5000}
           />
         </div>
       ))}
