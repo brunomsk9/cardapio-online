@@ -57,7 +57,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
         delivery_address: deliveryAddress,
         payment_method: paymentMethod,
         notes: notes || null,
-        items: cart,
+        items: cart as any, // Cast to any to satisfy Json type requirement
         total: totalPrice,
         user_id: user?.id || null,
         restaurant_id: restaurant?.id || null,
