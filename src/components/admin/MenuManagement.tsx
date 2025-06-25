@@ -4,20 +4,20 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { Plus } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useMenuItems } from '@/hooks/useMenuItems';
+import { useUserRestaurant } from '@/hooks/useUserRestaurant';
 import MenuItemForm from './MenuItemForm';
 import MenuItemCard from './MenuItemCard';
 import MenuEmptyState from './MenuEmptyState';
 
-// Por enquanto vamos usar um estado local para itens do menu
-// Posteriormente será integrado com Supabase
 interface MenuItem {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   price: number;
   category: string;
   available: boolean;
-  image_url?: string;
+  image_url?: string | null;
 }
 
 type MenuItemFormData = {
@@ -29,7 +29,16 @@ type MenuItemFormData = {
 };
 
 const MenuManagement = () => {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const { selectedRestaurant } = useUserRestaurant();
+  const { 
+    menuItems, 
+    loading, 
+    createMenuItem, 
+    updateMenuItem, 
+    deleteMenuItem, 
+    toggleAvailability 
+  } = useMenuItems();
+  
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -37,34 +46,29 @@ const MenuManagement = () => {
     try {
       if (editingItem) {
         // Atualizar item existente
-        setMenuItems(items => items.map(item => 
-          item.id === editingItem.id 
-            ? { 
-                ...item, 
-                name: data.name,
-                description: data.description,
-                price: data.price,
-                category: data.category,
-                image_url: data.image_url || undefined
-              }
-            : item
-        ));
+        await updateMenuItem(editingItem.id, {
+          name: data.name,
+          description: data.description,
+          price: data.price,
+          category: data.category,
+          image_url: data.image_url || null
+        });
+        
         toast({
           title: "Item atualizado!",
           description: "O item do cardápio foi atualizado com sucesso.",
         });
       } else {
         // Criar novo item
-        const newItem: MenuItem = {
-          id: Date.now().toString(),
+        await createMenuItem({
           name: data.name,
           description: data.description,
           price: data.price,
           category: data.category,
-          available: true,
-          image_url: data.image_url || undefined
-        };
-        setMenuItems(items => [...items, newItem]);
+          image_url: data.image_url || null,
+          available: true
+        });
+        
         toast({
           title: "Item criado!",
           description: "O novo item foi adicionado ao cardápio.",
@@ -73,9 +77,10 @@ const MenuManagement = () => {
 
       handleCloseDialog();
     } catch (error: any) {
+      console.error('Error saving menu item:', error);
       toast({
         title: "Erro ao salvar item",
-        description: error.message,
+        description: error.message || "Erro desconhecido",
         variant: "destructive",
       });
     }
@@ -86,24 +91,42 @@ const MenuManagement = () => {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (item: MenuItem) => {
-    setMenuItems(items => items.filter(i => i.id !== item.id));
-    toast({
-      title: "Item removido!",
-      description: "O item foi removido do cardápio.",
-    });
+  const handleDelete = async (item: MenuItem) => {
+    if (!confirm(`Tem certeza que deseja excluir "${item.name}"?`)) {
+      return;
+    }
+    
+    try {
+      await deleteMenuItem(item.id);
+      toast({
+        title: "Item removido!",
+        description: "O item foi removido do cardápio.",
+      });
+    } catch (error: any) {
+      console.error('Error deleting menu item:', error);
+      toast({
+        title: "Erro ao remover item",
+        description: error.message || "Erro desconhecido",
+        variant: "destructive",
+      });
+    }
   };
 
-  const toggleAvailability = (item: MenuItem) => {
-    setMenuItems(items => items.map(i => 
-      i.id === item.id 
-        ? { ...i, available: !i.available }
-        : i
-    ));
-    toast({
-      title: "Disponibilidade atualizada!",
-      description: `Item ${item.available ? 'desabilitado' : 'habilitado'}.`,
-    });
+  const handleToggleAvailability = async (item: MenuItem) => {
+    try {
+      await toggleAvailability(item.id);
+      toast({
+        title: "Disponibilidade atualizada!",
+        description: `Item ${item.available ? 'desabilitado' : 'habilitado'}.`,
+      });
+    } catch (error: any) {
+      console.error('Error toggling availability:', error);
+      toast({
+        title: "Erro ao atualizar disponibilidade",
+        description: error.message || "Erro desconhecido",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleCloseDialog = () => {
@@ -116,12 +139,42 @@ const MenuManagement = () => {
     setIsDialogOpen(true);
   };
 
+  if (!selectedRestaurant) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-8">
+          <h3 className="text-2xl font-bold mb-4">Gerenciar Cardápio</h3>
+          <p className="text-gray-600">
+            Selecione um restaurante para gerenciar o cardápio.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h3 className="text-2xl font-bold">Gerenciar Cardápio</h3>
+        </div>
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+          <p className="ml-4 text-gray-600">Carregando cardápio...</p>
+        </div>
+      </div>
+    );
+  }
+
   const categories = [...new Set(menuItems.map(item => item.category))];
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-2xl font-bold">Gerenciar Cardápio</h3>
+        <div>
+          <h3 className="text-2xl font-bold">Gerenciar Cardápio</h3>
+          <p className="text-gray-600">Restaurante: {selectedRestaurant.name}</p>
+        </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-gradient-to-r from-orange-500 to-orange-600">
@@ -153,7 +206,7 @@ const MenuManagement = () => {
                       item={item}
                       onEdit={handleEdit}
                       onDelete={handleDelete}
-                      onToggleAvailability={toggleAvailability}
+                      onToggleAvailability={handleToggleAvailability}
                     />
                   ))}
               </div>

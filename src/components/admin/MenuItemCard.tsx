@@ -8,11 +8,11 @@ import { Edit, Trash2, UtensilsCrossed } from 'lucide-react';
 interface MenuItem {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   price: number;
   category: string;
   available: boolean;
-  image_url?: string;
+  image_url?: string | null;
 }
 
 interface MenuItemCardProps {
@@ -41,7 +41,9 @@ const MenuItemCard = ({ item, onEdit, onDelete, onToggleAvailability }: MenuItem
               </div>
               <div>
                 <h5 className="font-semibold">{item.name}</h5>
-                <p className="text-sm text-gray-600">{item.description}</p>
+                {item.description && (
+                  <p className="text-sm text-gray-600">{item.description}</p>
+                )}
                 <p className="text-lg font-bold text-orange-600">
                   R$ {item.price.toFixed(2)}
                 </p>
