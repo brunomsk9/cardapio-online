@@ -59,11 +59,13 @@ export const useUserRole = () => {
 
   const isAdmin = userRole === 'admin';
   const isKitchen = userRole === 'kitchen';
+  const isSuperAdmin = userRole === 'super_admin';
 
   return {
     userRole,
     isAdmin,
     isKitchen,
+    isSuperAdmin,
     loading: authLoading || loading,
     error
   };

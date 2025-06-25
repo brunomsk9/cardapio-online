@@ -8,12 +8,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { User, Phone, Calendar, Shield } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
+import { useUserRole } from '@/hooks/useUserRole';
 
 type UserProfile = Database['public']['Tables']['profiles']['Row'] & {
   user_roles?: Array<{ role: string }>;
 };
 
 const UsersManagement = () => {
+  const { isSuperAdmin } = useUserRole();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -53,8 +55,18 @@ const UsersManagement = () => {
     }
   };
 
-  const updateUserRole = async (userId: string, newRole: 'user' | 'admin' | 'kitchen') => {
+  const updateUserRole = async (userId: string, newRole: 'user' | 'admin' | 'kitchen' | 'super_admin') => {
     try {
+      // Super admins can assign any role, regular admins cannot assign super_admin
+      if (!isSuperAdmin && newRole === 'super_admin') {
+        toast({
+          title: "Acesso negado",
+          description: "Apenas super administradores podem atribuir o papel de super admin.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       await supabase
         .from('user_roles')
         .delete()
@@ -88,6 +100,7 @@ const UsersManagement = () => {
 
     const role = roles[0].role;
     const roleConfig = {
+      super_admin: { label: 'Super Admin', variant: 'default' as const },
       admin: { label: 'Administrador', variant: 'destructive' as const },
       kitchen: { label: 'Cozinha', variant: 'secondary' as const },
       user: { label: 'Usuário', variant: 'outline' as const },
@@ -103,9 +116,9 @@ const UsersManagement = () => {
     );
   };
 
-  const getCurrentRole = (roles: { role: string }[] | undefined): 'user' | 'admin' | 'kitchen' => {
+  const getCurrentRole = (roles: { role: string }[] | undefined): 'user' | 'admin' | 'kitchen' | 'super_admin' => {
     if (!roles || roles.length === 0) return 'user';
-    return roles[0].role as 'user' | 'admin' | 'kitchen';
+    return roles[0].role as 'user' | 'admin' | 'kitchen' | 'super_admin';
   };
 
   if (loading) {
@@ -159,8 +172,8 @@ const UsersManagement = () => {
                   {getRoleBadge(user.user_roles)}
                   <Select
                     value={getCurrentRole(user.user_roles)}
-                    onValueChange={(value: 'user' | 'admin' | 'kitchen') => updateUserRole(user.id, value)}
-                  >
+                    onValueChange={(value: 'user' | 'admin' | 'kitchen' | 'super_admin') => updateUserRole(user.id, value)}
+                  >  
                     <SelectTrigger className="w-40">
                       <SelectValue />
                     </SelectTrigger>
@@ -168,6 +181,9 @@ const UsersManagement = () => {
                       <SelectItem value="user">Usuário</SelectItem>
                       <SelectItem value="kitchen">Cozinha</SelectItem>
                       <SelectItem value="admin">Administrador</SelectItem>
+                      {isSuperAdmin && (
+                        <SelectItem value="super_admin">Super Admin</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
