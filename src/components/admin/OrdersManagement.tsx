@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -166,81 +167,6 @@ const OrdersManagement = () => {
     return statusLabels[status as keyof typeof statusLabels] || status;
   };
 
-  const getActionButtons = (order: Order) => {
-    switch (order.status) {
-      case 'pending':
-        return (
-          <div className="flex gap-2">
-            <Button
-              onClick={() => updateOrderStatus(order.id, 'confirmed')}
-              className="flex-1 bg-blue-500 hover:bg-blue-600"
-              size="sm"
-            >
-              <Play className="h-4 w-4 mr-2" />
-              Confirmar
-            </Button>
-            <Button
-              onClick={() => updateOrderStatus(order.id, 'cancelled')}
-              variant="destructive"
-              size="sm"
-            >
-              <Ban className="h-4 w-4 mr-2" />
-              Cancelar
-            </Button>
-          </div>
-        );
-      
-      case 'confirmed':
-        return (
-          <div className="flex gap-2">
-            <Button
-              onClick={() => updateOrderStatus(order.id, 'preparing')}
-              className="flex-1 bg-orange-500 hover:bg-orange-600"
-              size="sm"
-            >
-              <Utensils className="h-4 w-4 mr-2" />
-              Iniciar Preparo
-            </Button>
-            <Button
-              onClick={() => updateOrderStatus(order.id, 'cancelled')}
-              variant="destructive"
-              size="sm"
-            >
-              <Ban className="h-4 w-4 mr-2" />
-              Cancelar
-            </Button>
-          </div>
-        );
-      
-      case 'preparing':
-        return (
-          <Button
-            onClick={() => updateOrderStatus(order.id, 'ready')}
-            className="w-full bg-green-500 hover:bg-green-600"
-            size="sm"
-          >
-            <CheckCircle className="h-4 w-4 mr-2" />
-            Marcar como Pronto
-          </Button>
-        );
-      
-      case 'ready':
-        return (
-          <Button
-            onClick={() => updateOrderStatus(order.id, 'delivered')}
-            className="w-full bg-gray-500 hover:bg-gray-600"
-            size="sm"
-          >
-            <CheckCircle className="h-4 w-4 mr-2" />
-            Marcar como Entregue
-          </Button>
-        );
-      
-      default:
-        return null;
-    }
-  };
-
   const filteredOrders = statusFilter === 'all' 
     ? orders 
     : orders.filter(order => order.status === statusFilter);
@@ -350,8 +276,25 @@ const OrdersManagement = () => {
                 </div>
               )}
 
-              <div className="flex gap-2 pt-2">
-                {getActionButtons(order)}
+              <div className="flex justify-between items-center pt-2">
+                <div className="flex gap-2">
+                  <Select
+                    value={order.status}
+                    onValueChange={(newStatus) => updateOrderStatus(order.id, newStatus)}
+                  >
+                    <SelectTrigger className="w-48">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pending">Pendente</SelectItem>
+                      <SelectItem value="confirmed">Confirmado</SelectItem>
+                      <SelectItem value="preparing">Preparando</SelectItem>
+                      <SelectItem value="ready">Pronto</SelectItem>
+                      <SelectItem value="delivered">Entregue</SelectItem>
+                      <SelectItem value="cancelled">Cancelado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 <Button
                   onClick={() => sendOrderToCustomer(order)}
                   variant="outline"
