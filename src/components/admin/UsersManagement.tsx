@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { User, Mail, Phone, Calendar, Shield } from 'lucide-react';
+import { User, Phone, Calendar, Shield } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 
 type UserProfile = Database['public']['Tables']['profiles']['Row'] & {
@@ -23,7 +23,6 @@ const UsersManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      // First get all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
@@ -31,14 +30,12 @@ const UsersManagement = () => {
 
       if (profilesError) throw profilesError;
 
-      // Then get all user roles
       const { data: userRoles, error: rolesError } = await supabase
         .from('user_roles')
         .select('*');
 
       if (rolesError) throw rolesError;
 
-      // Combine the data
       const usersWithRoles = profiles?.map(profile => ({
         ...profile,
         user_roles: userRoles?.filter(role => role.user_id === profile.id).map(role => ({ role: role.role })) || []
@@ -58,20 +55,17 @@ const UsersManagement = () => {
 
   const updateUserRole = async (userId: string, newRole: 'user' | 'admin' | 'kitchen') => {
     try {
-      // Primeiro, remove o papel atual do usuário
       await supabase
         .from('user_roles')
         .delete()
         .eq('user_id', userId);
 
-      // Depois, adiciona o novo papel
       const { error } = await supabase
         .from('user_roles')
         .insert({ user_id: userId, role: newRole });
 
       if (error) throw error;
 
-      // Atualiza a lista local
       fetchUsers();
 
       toast({
@@ -94,15 +88,15 @@ const UsersManagement = () => {
 
     const role = roles[0].role;
     const roleConfig = {
-      admin: { label: 'Administrador', color: 'bg-red-100 text-red-800' },
-      kitchen: { label: 'Cozinha', color: 'bg-orange-100 text-orange-800' },
-      user: { label: 'Usuário', color: 'bg-gray-100 text-gray-800' },
+      admin: { label: 'Administrador', variant: 'destructive' as const },
+      kitchen: { label: 'Cozinha', variant: 'secondary' as const },
+      user: { label: 'Usuário', variant: 'outline' as const },
     };
 
     const config = roleConfig[role as keyof typeof roleConfig] || roleConfig.user;
     
     return (
-      <Badge className={config.color}>
+      <Badge variant={config.variant}>
         <Shield className="h-3 w-3 mr-1" />
         {config.label}
       </Badge>

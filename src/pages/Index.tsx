@@ -12,7 +12,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { mockMenuItems } from '@/data/mockData';
 import { toast } from '@/hooks/use-toast';
-import { ChefHat, Clock, Star, MapPin } from 'lucide-react';
 
 const Index = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -21,15 +20,6 @@ const Index = () => {
   const { user, loading: authLoading, signOut } = useAuth();
   const { isAdmin, isKitchen, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
-
-  console.log('🏠 Index page - Current state:', { 
-    userEmail: user?.email,
-    userId: user?.id, 
-    authLoading, 
-    roleLoading,
-    isAdmin, 
-    isKitchen 
-  });
 
   const {
     cart,
@@ -44,17 +34,7 @@ const Index = () => {
   const [showCheckout, setShowCheckout] = useState(false);
 
   const handleAdminToggle = () => {
-    console.log('🔑 Admin toggle clicked - Current state:', { 
-      hasUser: !!user, 
-      userEmail: user?.email,
-      isAdmin, 
-      authLoading, 
-      roleLoading 
-    });
-    
-    // Wait for loading to complete before making decisions
     if (authLoading || roleLoading) {
-      console.log('⏳ Still loading, cannot proceed with admin toggle');
       toast({
         title: "Aguarde",
         description: "Carregando informações do usuário...",
@@ -63,17 +43,14 @@ const Index = () => {
     }
     
     if (user && isAdmin) {
-      console.log('✅ User is admin, navigating to admin panel');
       navigate('/admin');
     } else if (user && !isAdmin) {
-      console.log('🚫 User is not admin, showing access denied message');
       toast({
         title: "Acesso negado",
         description: "Você não tem permissão para acessar o painel administrativo.",
         variant: "destructive",
       });
     } else {
-      console.log('👤 Not logged in, showing auth modal');
       setShowAuthModal(true);
     }
   };
@@ -113,14 +90,13 @@ const Index = () => {
     ? mockMenuItems
     : mockMenuItems.filter(item => item.category === activeCategory);
 
-  // Show loading while checking auth and roles
-  if (authLoading || roleLoading) {
+  // Mostrar loading apenas se estiver carregando auth
+  if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
           <p className="mt-4 text-gray-600">Carregando...</p>
-          {user?.email && <p className="text-sm text-gray-500">Usuário: {user.email}</p>}
         </div>
       </div>
     );
@@ -167,7 +143,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Mostrar carrinho apenas quando showCart for true */}
       {showCart && (
         <Cart
           cart={cart}
