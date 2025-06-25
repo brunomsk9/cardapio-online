@@ -11,7 +11,7 @@ export interface CreateUserData {
 export const createUser = async (userData: CreateUserData) => {
   console.log('Creating user with data:', { ...userData, password: '[HIDDEN]' });
   
-  // 1. Criar usuário via signUp (deixa o trigger criar o papel padrão)
+  // 1. Criar usuário via signUp
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email: userData.email,
     password: userData.password,
@@ -35,10 +35,7 @@ export const createUser = async (userData: CreateUserData) => {
 
   console.log('User created successfully:', authData.user.id);
 
-  // 2. Aguardar um pouco para os triggers serem executados
-  await new Promise(resolve => setTimeout(resolve, 2000));
-
-  // 3. Atualizar perfil
+  // 2. Criar perfil do usuário
   const { error: profileError } = await supabase
     .from('profiles')
     .upsert({
@@ -50,10 +47,27 @@ export const createUser = async (userData: CreateUserData) => {
     });
 
   if (profileError) {
-    console.error('Error updating profile:', profileError);
-    throw new Error('Usuário criado, mas não foi possível atualizar o perfil');
+    console.error('Error creating profile:', profileError);
+    throw new Error('Usuário criado, mas não foi possível criar o perfil');
   } else {
-    console.log('Profile updated successfully');
+    console.log('Profile created successfully');
+  }
+
+  // 3. Atribuir papel padrão de usuário
+  const { error: roleError } = await supabase
+    .from('user_roles')
+    .upsert({
+      user_id: authData.user.id,
+      role: 'user'
+    }, {
+      onConflict: 'user_id,role'
+    });
+
+  if (roleError) {
+    console.error('Error assigning user role:', roleError);
+    throw new Error('Usuário criado, mas não foi possível atribuir papel');
+  } else {
+    console.log('User role assigned successfully');
   }
 
   return authData.user;

@@ -40,8 +40,7 @@ CREATE POLICY "Super admins can delete user roles"
   FOR DELETE
   USING (public.is_super_admin());
 
--- Verificar se a função de sincronização está funcionando corretamente
--- Vamos ajustar o trigger para garantir que novos usuários sempre tenham um papel
+-- Manter a função handle_new_user para uso manual se necessário (sem trigger automático)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -62,3 +61,6 @@ BEGIN
   RETURN NEW;
 END;
 $$;
+
+-- IMPORTANTE: Não recriar o trigger automático para evitar conflitos
+-- A função está disponível para uso manual se necessário
