@@ -36,47 +36,67 @@ export const createUserWithRole = async (userData: CreateUserData) => {
 
   console.log('User created successfully:', authData.user.id);
 
-  // 2. Aguardar para garantir que os triggers foram executados
-  await new Promise(resolve => setTimeout(resolve, 3000));
+  // 2. Aguardar mais tempo para garantir que os triggers foram executados
+  await new Promise(resolve => setTimeout(resolve, 5000));
 
-  // 3. Se o papel desejado não é 'user', atualizar o papel
+  // 3. Se o papel desejado não é 'user', precisamos gerenciar os papéis
   if (userData.role !== 'user') {
-    console.log('Updating user role to:', userData.role);
+    console.log('Managing user role to:', userData.role);
     
-    // Primeiro, tentar atualizar se já existe
-    const { error: updateError } = await supabase
+    // Primeiro, verificar se já existe o papel 'user' (criado pelo trigger)
+    const { data: existingRoles } = await supabase
       .from('user_roles')
-      .update({ role: userData.role })
+      .select('role')
       .eq('user_id', authData.user.id);
 
-    if (updateError) {
-      console.error('Error updating role:', updateError);
-      
-      // Se a atualização falhou, tentar inserir diretamente
-      const { error: insertError } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: authData.user.id,
-          role: userData.role
-        });
+    console.log('Existing roles:', existingRoles);
 
-      if (insertError && !insertError.message?.includes('duplicate key')) {
-        console.error('Error inserting role:', insertError);
-        // Não bloqueia o fluxo, pois o usuário foi criado
-      } else if (insertError) {
-        console.log('Role already exists, ignoring duplicate error');
+    // Se já existe o papel 'user', removê-lo antes de adicionar o novo
+    if (existingRoles?.some(r => r.role === 'user')) {
+      console.log('Removing default user role');
+      const { error: deleteError } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', authData.user.id)
+        .eq('role', 'user');
+
+      if (deleteError) {
+        console.error('Error removing default user role:', deleteError);
+        // Não falha o processo, apenas loga o erro
+      }
+    }
+
+    // Agora inserir o papel desejado
+    const { error: insertError } = await supabase
+      .from('user_roles')
+      .insert({
+        user_id: authData.user.id,
+        role: userData.role
+      });
+
+    if (insertError) {
+      console.error('Error inserting role:', insertError);
+      // Se falhar, tentar atualizar o papel existente
+      const { error: updateError } = await supabase
+        .from('user_roles')
+        .update({ role: userData.role })
+        .eq('user_id', authData.user.id);
+
+      if (updateError) {
+        console.error('Error updating role:', updateError);
+        throw new Error(`Usuário criado, mas não foi possível definir o papel como ${userData.role}`);
       } else {
-        console.log('Role inserted successfully:', userData.role);
+        console.log('Role updated successfully:', userData.role);
       }
     } else {
-      console.log('Role updated successfully:', userData.role);
+      console.log('Role inserted successfully:', userData.role);
     }
   }
 
-  // 4. Verificar e criar perfil se necessário
+  // 4. Verificar e atualizar perfil se necessário
   const { data: existingProfile, error: profileCheckError } = await supabase
     .from('profiles')
-    .select('id')
+    .select('id, full_name, phone')
     .eq('id', authData.user.id)
     .single();
 
@@ -95,11 +115,33 @@ export const createUserWithRole = async (userData: CreateUserData) => {
 
     if (profileError) {
       console.error('Error creating profile:', profileError);
+      throw new Error('Usuário criado, mas não foi possível criar o perfil');
     } else {
       console.log('Profile created successfully');
     }
   } else {
-    console.log('Profile already exists');
+    // Atualizar perfil existente se necessário
+    const needsUpdate = 
+      existingProfile.full_name !== userData.fullName || 
+      existingProfile.phone !== userData.phone;
+
+    if (needsUpdate) {
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          full_name: userData.fullName,
+          phone: userData.phone
+        })
+        .eq('id', authData.user.id);
+
+      if (updateError) {
+        console.error('Error updating profile:', updateError);
+      } else {
+        console.log('Profile updated successfully');
+      }
+    } else {
+      console.log('Profile already up to date');
+    }
   }
 
   return authData.user;
