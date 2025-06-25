@@ -6,13 +6,12 @@ export interface CreateUserData {
   password: string;
   fullName: string;
   phone: string;
-  role: 'user' | 'admin' | 'kitchen' | 'super_admin';
 }
 
-export const createUserWithRole = async (userData: CreateUserData) => {
+export const createUser = async (userData: CreateUserData) => {
   console.log('Creating user with data:', { ...userData, password: '[HIDDEN]' });
   
-  // 1. Criar usuário via signUp
+  // 1. Criar usuário via signUp (deixa o trigger criar o papel padrão)
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email: userData.email,
     password: userData.password,
@@ -39,29 +38,7 @@ export const createUserWithRole = async (userData: CreateUserData) => {
   // 2. Aguardar um pouco para os triggers serem executados
   await new Promise(resolve => setTimeout(resolve, 2000));
 
-  // 3. Se o papel desejado não é 'user', substituir o papel padrão
-  if (userData.role !== 'user') {
-    console.log('Setting user role to:', userData.role);
-    
-    // Usar upsert para substituir o papel existente
-    const { error: roleError } = await supabase
-      .from('user_roles')
-      .upsert({
-        user_id: authData.user.id,
-        role: userData.role
-      }, {
-        onConflict: 'user_id'
-      });
-
-    if (roleError) {
-      console.error('Error setting role:', roleError);
-      throw new Error(`Usuário criado, mas não foi possível definir o papel como ${userData.role}`);
-    } else {
-      console.log('Role set successfully:', userData.role);
-    }
-  }
-
-  // 4. Atualizar perfil se necessário
+  // 3. Atualizar perfil
   const { error: profileError } = await supabase
     .from('profiles')
     .upsert({
@@ -86,9 +63,9 @@ export const createUserWithRestaurant = async (
   userData: CreateUserData, 
   restaurantId: string
 ) => {
-  const user = await createUserWithRole(userData);
+  const user = await createUser(userData);
 
-  // 5. Associar ao restaurante se fornecido
+  // 4. Associar ao restaurante se fornecido
   console.log('Associating user to restaurant:', restaurantId);
   
   const { error: restaurantError } = await supabase
@@ -109,3 +86,6 @@ export const createUserWithRestaurant = async (
 
   return user;
 };
+
+// Manter compatibilidade com código existente
+export const createUserWithRole = createUser;

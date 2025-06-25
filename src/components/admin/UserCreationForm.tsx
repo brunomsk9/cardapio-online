@@ -4,11 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from '@/hooks/use-toast';
 import { UserPlus, X, AlertTriangle } from 'lucide-react';
-import { createUserWithRole } from '@/utils/userCreationUtils';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UserCreationFormProps {
   isOpen: boolean;
@@ -21,8 +20,7 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
     email: '',
     password: '',
     fullName: '',
-    phone: '',
-    role: 'user' as 'user' | 'admin' | 'kitchen' | 'super_admin'
+    phone: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +29,52 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
     setLoading(true);
 
     try {
-      await createUserWithRole(formData);
+      console.log('Creating user with data:', { ...formData, password: '[HIDDEN]' });
+      
+      // 1. Criar usuário via signUp (sem especificar papel)
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.fullName,
+            phone: formData.phone
+          },
+          emailRedirectTo: `${window.location.origin}/`
+        }
+      });
+
+      if (authError) {
+        console.error('Auth error:', authError);
+        throw authError;
+      }
+
+      if (!authData.user) {
+        throw new Error('Falha ao criar usuário');
+      }
+
+      console.log('User created successfully:', authData.user.id);
+
+      // 2. Aguardar um pouco para os triggers serem executados
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // 3. Atualizar perfil
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: authData.user.id,
+          full_name: formData.fullName,
+          phone: formData.phone
+        }, {
+          onConflict: 'id'
+        });
+
+      if (profileError) {
+        console.error('Error updating profile:', profileError);
+        throw new Error('Usuário criado, mas não foi possível atualizar o perfil');
+      } else {
+        console.log('Profile updated successfully');
+      }
 
       toast({
         title: "Usuário criado com sucesso!",
@@ -43,8 +86,7 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
         email: '',
         password: '',
         fullName: '',
-        phone: '',
-        role: 'user'
+        phone: ''
       });
 
       onUserCreated();
@@ -98,7 +140,7 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
             <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
             <div className="text-sm text-amber-800">
               <p className="font-medium">Informação importante:</p>
-              <p>O usuário receberá um email de confirmação e precisará ativar a conta antes de fazer login.</p>
+              <p>O usuário será criado com papel padrão (usuário) e receberá um email de confirmação. O papel pode ser alterado posteriormente na lista de usuários.</p>
             </div>
           </div>
         </div>
@@ -148,21 +190,6 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
               onChange={(e) => handleInputChange('phone', e.target.value)}
               placeholder="(11) 99999-9999"
             />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="role">Papel no Sistema *</Label>
-            <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="user">Usuário</SelectItem>
-                <SelectItem value="kitchen">Cozinha</SelectItem>
-                <SelectItem value="admin">Administrador</SelectItem>
-                <SelectItem value="super_admin">Super Admin</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           <div className="flex gap-2 pt-4">

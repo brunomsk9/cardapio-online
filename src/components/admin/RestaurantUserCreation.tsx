@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from '@/hooks/use-toast';
 import { UserPlus, X, AlertTriangle } from 'lucide-react';
@@ -23,8 +22,7 @@ const RestaurantUserCreation = ({ isOpen, onClose, onUserCreated }: RestaurantUs
     email: '',
     password: '',
     fullName: '',
-    phone: '',
-    role: 'user' as 'user' | 'kitchen'
+    phone: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -55,8 +53,7 @@ const RestaurantUserCreation = ({ isOpen, onClose, onUserCreated }: RestaurantUs
         email: '',
         password: '',
         fullName: '',
-        phone: '',
-        role: 'user'
+        phone: ''
       });
 
       onUserCreated();
@@ -114,7 +111,7 @@ const RestaurantUserCreation = ({ isOpen, onClose, onUserCreated }: RestaurantUs
             <AlertTriangle className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
             <div className="text-sm text-blue-800">
               <p className="font-medium">Informação:</p>
-              <p>O usuário será automaticamente associado ao restaurante <strong>{selectedRestaurant.name}</strong> e receberá um email de confirmação.</p>
+              <p>O usuário será automaticamente associado ao restaurante <strong>{selectedRestaurant.name}</strong> com papel padrão (usuário). O papel pode ser alterado posteriormente.</p>
             </div>
           </div>
         </div>
@@ -164,19 +161,6 @@ const RestaurantUserCreation = ({ isOpen, onClose, onUserCreated }: RestaurantUs
               onChange={(e) => handleInputChange('phone', e.target.value)}
               placeholder="(11) 99999-9999"
             />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="role">Papel no Restaurante *</Label>
-            <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="user">Usuário</SelectItem>
-                <SelectItem value="kitchen">Cozinha</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           <div className="flex gap-2 pt-4">
