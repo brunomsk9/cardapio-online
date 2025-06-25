@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -81,6 +80,25 @@ const UsersManagement = () => {
         return;
       }
 
+      // Verificar se é mudança para kitchen e usuário tem múltiplos restaurantes
+      if (newRole === 'kitchen') {
+        const { data: userRestaurants, error: restaurantError } = await supabase
+          .from('user_restaurants')
+          .select('restaurant_id')
+          .eq('user_id', userId);
+
+        if (restaurantError) throw restaurantError;
+
+        if (userRestaurants && userRestaurants.length > 1) {
+          toast({
+            title: "Erro ao atribuir papel Kitchen",
+            description: "Não é possível atribuir papel Kitchen a usuário associado a múltiplos restaurantes. Mantenha apenas uma associação.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
       await supabase
         .from('user_roles')
         .delete()
@@ -90,7 +108,17 @@ const UsersManagement = () => {
         .from('user_roles')
         .insert({ user_id: userId, role: newRole });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message.includes('múltiplos restaurantes')) {
+          toast({
+            title: "Erro ao atribuir papel Kitchen",
+            description: "Não é possível atribuir papel Kitchen a usuário associado a múltiplos restaurantes. Mantenha apenas uma associação.",
+            variant: "destructive",
+          });
+          return;
+        }
+        throw error;
+      }
 
       fetchUsers();
 
@@ -266,6 +294,7 @@ const UsersManagement = () => {
             <UserRestaurantAssignment
               userId={selectedUser.id}
               userName={selectedUser.full_name || 'Usuário'}
+              userRole={getCurrentRole(selectedUser.user_roles)}
               onClose={handleCloseAssignment}
             />
           )}

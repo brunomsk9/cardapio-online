@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Building2, Users, Link } from 'lucide-react';
+import { Building2, Users, Link, AlertTriangle } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 
 type Restaurant = Database['public']['Tables']['restaurants']['Row'];
@@ -16,14 +16,17 @@ type UserProfile = Database['public']['Tables']['profiles']['Row'];
 interface UserRestaurantAssignmentProps {
   userId: string;
   userName: string;
+  userRole?: string;
   onClose: () => void;
 }
 
-const UserRestaurantAssignment = ({ userId, userName, onClose }: UserRestaurantAssignmentProps) => {
+const UserRestaurantAssignment = ({ userId, userName, userRole, onClose }: UserRestaurantAssignmentProps) => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [userRestaurants, setUserRestaurants] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  const isKitchenUser = userRole === 'kitchen';
 
   useEffect(() => {
     fetchData();
@@ -62,8 +65,22 @@ const UserRestaurantAssignment = ({ userId, userName, onClose }: UserRestaurantA
   };
 
   const handleRestaurantToggle = (restaurantId: string, checked: boolean) => {
+    if (isKitchenUser && checked && userRestaurants.length >= 1) {
+      toast({
+        title: "Restrição de usuário Kitchen",
+        description: "Usuários com papel Kitchen podem ser associados a apenas um restaurante.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (checked) {
-      setUserRestaurants([...userRestaurants, restaurantId]);
+      if (isKitchenUser) {
+        // Para usuários kitchen, substitui a seleção atual
+        setUserRestaurants([restaurantId]);
+      } else {
+        setUserRestaurants([...userRestaurants, restaurantId]);
+      }
     } else {
       setUserRestaurants(userRestaurants.filter(id => id !== restaurantId));
     }
@@ -90,7 +107,18 @@ const UserRestaurantAssignment = ({ userId, userName, onClose }: UserRestaurantA
             }))
           );
 
-        if (insertError) throw insertError;
+        if (insertError) {
+          // Verifica se é erro de constraint de kitchen
+          if (insertError.message.includes('Kitchen podem ser associados a apenas um restaurante')) {
+            toast({
+              title: "Erro de validação",
+              description: "Usuários com papel Kitchen podem ser associados a apenas um restaurante.",
+              variant: "destructive",
+            });
+            return;
+          }
+          throw insertError;
+        }
       }
 
       toast({
@@ -127,30 +155,47 @@ const UserRestaurantAssignment = ({ userId, userName, onClose }: UserRestaurantA
         </h3>
       </div>
 
+      {isKitchenUser && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+            <p className="text-sm text-amber-800">
+              <strong>Atenção:</strong> Usuários com papel Kitchen podem ser associados a apenas um restaurante.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-3">
-        {restaurants.map((restaurant) => (
-          <Card key={restaurant.id}>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Building2 className="h-4 w-4 text-orange-500" />
-                  <div>
-                    <h4 className="font-medium">{restaurant.name}</h4>
-                    {restaurant.description && (
-                      <p className="text-sm text-gray-600">{restaurant.description}</p>
-                    )}
+        {restaurants.map((restaurant) => {
+          const isSelected = userRestaurants.includes(restaurant.id);
+          const isDisabled = isKitchenUser && userRestaurants.length >= 1 && !isSelected;
+          
+          return (
+            <Card key={restaurant.id} className={isDisabled ? 'opacity-50' : ''}>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Building2 className="h-4 w-4 text-orange-500" />
+                    <div>
+                      <h4 className="font-medium">{restaurant.name}</h4>
+                      {restaurant.description && (
+                        <p className="text-sm text-gray-600">{restaurant.description}</p>
+                      )}
+                    </div>
                   </div>
+                  <Checkbox
+                    checked={isSelected}
+                    disabled={isDisabled}
+                    onCheckedChange={(checked) => 
+                      handleRestaurantToggle(restaurant.id, checked as boolean)
+                    }
+                  />
                 </div>
-                <Checkbox
-                  checked={userRestaurants.includes(restaurant.id)}
-                  onCheckedChange={(checked) => 
-                    handleRestaurantToggle(restaurant.id, checked as boolean)
-                  }
-                />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       {restaurants.length === 0 && (
