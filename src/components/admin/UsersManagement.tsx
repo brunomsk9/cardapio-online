@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Users, Phone, Calendar, Shield, Building2, Link, Plus } from 'lucide-react';
+import { Users, Phone, Calendar, Shield, Building2, Link, Plus, RefreshCw } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 import { useUserRole } from '@/hooks/useUserRole';
 import UserRestaurantAssignment from './UserRestaurantAssignment';
@@ -15,12 +15,14 @@ import UserCreationForm from './UserCreationForm';
 type UserProfile = Database['public']['Tables']['profiles']['Row'] & {
   user_roles?: Array<{ role: string }>;
   user_restaurants?: Array<{ restaurant: { name: string } }>;
+  email?: string;
 };
 
 const UsersManagement = () => {
   const { isSuperAdmin } = useUserRole();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [showAssignmentDialog, setShowAssignmentDialog] = useState(false);
   const [showCreationForm, setShowCreationForm] = useState(false);
@@ -28,6 +30,76 @@ const UsersManagement = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  const syncUsersWithAuth = async () => {
+    try {
+      setSyncing(true);
+      console.log('Iniciando sincronização de usuários...');
+      
+      // Buscar todos os usuários da tabela auth (via RPC função)
+      const { data: authUsers, error: authError } = await supabase
+        .rpc('get_all_users_profiles');
+
+      if (authError) {
+        console.error('Erro ao buscar usuários auth:', authError);
+        // Fallback: tentar buscar diretamente da tabela profiles
+        return await fetchUsers();
+      }
+
+      console.log('Usuários auth encontrados:', authUsers?.length || 0);
+
+      // Buscar perfis existentes
+      const { data: existingProfiles } = await supabase
+        .from('profiles')
+        .select('id');
+
+      const existingIds = existingProfiles?.map(p => p.id) || [];
+      
+      // Identificar usuários sem perfil
+      const usersWithoutProfile = authUsers?.filter(user => 
+        !existingIds.includes(user.id)
+      ) || [];
+
+      console.log('Usuários sem perfil:', usersWithoutProfile.length);
+
+      // Criar perfis para usuários sem perfil
+      if (usersWithoutProfile.length > 0) {
+        const profilesToCreate = usersWithoutProfile.map(user => ({
+          id: user.id,
+          full_name: user.email?.split('@')[0] || 'Usuário',
+          phone: null
+        }));
+
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert(profilesToCreate);
+
+        if (insertError) {
+          console.error('Erro ao criar perfis:', insertError);
+        } else {
+          console.log('Perfis criados com sucesso:', profilesToCreate.length);
+        }
+      }
+
+      // Buscar usuários atualizados
+      await fetchUsers();
+      
+      toast({
+        title: "Sincronização concluída!",
+        description: `${usersWithoutProfile.length} perfis foram sincronizados.`,
+      });
+
+    } catch (error: any) {
+      console.error('Erro na sincronização:', error);
+      toast({
+        title: "Erro na sincronização",
+        description: "Não foi possível sincronizar todos os usuários.",
+        variant: "destructive",
+      });
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -84,11 +156,20 @@ const UsersManagement = () => {
 
       console.log('Associações usuário-restaurante encontradas:', userRestaurants?.length || 0, userRestaurants);
 
+      // Buscar emails dos usuários via RPC
+      const { data: userEmails, error: emailsError } = await supabase
+        .rpc('get_users_emails', { user_ids: profiles?.map(p => p.id) || [] });
+
+      if (emailsError) {
+        console.error('Erro ao buscar emails:', emailsError);
+      }
+
       // Combinar dados
       const usersWithRoles = profiles?.map(profile => ({
         ...profile,
         user_roles: userRoles?.filter(role => role.user_id === profile.id).map(role => ({ role: role.role })) || [],
-        user_restaurants: userRestaurants?.filter(ur => ur.user_id === profile.id) || []
+        user_restaurants: userRestaurants?.filter(ur => ur.user_id === profile.id) || [],
+        email: userEmails?.find(email => email.user_id === profile.id)?.email || null
       })) || [];
 
       console.log('Usuários processados:', usersWithRoles.length, usersWithRoles);
@@ -249,6 +330,15 @@ const UsersManagement = () => {
             Total: {users.length} usuários
           </div>
           <Button
+            onClick={syncUsersWithAuth}
+            disabled={syncing}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
+            {syncing ? 'Sincronizando...' : 'Sincronizar'}
+          </Button>
+          <Button
             onClick={() => setShowCreationForm(true)}
             className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
           >
@@ -264,6 +354,7 @@ const UsersManagement = () => {
         <p>Usuários carregados: {users.length}</p>
         <p>Loading: {loading.toString()}</p>
         <p>Super Admin: {isSuperAdmin.toString()}</p>
+        <p>Syncing: {syncing.toString()}</p>
       </div>
 
       <div className="grid gap-4">
@@ -279,6 +370,9 @@ const UsersManagement = () => {
                     <div>
                       <h4 className="font-semibold">{user.full_name || 'Nome não informado'}</h4>
                       <p className="text-sm text-gray-600">ID: {user.id.slice(0, 8)}...</p>
+                      {user.email && (
+                        <p className="text-sm text-gray-500">{user.email}</p>
+                      )}
                     </div>
                   </div>
                   
@@ -355,7 +449,7 @@ const UsersManagement = () => {
             Nenhum usuário encontrado.
           </p>
           <p className="text-sm text-gray-400 mt-2">
-            Verifique os logs do console para mais detalhes.
+            Clique em "Sincronizar" para buscar usuários da tabela de autenticação.
           </p>
         </div>
       )}
