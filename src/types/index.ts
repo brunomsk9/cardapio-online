@@ -24,3 +24,18 @@ export interface Order {
   customerName: string;
   createdAt: Date;
 }
+
+// Frontend-specific types for forms and display
+export interface MenuItemDisplay {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  category: string;
+  image: string | null;
+  available: boolean;
+}
+
+export interface CartItemDisplay extends MenuItemDisplay {
+  quantity: number;
+}

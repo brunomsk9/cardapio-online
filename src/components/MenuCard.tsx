@@ -24,7 +24,7 @@ const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: Men
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 hover:scale-105 transform">
       <div className="relative h-48 overflow-hidden">
         <img
-          src={item.image}
+          src={item.image_url || ''}
           alt={item.name}
           className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
         />

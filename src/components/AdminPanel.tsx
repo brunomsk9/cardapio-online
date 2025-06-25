@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import AdminSidebar from './admin/AdminSidebar';
 import OrdersManagement from './admin/OrdersManagement';
@@ -18,7 +17,7 @@ interface AdminPanelProps {
   menuItems: MenuItem[];
   onUpdateMenuItem: (item: MenuItem) => void;
   onDeleteMenuItem: (itemId: string) => void;
-  onAddMenuItem: (item: Omit<MenuItem, 'id'>) => void;
+  onAddMenuItem: (item: Omit<MenuItem, 'id' | 'restaurant_id' | 'created_at' | 'updated_at'>) => void;
 }
 
 const AdminPanel = ({ menuItems, onUpdateMenuItem, onDeleteMenuItem, onAddMenuItem }: AdminPanelProps) => {
@@ -30,7 +29,7 @@ const AdminPanel = ({ menuItems, onUpdateMenuItem, onDeleteMenuItem, onAddMenuIt
     description: '',
     price: 0,
     category: 'entrada' as const,
-    image: '',
+    image_url: '',
     available: true
   });
 
@@ -48,7 +47,7 @@ const AdminPanel = ({ menuItems, onUpdateMenuItem, onDeleteMenuItem, onAddMenuIt
       description: '',
       price: 0,
       category: 'entrada',
-      image: '',
+      image_url: '',
       available: true
     });
     setShowAddForm(false);
@@ -115,8 +114,8 @@ const AdminPanel = ({ menuItems, onUpdateMenuItem, onDeleteMenuItem, onAddMenuIt
                   </Select>
                   <Input
                     placeholder="URL da imagem"
-                    value={newItem.image}
-                    onChange={(e) => setNewItem({ ...newItem, image: e.target.value })}
+                    value={newItem.image_url}
+                    onChange={(e) => setNewItem({ ...newItem, image_url: e.target.value })}
                   />
                   <div className="flex gap-2">
                     <Button onClick={handleAddNew} className="bg-green-500 hover:bg-green-600">
@@ -166,7 +165,7 @@ const AdminPanel = ({ menuItems, onUpdateMenuItem, onDeleteMenuItem, onAddMenuIt
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                           <img
-                            src={item.image}
+                            src={item.image_url || ''}
                             alt={item.name}
                             className="w-16 h-16 object-cover rounded"
                           />
@@ -233,4 +232,3 @@ const AdminPanel = ({ menuItems, onUpdateMenuItem, onDeleteMenuItem, onAddMenuIt
 };
 
 export default AdminPanel;
-

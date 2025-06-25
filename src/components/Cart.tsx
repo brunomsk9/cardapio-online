@@ -38,7 +38,7 @@ const Cart = ({ cart, onUpdateQuantity, onClose, totalPrice, onCheckout }: CartP
             {cart.map((item) => (
               <div key={item.id} className="flex items-center space-x-3 p-3 border rounded-lg">
                 <img
-                  src={item.image}
+                  src={item.image_url || ''}
                   alt={item.name}
                   className="w-16 h-16 object-cover rounded"
                 />
