@@ -1,8 +1,8 @@
 
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, Phone, Calendar, Shield, Building2, Link } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { User, Mail, Phone, Building2, Settings } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 import UserRoleSelect from './UserRoleSelect';
 
@@ -16,106 +16,109 @@ interface UserCardProps {
   user: UserProfile;
   onRoleUpdate: () => void;
   onAssignRestaurants: (user: UserProfile) => void;
+  hideRestaurantAssignment?: boolean;
 }
 
-const UserCard = ({ user, onRoleUpdate, onAssignRestaurants }: UserCardProps) => {
-  const getRoleBadge = (roles: { role: string }[] | undefined) => {
-    if (!roles || roles.length === 0) {
-      return <Badge variant="outline">Usuário</Badge>;
-    }
-
-    const role = roles[0].role;
-    const roleConfig = {
-      super_admin: { label: 'Super Admin', variant: 'default' as const },
-      admin: { label: 'Administrador', variant: 'destructive' as const },
-      kitchen: { label: 'Cozinha', variant: 'secondary' as const },
-      user: { label: 'Usuário', variant: 'outline' as const },
-    };
-
-    const config = roleConfig[role as keyof typeof roleConfig] || roleConfig.user;
-    
-    return (
-      <Badge variant={config.variant}>
-        <Shield className="h-3 w-3 mr-1" />
-        {config.label}
-      </Badge>
-    );
-  };
-
+const UserCard = ({ user, onRoleUpdate, onAssignRestaurants, hideRestaurantAssignment = false }: UserCardProps) => {
   const getCurrentRole = (roles: { role: string }[] | undefined): 'user' | 'admin' | 'kitchen' | 'super_admin' => {
     if (!roles || roles.length === 0) return 'user';
     return roles[0].role as 'user' | 'admin' | 'kitchen' | 'super_admin';
   };
 
+  const getRoleBadgeColor = (role: string) => {
+    switch (role) {
+      case 'super_admin':
+        return 'bg-purple-100 text-purple-800 border-purple-300';
+      case 'admin':
+        return 'bg-blue-100 text-blue-800 border-blue-300';
+      case 'kitchen':
+        return 'bg-orange-100 text-orange-800 border-orange-300';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-300';
+    }
+  };
+
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case 'super_admin':
+        return 'Super Admin';
+      case 'admin':
+        return 'Administrador';
+      case 'kitchen':
+        return 'Cozinha';
+      default:
+        return 'Usuário';
+    }
+  };
+
   const currentRole = getCurrentRole(user.user_roles);
+  const userRestaurants = user.user_restaurants || [];
 
   return (
-    <Card key={user.id}>
+    <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-6">
-        <div className="flex justify-between items-start">
-          <div className="space-y-3 flex-1">
-            <div className="flex items-center space-x-3">
-              <div className="bg-orange-100 p-2 rounded-full">
-                <Users className="h-4 w-4 text-orange-600" />
-              </div>
+        <div className="flex items-start justify-between">
+          <div className="flex items-start space-x-4">
+            <div className="bg-gray-100 p-3 rounded-full">
+              <User className="h-6 w-6 text-gray-600" />
+            </div>
+            <div className="space-y-2">
               <div>
-                <h4 className="font-semibold">{user.full_name || 'Nome não informado'}</h4>
-                <p className="text-sm text-gray-600">ID: {user.id.slice(0, 8)}...</p>
-                {user.email && (
-                  <p className="text-sm text-gray-500">{user.email}</p>
+                <h3 className="font-semibold text-lg">{user.full_name}</h3>
+                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  {user.email && (
+                    <div className="flex items-center space-x-1">
+                      <Mail className="h-3 w-3" />
+                      <span>{user.email}</span>
+                    </div>
+                  )}
+                  {user.phone && (
+                    <div className="flex items-center space-x-1">
+                      <Phone className="h-3 w-3" />
+                      <span>{user.phone}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Badge variant="outline" className={getRoleBadgeColor(currentRole)}>
+                  {getRoleLabel(currentRole)}
+                </Badge>
+                
+                {userRestaurants.length > 0 && (
+                  <div className="flex items-center space-x-1 text-xs text-gray-500">
+                    <Building2 className="h-3 w-3" />
+                    <span>
+                      {userRestaurants.length === 1 
+                        ? userRestaurants[0].restaurant?.name
+                        : `${userRestaurants.length} restaurantes`
+                      }
+                    </span>
+                  </div>
                 )}
               </div>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {user.phone && (
-                <div className="flex items-center text-sm">
-                  <Phone className="h-4 w-4 mr-2 text-gray-500" />
-                  {user.phone}
-                </div>
-              )}
-              <div className="flex items-center text-sm">
-                <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                {new Date(user.created_at).toLocaleDateString('pt-BR')}
-              </div>
-            </div>
-
-            {user.user_restaurants && user.user_restaurants.length > 0 && (
-              <div className="flex items-center text-sm">
-                <Building2 className="h-4 w-4 mr-2 text-gray-500" />
-                <span>
-                  {user.user_restaurants.length} restaurante(s): {' '}
-                  {user.user_restaurants.map((ur, index) => (
-                    <span key={index}>
-                      {ur.restaurant?.name}
-                      {index < user.user_restaurants!.length - 1 ? ', ' : ''}
-                    </span>
-                  ))}
-                </span>
-              </div>
-            )}
           </div>
-
-          <div className="space-y-3 flex flex-col items-end">
-            {getRoleBadge(user.user_roles)}
-            <div className="flex gap-2">
-              <UserRoleSelect
-                userId={user.id}
-                currentRole={currentRole}
-                onRoleUpdate={onRoleUpdate}
-              />
-              
-              {(currentRole === 'admin' || currentRole === 'kitchen') && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onAssignRestaurants(user)}
-                >
-                  <Link className="h-4 w-4 mr-1" />
-                  Restaurantes
-                </Button>
-              )}
-            </div>
+          
+          <div className="flex items-center space-x-2">
+            <UserRoleSelect
+              userId={user.id}
+              currentRole={currentRole}
+              onRoleUpdate={onRoleUpdate}
+            />
+            
+            {!hideRestaurantAssignment && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onAssignRestaurants(user)}
+                className="flex items-center space-x-1"
+              >
+                <Settings className="h-3 w-3" />
+                <span>Restaurantes</span>
+              </Button>
+            )}
           </div>
         </div>
       </CardContent>

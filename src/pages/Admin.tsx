@@ -7,9 +7,13 @@ import UserProfile from '@/components/UserProfile';
 import MenuManagement from '@/components/admin/MenuManagement';
 import OrdersManagement from '@/components/admin/OrdersManagement';
 import SettingsManagement from '@/components/admin/SettingsManagement';
+import RestaurantUsersManagement from '@/components/admin/RestaurantUsersManagement';
+import RestaurantSettings from '@/components/admin/RestaurantSettings';
+import { useUserRole } from '@/hooks/useUserRole';
 
 const Admin = () => {
   const [activeSection, setActiveSection] = useState('menu');
+  const { isSuperAdmin } = useUserRole();
 
   const renderContent = () => {
     switch (activeSection) {
@@ -20,11 +24,13 @@ const Admin = () => {
       case 'restaurants':
         return <RestaurantsManagement />;
       case 'users':
-        return <UsersManagement />;
+        // Super admins veem todos os usuários, admins veem usuários do restaurante
+        return isSuperAdmin ? <UsersManagement /> : <RestaurantUsersManagement />;
       case 'profile':
         return <UserProfile />;
       case 'settings':
-        return <SettingsManagement />;
+        // Super admins veem configurações gerais, admins veem configurações do restaurante
+        return isSuperAdmin ? <SettingsManagement /> : <RestaurantSettings />;
       default:
         return <MenuManagement />;
     }
