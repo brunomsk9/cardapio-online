@@ -57,17 +57,17 @@ const RestaurantForm = ({ isOpen, onClose, onSubmit, editingRestaurant }: Restau
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="pb-2">
+          <DialogTitle className="text-lg">
             {editingRestaurant ? 'Editar Restaurante' : 'Novo Restaurante'}
           </DialogTitle>
-          <DialogDescription>
-            Preencha as informações do restaurante.
+          <DialogDescription className="text-sm">
+            Preencha as informações básicas do restaurante.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-3">
             <RestaurantFormFields control={form.control} />
             <RestaurantFormActions 
               isEditing={!!editingRestaurant} 

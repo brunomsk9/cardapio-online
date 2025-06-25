@@ -11,55 +11,30 @@ interface RestaurantFormFieldsProps {
 
 const RestaurantFormFields = ({ control }: RestaurantFormFieldsProps) => {
   return (
-    <>
+    <div className="space-y-3">
       <FormField
         control={control}
         name="name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Nome *</FormLabel>
+            <FormLabel className="text-sm font-medium">Nome *</FormLabel>
             <FormControl>
-              <Input placeholder="Nome do restaurante" {...field} />
+              <Input placeholder="Nome do restaurante" className="h-9" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
-      <FormField
-        control={control}
-        name="description"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Descrição</FormLabel>
-            <FormControl>
-              <Textarea placeholder="Descrição do restaurante" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={control}
-        name="address"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Endereço</FormLabel>
-            <FormControl>
-              <Input placeholder="Endereço completo" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <div className="grid grid-cols-2 gap-4">
+      
+      <div className="grid grid-cols-2 gap-3">
         <FormField
           control={control}
           name="phone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Telefone</FormLabel>
+              <FormLabel className="text-sm font-medium">Telefone</FormLabel>
               <FormControl>
-                <Input placeholder="(11) 99999-9999" {...field} />
+                <Input placeholder="(11) 99999-9999" className="h-9" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -70,42 +45,77 @@ const RestaurantFormFields = ({ control }: RestaurantFormFieldsProps) => {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel className="text-sm font-medium">Email</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="contato@restaurante.com" {...field} />
+                <Input type="email" placeholder="contato@exemplo.com" className="h-9" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
       </div>
+
       <FormField
         control={control}
-        name="logo_url"
+        name="address"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>URL do Logo</FormLabel>
+            <FormLabel className="text-sm font-medium">Endereço</FormLabel>
             <FormControl>
-              <Input placeholder="https://exemplo.com/logo.jpg" {...field} />
+              <Input placeholder="Endereço completo" className="h-9" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
+
       <FormField
         control={control}
-        name="subdomain"
+        name="description"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Subdomínio</FormLabel>
+            <FormLabel className="text-sm font-medium">Descrição</FormLabel>
             <FormControl>
-              <Input placeholder="meurestaurante" {...field} />
+              <Textarea 
+                placeholder="Descrição breve do restaurante" 
+                className="min-h-[60px] resize-none" 
+                {...field} 
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
-    </>
+
+      <div className="grid grid-cols-2 gap-3">
+        <FormField
+          control={control}
+          name="subdomain"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-medium">Subdomínio</FormLabel>
+              <FormControl>
+                <Input placeholder="meurestaurante" className="h-9" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="logo_url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-medium">URL do Logo</FormLabel>
+              <FormControl>
+                <Input placeholder="https://..." className="h-9" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+    </div>
   );
 };
 
