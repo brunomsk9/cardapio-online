@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,12 +17,12 @@ const Kitchen = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const { user, loading: authLoading } = useAuth();
-  const { isAdmin, loading: roleLoading } = useUserRole();
+  const { isAdmin, isKitchen, loading: roleLoading } = useUserRole();
 
-  console.log('Kitchen page - Auth state:', { user: user?.id, authLoading, isAdmin, roleLoading });
+  console.log('Kitchen page - Auth state:', { user: user?.id, authLoading, isAdmin, isKitchen, roleLoading });
 
   useEffect(() => {
-    console.log('Kitchen useEffect triggered:', { authLoading, roleLoading, user: !!user, isAdmin });
+    console.log('Kitchen useEffect triggered:', { authLoading, roleLoading, user: !!user, isAdmin, isKitchen });
     
     if (!authLoading && !roleLoading) {
       if (!user) {
@@ -37,22 +36,22 @@ const Kitchen = () => {
         return;
       }
 
-      if (!isAdmin) {
-        console.log('User is not admin, redirecting to home');
+      if (!isAdmin && !isKitchen) {
+        console.log('User is neither admin nor kitchen, redirecting to home');
         toast({
           title: "Acesso negado",
-          description: "Apenas administradores podem acessar a cozinha.",
+          description: "Apenas administradores e funcionários da cozinha podem acessar esta página.",
           variant: "destructive",
         });
         navigate('/');
         return;
       }
       
-      console.log('User has admin access, loading kitchen orders');
+      console.log('User has kitchen or admin access, loading orders');
       fetchOrders();
       setupRealtimeSubscription();
     }
-  }, [user, isAdmin, authLoading, roleLoading, navigate]);
+  }, [user, isAdmin, isKitchen, authLoading, roleLoading, navigate]);
 
   const fetchOrders = async () => {
     try {
@@ -159,8 +158,8 @@ const Kitchen = () => {
     );
   }
 
-  // Don't render kitchen if user is not admin
-  if (!user || !isAdmin) {
+  // Don't render kitchen if user doesn't have access
+  if (!user || (!isAdmin && !isKitchen)) {
     return null;
   }
 

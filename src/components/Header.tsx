@@ -12,13 +12,14 @@ interface HeaderProps {
   user?: SupabaseUser | null;
   onSignOut?: () => void;
   isAdmin?: boolean;
+  isKitchen?: boolean;
 }
 
-const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, isAdmin = false }: HeaderProps) => {
+const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, isAdmin = false, isKitchen = false }: HeaderProps) => {
   const navigate = useNavigate();
 
   const handleKitchenClick = () => {
-    if (isAdmin) {
+    if (isAdmin || isKitchen) {
       navigate('/kitchen');
     }
   };
@@ -32,7 +33,7 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
         </div>
         
         <div className="flex items-center space-x-4">
-          {!isAdmin && (
+          {!isAdmin && !isKitchen && (
             <Button
               variant="ghost"
               size="sm"
@@ -50,7 +51,7 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
           
           {user && (
             <>
-              {isAdmin && (
+              {(isAdmin || isKitchen) && (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -78,15 +79,29 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
             </>
           )}
           
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onAdminClick}
-            className="text-white hover:bg-white/20"
-          >
-            {isAdmin ? <User className="h-5 w-5" /> : <Settings className="h-5 w-5" />}
-            {isAdmin ? 'Cliente' : 'Admin'}
-          </Button>
+          {isAdmin && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onAdminClick}
+              className="text-white hover:bg-white/20"
+            >
+              <Settings className="h-5 w-5" />
+              Admin
+            </Button>
+          )}
+          
+          {!user && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onAdminClick}
+              className="text-white hover:bg-white/20"
+            >
+              <User className="h-5 w-5" />
+              Login
+            </Button>
+          )}
         </div>
       </div>
     </header>

@@ -55,12 +55,14 @@ export const useUserRole = () => {
   }, [user]);
 
   const isAdmin = userRole === 'admin';
+  const isKitchen = userRole === 'kitchen';
   
-  console.log('useUserRole state:', { userRole, isAdmin, loading, userId: user?.id });
+  console.log('useUserRole state:', { userRole, isAdmin, isKitchen, loading, userId: user?.id });
 
   return {
     userRole,
     isAdmin,
+    isKitchen,
     loading
   };
 };

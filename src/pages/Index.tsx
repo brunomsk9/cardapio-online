@@ -19,10 +19,10 @@ const Index = () => {
   const [showCart, setShowCart] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
   const { user, loading: authLoading, signOut } = useAuth();
-  const { isAdmin, loading: roleLoading } = useUserRole();
+  const { isAdmin, isKitchen, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
 
-  console.log('Index page - Auth state:', { user: user?.id, authLoading, isAdmin, roleLoading });
+  console.log('Index page - Auth state:', { user: user?.id, authLoading, isAdmin, isKitchen, roleLoading });
 
   const {
     cart,
@@ -107,6 +107,7 @@ const Index = () => {
         user={user}
         onSignOut={handleSignOut}
         isAdmin={isAdmin}
+        isKitchen={isKitchen}
       />
 
       <section className="bg-orange-100 py-16">

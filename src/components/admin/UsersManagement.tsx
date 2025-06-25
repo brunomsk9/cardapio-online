@@ -56,7 +56,7 @@ const UsersManagement = () => {
     }
   };
 
-  const updateUserRole = async (userId: string, newRole: 'user' | 'admin') => {
+  const updateUserRole = async (userId: string, newRole: 'user' | 'admin' | 'kitchen') => {
     try {
       // Primeiro, remove o papel atual do usuário
       await supabase
@@ -65,20 +65,11 @@ const UsersManagement = () => {
         .eq('user_id', userId);
 
       // Depois, adiciona o novo papel
-      if (newRole !== 'user') {
-        const { error } = await supabase
-          .from('user_roles')
-          .insert({ user_id: userId, role: newRole });
+      const { error } = await supabase
+        .from('user_roles')
+        .insert({ user_id: userId, role: newRole });
 
-        if (error) throw error;
-      } else {
-        // Insert user role explicitly
-        const { error } = await supabase
-          .from('user_roles')
-          .insert({ user_id: userId, role: 'user' });
-
-        if (error) throw error;
-      }
+      if (error) throw error;
 
       // Atualiza a lista local
       fetchUsers();
@@ -104,6 +95,7 @@ const UsersManagement = () => {
     const role = roles[0].role;
     const roleConfig = {
       admin: { label: 'Administrador', color: 'bg-red-100 text-red-800' },
+      kitchen: { label: 'Cozinha', color: 'bg-orange-100 text-orange-800' },
       user: { label: 'Usuário', color: 'bg-gray-100 text-gray-800' },
     };
 
@@ -117,9 +109,9 @@ const UsersManagement = () => {
     );
   };
 
-  const getCurrentRole = (roles: { role: string }[] | undefined): 'user' | 'admin' => {
+  const getCurrentRole = (roles: { role: string }[] | undefined): 'user' | 'admin' | 'kitchen' => {
     if (!roles || roles.length === 0) return 'user';
-    return roles[0].role as 'user' | 'admin';
+    return roles[0].role as 'user' | 'admin' | 'kitchen';
   };
 
   if (loading) {
@@ -173,13 +165,14 @@ const UsersManagement = () => {
                   {getRoleBadge(user.user_roles)}
                   <Select
                     value={getCurrentRole(user.user_roles)}
-                    onValueChange={(value: 'user' | 'admin') => updateUserRole(user.id, value)}
+                    onValueChange={(value: 'user' | 'admin' | 'kitchen') => updateUserRole(user.id, value)}
                   >
                     <SelectTrigger className="w-40">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="user">Usuário</SelectItem>
+                      <SelectItem value="kitchen">Cozinha</SelectItem>
                       <SelectItem value="admin">Administrador</SelectItem>
                     </SelectContent>
                   </Select>
