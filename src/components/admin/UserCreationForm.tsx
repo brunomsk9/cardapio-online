@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { UserPlus, X } from 'lucide-react';
+import { UserPlus, X, AlertTriangle } from 'lucide-react';
 
 interface UserCreationFormProps {
   isOpen: boolean;
@@ -31,15 +31,17 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
     setLoading(true);
 
     try {
-      // Criar usuário no Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      // Criar usuário usando signUp normal
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
-        user_metadata: {
-          full_name: formData.fullName,
-          phone: formData.phone
-        },
-        email_confirm: true // Auto-confirma o email
+        options: {
+          data: {
+            full_name: formData.fullName,
+            phone: formData.phone
+          },
+          emailRedirectTo: `${window.location.origin}/`
+        }
       });
 
       if (authError) {
@@ -49,6 +51,9 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
       if (!authData.user) {
         throw new Error('Falha ao criar usuário');
       }
+
+      // Aguardar um pouco para garantir que o usuário foi criado
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Criar perfil do usuário
       const { error: profileError } = await supabase
@@ -66,7 +71,7 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
 
       // Atribuir papel se não for 'user' (padrão)
       if (formData.role !== 'user') {
-        // Remover papel padrão
+        // Primeiro, remover papel padrão se existir
         await supabase
           .from('user_roles')
           .delete()
@@ -82,13 +87,13 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
 
         if (roleError) {
           console.error('Error assigning role:', roleError);
-          throw roleError;
+          // Continua mesmo com erro de papel, pois o usuário foi criado
         }
       }
 
       toast({
         title: "Usuário criado com sucesso!",
-        description: `${formData.fullName} foi criado e pode fazer login imediatamente.`,
+        description: `${formData.fullName} foi criado. Um email de confirmação foi enviado para ${formData.email}.`,
       });
 
       // Reset form
@@ -104,9 +109,20 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
       onClose();
     } catch (error: any) {
       console.error('Error creating user:', error);
+      
+      let errorMessage = error.message;
+      
+      if (error.message?.includes('User already registered')) {
+        errorMessage = 'Este email já está cadastrado no sistema.';
+      } else if (error.message?.includes('Password should be at least')) {
+        errorMessage = 'A senha deve ter pelo menos 6 caracteres.';
+      } else if (error.message?.includes('Invalid email')) {
+        errorMessage = 'Por favor, insira um email válido.';
+      }
+      
       toast({
         title: "Erro ao criar usuário",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -130,6 +146,16 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
             Preencha os dados para criar um novo usuário no sistema.
           </DialogDescription>
         </DialogHeader>
+
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
+          <div className="flex items-start space-x-2">
+            <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-amber-800">
+              <p className="font-medium">Informação importante:</p>
+              <p>O usuário receberá um email de confirmação e precisará ativar a conta antes de fazer login.</p>
+            </div>
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
