@@ -30,41 +30,23 @@ interface RestaurantFormProps {
 }
 
 const RestaurantForm = ({ isOpen, onClose, onSubmit, editingRestaurant }: RestaurantFormProps) => {
+  const getDefaultValues = (): RestaurantFormData => ({
+    name: editingRestaurant?.name || '',
+    description: editingRestaurant?.description || '',
+    address: editingRestaurant?.address || '',
+    phone: editingRestaurant?.phone || '',
+    email: editingRestaurant?.email || '',
+    logo_url: editingRestaurant?.logo_url || '',
+    subdomain: editingRestaurant?.subdomain || ''
+  });
+
   const form = useForm<RestaurantFormData>({
     resolver: zodResolver(restaurantSchema),
-    defaultValues: {
-      name: editingRestaurant?.name || '',
-      description: editingRestaurant?.description || '',
-      address: editingRestaurant?.address || '',
-      phone: editingRestaurant?.phone || '',
-      email: editingRestaurant?.email || '',
-      logo_url: editingRestaurant?.logo_url || '',
-      subdomain: editingRestaurant?.subdomain || ''
-    }
+    defaultValues: getDefaultValues()
   });
 
   React.useEffect(() => {
-    if (editingRestaurant) {
-      form.reset({
-        name: editingRestaurant.name,
-        description: editingRestaurant.description || '',
-        address: editingRestaurant.address || '',
-        phone: editingRestaurant.phone || '',
-        email: editingRestaurant.email || '',
-        logo_url: editingRestaurant.logo_url || '',
-        subdomain: editingRestaurant.subdomain || ''
-      });
-    } else {
-      form.reset({
-        name: '',
-        description: '',
-        address: '',
-        phone: '',
-        email: '',
-        logo_url: '',
-        subdomain: ''
-      });
-    }
+    form.reset(getDefaultValues());
   }, [editingRestaurant, form]);
 
   const handleSubmit = (data: RestaurantFormData) => {
