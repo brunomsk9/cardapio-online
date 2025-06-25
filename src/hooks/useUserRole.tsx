@@ -10,41 +10,40 @@ export const useUserRole = () => {
 
   useEffect(() => {
     const fetchUserRole = async () => {
-      console.log('Fetching user role for user:', user?.id);
+      console.log('🔍 Fetching user role for user:', user?.id, 'email:', user?.email);
       
       if (!user) {
-        console.log('No user found, setting role to null');
+        console.log('❌ No user found, setting role to null');
         setUserRole(null);
         setLoading(false);
         return;
       }
 
       try {
-        console.log('Querying user_roles table for user_id:', user.id);
+        console.log('📡 Querying user_roles table for user_id:', user.id);
         
         const { data, error } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle(); // Use maybeSingle instead of single to avoid errors when no data
 
-        console.log('User roles query result:', { data, error });
+        console.log('📊 User roles query result:', { data, error, userEmail: user.email });
 
         if (error) {
-          console.error('Error fetching user role:', error);
-          // If no role found, default to 'user'
-          if (error.code === 'PGRST116') {
-            console.log('No role found, defaulting to user');
-            setUserRole('user');
-          } else {
-            setUserRole('user');
-          }
+          console.error('❌ Error fetching user role:', error);
+          // If there's an error, default to 'user' role
+          console.log('⚠️ Defaulting to user role due to error');
+          setUserRole('user');
+        } else if (!data) {
+          console.log('⚠️ No role found in database, defaulting to user role');
+          setUserRole('user');
         } else {
-          console.log('User role found:', data?.role);
-          setUserRole(data?.role || 'user');
+          console.log('✅ User role found:', data.role, 'for user:', user.email);
+          setUserRole(data.role);
         }
       } catch (error) {
-        console.error('Error in fetchUserRole:', error);
+        console.error('💥 Exception in fetchUserRole:', error);
         setUserRole('user');
       } finally {
         setLoading(false);
@@ -57,7 +56,14 @@ export const useUserRole = () => {
   const isAdmin = userRole === 'admin';
   const isKitchen = userRole === 'kitchen';
   
-  console.log('useUserRole state:', { userRole, isAdmin, isKitchen, loading, userId: user?.id });
+  console.log('📋 useUserRole final state:', { 
+    userEmail: user?.email,
+    userId: user?.id, 
+    userRole, 
+    isAdmin, 
+    isKitchen, 
+    loading 
+  });
 
   return {
     userRole,

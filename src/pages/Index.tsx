@@ -22,7 +22,14 @@ const Index = () => {
   const { isAdmin, isKitchen, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
 
-  console.log('Index page - Auth state:', { user: user?.id, authLoading, isAdmin, isKitchen, roleLoading });
+  console.log('🏠 Index page - Current state:', { 
+    userEmail: user?.email,
+    userId: user?.id, 
+    authLoading, 
+    roleLoading,
+    isAdmin, 
+    isKitchen 
+  });
 
   const {
     cart,
@@ -37,19 +44,36 @@ const Index = () => {
   const [showCheckout, setShowCheckout] = useState(false);
 
   const handleAdminToggle = () => {
-    console.log('Admin toggle clicked, current isAdmin:', isAdmin, 'user:', !!user);
+    console.log('🔑 Admin toggle clicked - Current state:', { 
+      hasUser: !!user, 
+      userEmail: user?.email,
+      isAdmin, 
+      authLoading, 
+      roleLoading 
+    });
+    
+    // Wait for loading to complete before making decisions
+    if (authLoading || roleLoading) {
+      console.log('⏳ Still loading, cannot proceed with admin toggle');
+      toast({
+        title: "Aguarde",
+        description: "Carregando informações do usuário...",
+      });
+      return;
+    }
     
     if (user && isAdmin) {
-      // If user is admin, redirect to admin route
+      console.log('✅ User is admin, navigating to admin panel');
       navigate('/admin');
     } else if (user && !isAdmin) {
+      console.log('🚫 User is not admin, showing access denied message');
       toast({
         title: "Acesso negado",
         description: "Você não tem permissão para acessar o painel administrativo.",
         variant: "destructive",
       });
     } else {
-      // Not logged in, show auth modal
+      console.log('👤 Not logged in, showing auth modal');
       setShowAuthModal(true);
     }
   };
@@ -93,7 +117,11 @@ const Index = () => {
   if (authLoading || roleLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Carregando...</p>
+          {user?.email && <p className="text-sm text-gray-500">Usuário: {user.email}</p>}
+        </div>
       </div>
     );
   }
