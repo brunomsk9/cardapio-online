@@ -14,13 +14,27 @@ import LoadingSpinner from '@/components/kitchen/LoadingSpinner';
 const Kitchen = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { isAdmin, isKitchen, loading: roleLoading } = useUserRole();
+  const { isAdmin, isKitchen, isSuperAdmin, loading: roleLoading } = useUserRole();
   const { orders, loading: ordersLoading, updateOrderStatus } = useKitchenOrders();
 
-  console.log('Kitchen page - Auth state:', { user: user?.id, authLoading, isAdmin, isKitchen, roleLoading });
+  console.log('Kitchen page - Auth state:', { 
+    user: user?.id, 
+    authLoading, 
+    isAdmin, 
+    isKitchen, 
+    isSuperAdmin, 
+    roleLoading 
+  });
 
   useEffect(() => {
-    console.log('Kitchen useEffect triggered:', { authLoading, roleLoading, user: !!user, isAdmin, isKitchen });
+    console.log('Kitchen useEffect triggered:', { 
+      authLoading, 
+      roleLoading, 
+      user: !!user, 
+      isAdmin, 
+      isKitchen, 
+      isSuperAdmin 
+    });
     
     if (!authLoading && !roleLoading) {
       if (!user) {
@@ -34,8 +48,9 @@ const Kitchen = () => {
         return;
       }
 
-      if (!isAdmin && !isKitchen) {
-        console.log('User is neither admin nor kitchen, redirecting to home');
+      // Admins, super admins e kitchen têm acesso à cozinha
+      if (!isAdmin && !isKitchen && !isSuperAdmin) {
+        console.log('User does not have kitchen access, redirecting to home');
         toast({
           title: "Acesso negado",
           description: "Apenas administradores e funcionários da cozinha podem acessar esta página.",
@@ -45,9 +60,9 @@ const Kitchen = () => {
         return;
       }
       
-      console.log('User has kitchen or admin access, loading orders');
+      console.log('User has kitchen access, loading orders');
     }
-  }, [user, isAdmin, isKitchen, authLoading, roleLoading, navigate]);
+  }, [user, isAdmin, isKitchen, isSuperAdmin, authLoading, roleLoading, navigate]);
 
   // Show loading while checking authentication and role
   if (authLoading || roleLoading) {
@@ -55,7 +70,7 @@ const Kitchen = () => {
   }
 
   // Don't render kitchen if user doesn't have access
-  if (!user || (!isAdmin && !isKitchen)) {
+  if (!user || (!isAdmin && !isKitchen && !isSuperAdmin)) {
     return null;
   }
 

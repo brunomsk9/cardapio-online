@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, User, CheckCircle, Utensils } from 'lucide-react';
+import { Clock, User, CheckCircle, Utensils, Play, Ban } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 
 type Order = Database['public']['Tables']['orders']['Row'];
@@ -15,8 +15,10 @@ interface OrderCardProps {
 const OrderCard = ({ order, onStatusUpdate }: OrderCardProps) => {
   const getStatusBadge = (status: string) => {
     const statusConfig = {
+      pending: { label: 'Pendente', color: 'bg-yellow-100 text-yellow-800' },
       confirmed: { label: 'Confirmado', color: 'bg-blue-100 text-blue-800' },
       preparing: { label: 'Preparando', color: 'bg-orange-100 text-orange-800' },
+      ready: { label: 'Pronto', color: 'bg-green-100 text-green-800' },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.confirmed;
@@ -39,6 +41,81 @@ const OrderCard = ({ order, onStatusUpdate }: OrderCardProps) => {
       const hours = Math.floor(diffMinutes / 60);
       const minutes = diffMinutes % 60;
       return `${hours}h ${minutes}min`;
+    }
+  };
+
+  const getActionButtons = () => {
+    switch (order.status) {
+      case 'pending':
+        return (
+          <div className="flex gap-2">
+            <Button
+              onClick={() => onStatusUpdate(order.id, 'confirmed')}
+              className="flex-1 bg-blue-500 hover:bg-blue-600"
+              size="sm"
+            >
+              <Play className="h-4 w-4 mr-2" />
+              Confirmar
+            </Button>
+            <Button
+              onClick={() => onStatusUpdate(order.id, 'cancelled')}
+              variant="destructive"
+              size="sm"
+            >
+              <Ban className="h-4 w-4 mr-2" />
+              Cancelar
+            </Button>
+          </div>
+        );
+      
+      case 'confirmed':
+        return (
+          <div className="flex gap-2">
+            <Button
+              onClick={() => onStatusUpdate(order.id, 'preparing')}
+              className="flex-1 bg-orange-500 hover:bg-orange-600"
+              size="sm"
+            >
+              <Utensils className="h-4 w-4 mr-2" />
+              Iniciar Preparo
+            </Button>
+            <Button
+              onClick={() => onStatusUpdate(order.id, 'cancelled')}
+              variant="destructive"
+              size="sm"
+            >
+              <Ban className="h-4 w-4 mr-2" />
+              Cancelar
+            </Button>
+          </div>
+        );
+      
+      case 'preparing':
+        return (
+          <Button
+            onClick={() => onStatusUpdate(order.id, 'ready')}
+            className="w-full bg-green-500 hover:bg-green-600"
+            size="sm"
+          >
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Marcar como Pronto
+          </Button>
+        );
+      
+      case 'ready':
+        return (
+          <Button
+            onClick={() => onStatusUpdate(order.id, 'delivered')}
+            className="w-full bg-gray-500 hover:bg-gray-600"
+            size="sm"
+          >
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Marcar como Entregue
+          </Button>
+        );
+      
+      default:
+        return null;
     }
   };
 
@@ -82,6 +159,11 @@ const OrderCard = ({ order, onStatusUpdate }: OrderCardProps) => {
               </div>
             ))}
           </div>
+          <div className="mt-2 text-right">
+            <span className="font-bold text-lg">
+              Total: R$ {order.total.toFixed(2)}
+            </span>
+          </div>
         </div>
 
         {order.notes && (
@@ -93,26 +175,8 @@ const OrderCard = ({ order, onStatusUpdate }: OrderCardProps) => {
           </div>
         )}
 
-        <div className="pt-2 space-y-2">
-          {order.status === 'confirmed' && (
-            <Button
-              onClick={() => onStatusUpdate(order.id, 'preparing')}
-              className="w-full bg-orange-500 hover:bg-orange-600"
-            >
-              <Utensils className="h-4 w-4 mr-2" />
-              Iniciar Preparo
-            </Button>
-          )}
-          
-          {order.status === 'preparing' && (
-            <Button
-              onClick={() => onStatusUpdate(order.id, 'ready')}
-              className="w-full bg-green-500 hover:bg-green-600"
-            >
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Marcar como Pronto
-            </Button>
-          )}
+        <div className="pt-2">
+          {getActionButtons()}
         </div>
       </CardContent>
     </Card>

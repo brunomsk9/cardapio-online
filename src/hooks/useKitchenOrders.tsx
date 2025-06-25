@@ -22,8 +22,6 @@ export const useKitchenOrders = () => {
     try {
       setLoading(true);
       
-      // Por enquanto, buscamos todos os pedidos já que não temos ainda o campo restaurant_id
-      // TODO: Adicionar filtro por restaurant_id quando o campo for adicionado à tabela orders
       const { data, error } = await supabase
         .from('orders')
         .select('*')
@@ -34,6 +32,7 @@ export const useKitchenOrders = () => {
         throw error;
       }
 
+      console.log(`Loaded ${data?.length || 0} orders for restaurant ${selectedRestaurant.name}`);
       setOrders(data || []);
     } catch (error: any) {
       console.error('Error fetching orders:', error);
@@ -66,7 +65,7 @@ export const useKitchenOrders = () => {
 
       toast({
         title: "Status atualizado!",
-        description: "O status do pedido foi atualizado com sucesso.",
+        description: `Pedido marcado como: ${getStatusLabel(newStatus)}`,
       });
     } catch (error: any) {
       toast({
@@ -75,6 +74,18 @@ export const useKitchenOrders = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const getStatusLabel = (status: string) => {
+    const statusLabels = {
+      pending: 'Pendente',
+      confirmed: 'Confirmado',
+      preparing: 'Preparando',
+      ready: 'Pronto',
+      delivered: 'Entregue',
+      cancelled: 'Cancelado'
+    };
+    return statusLabels[status as keyof typeof statusLabels] || status;
   };
 
   return {
