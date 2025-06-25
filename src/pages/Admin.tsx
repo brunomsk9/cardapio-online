@@ -1,43 +1,45 @@
 
-import AdminPanel from '@/components/AdminPanel';
-import { mockMenuItems } from '@/data/mockData';
-import { toast } from '@/hooks/use-toast';
+import { useState } from 'react';
+import AdminSidebar from '@/components/admin/AdminSidebar';
+import RestaurantsManagement from '@/components/admin/RestaurantsManagement';
+import UsersManagement from '@/components/admin/UsersManagement';
+import UserProfile from '@/components/UserProfile';
+import MenuManagement from '@/components/admin/MenuManagement';
+import OrdersManagement from '@/components/admin/OrdersManagement';
+import SettingsManagement from '@/components/admin/SettingsManagement';
 
 const Admin = () => {
-  // Toda lógica de proteção é delegada para ProtectedRoute
-  // Esta página só renderiza se o usuário for admin
+  const [activeSection, setActiveSection] = useState('menu');
 
-  const handleUpdateMenuItem = (item: any) => {
-    console.log('Update menu item:', item);
-    toast({
-      title: "Item atualizado!",
-      description: "O item do cardápio foi atualizado com sucesso.",
-    });
-  };
-
-  const handleDeleteMenuItem = (itemId: string) => {
-    console.log('Delete menu item:', itemId);
-    toast({
-      title: "Item removido!",
-      description: "O item foi removido do cardápio.",
-    });
-  };
-
-  const handleAddMenuItem = (item: any) => {
-    console.log('Add menu item:', item);
-    toast({
-      title: "Item adicionado!",
-      description: "O novo item foi adicionado ao cardápio.",
-    });
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'menu':
+        return <MenuManagement />;
+      case 'orders':
+        return <OrdersManagement />;
+      case 'restaurants':
+        return <RestaurantsManagement />;
+      case 'users':
+        return <UsersManagement />;
+      case 'profile':
+        return <UserProfile />;
+      case 'settings':
+        return <SettingsManagement />;
+      default:
+        return <MenuManagement />;
+    }
   };
 
   return (
-    <AdminPanel
-      menuItems={mockMenuItems}
-      onUpdateMenuItem={handleUpdateMenuItem}
-      onDeleteMenuItem={handleDeleteMenuItem}
-      onAddMenuItem={handleAddMenuItem}
-    />
+    <div className="flex min-h-screen bg-gray-50">
+      <AdminSidebar
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+      />
+      <div className="flex-1 p-8">
+        {renderContent()}
+      </div>
+    </div>
   );
 };
 

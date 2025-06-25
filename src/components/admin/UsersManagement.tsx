@@ -4,20 +4,25 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { User, Phone, Calendar, Shield } from 'lucide-react';
+import { User, Phone, Calendar, Shield, Building2, Link } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 import { useUserRole } from '@/hooks/useUserRole';
+import UserRestaurantAssignment from './UserRestaurantAssignment';
 
 type UserProfile = Database['public']['Tables']['profiles']['Row'] & {
   user_roles?: Array<{ role: string }>;
+  user_restaurants?: Array<{ restaurant: { name: string } }>;
 };
 
 const UsersManagement = () => {
   const { isSuperAdmin } = useUserRole();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
+  const [showAssignmentDialog, setShowAssignmentDialog] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -38,9 +43,19 @@ const UsersManagement = () => {
 
       if (rolesError) throw rolesError;
 
+      const { data: userRestaurants, error: userRestaurantsError } = await supabase
+        .from('user_restaurants')
+        .select(`
+          user_id,
+          restaurant:restaurants(name)
+        `);
+
+      if (userRestaurantsError) throw userRestaurantsError;
+
       const usersWithRoles = profiles?.map(profile => ({
         ...profile,
-        user_roles: userRoles?.filter(role => role.user_id === profile.id).map(role => ({ role: role.role })) || []
+        user_roles: userRoles?.filter(role => role.user_id === profile.id).map(role => ({ role: role.role })) || [],
+        user_restaurants: userRestaurants?.filter(ur => ur.user_id === profile.id) || []
       })) || [];
 
       setUsers(usersWithRoles);
@@ -57,7 +72,6 @@ const UsersManagement = () => {
 
   const updateUserRole = async (userId: string, newRole: 'user' | 'admin' | 'kitchen' | 'super_admin') => {
     try {
-      // Super admins can assign any role, regular admins cannot assign super_admin
       if (!isSuperAdmin && newRole === 'super_admin') {
         toast({
           title: "Acesso negado",
@@ -121,6 +135,17 @@ const UsersManagement = () => {
     return roles[0].role as 'user' | 'admin' | 'kitchen' | 'super_admin';
   };
 
+  const handleAssignRestaurants = (user: UserProfile) => {
+    setSelectedUser(user);
+    setShowAssignmentDialog(true);
+  };
+
+  const handleCloseAssignment = () => {
+    setShowAssignmentDialog(false);
+    setSelectedUser(null);
+    fetchUsers(); // Refresh data
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -143,7 +168,7 @@ const UsersManagement = () => {
           <Card key={user.id}>
             <CardContent className="p-6">
               <div className="flex justify-between items-start">
-                <div className="space-y-3">
+                <div className="space-y-3 flex-1">
                   <div className="flex items-center space-x-3">
                     <div className="bg-orange-100 p-2 rounded-full">
                       <User className="h-4 w-4 text-orange-600" />
@@ -166,26 +191,54 @@ const UsersManagement = () => {
                       {new Date(user.created_at).toLocaleDateString('pt-BR')}
                     </div>
                   </div>
+
+                  {user.user_restaurants && user.user_restaurants.length > 0 && (
+                    <div className="flex items-center text-sm">
+                      <Building2 className="h-4 w-4 mr-2 text-gray-500" />
+                      <span>
+                        {user.user_restaurants.length} restaurante(s): {' '}
+                        {user.user_restaurants.map((ur, index) => (
+                          <span key={index}>
+                            {ur.restaurant?.name}
+                            {index < user.user_restaurants!.length - 1 ? ', ' : ''}
+                          </span>
+                        ))}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-3 flex flex-col items-end">
                   {getRoleBadge(user.user_roles)}
-                  <Select
-                    value={getCurrentRole(user.user_roles)}
-                    onValueChange={(value: 'user' | 'admin' | 'kitchen' | 'super_admin') => updateUserRole(user.id, value)}
-                  >  
-                    <SelectTrigger className="w-40">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="user">Usuário</SelectItem>
-                      <SelectItem value="kitchen">Cozinha</SelectItem>
-                      <SelectItem value="admin">Administrador</SelectItem>
-                      {isSuperAdmin && (
-                        <SelectItem value="super_admin">Super Admin</SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
+                  <div className="flex gap-2">
+                    <Select
+                      value={getCurrentRole(user.user_roles)}
+                      onValueChange={(value: 'user' | 'admin' | 'kitchen' | 'super_admin') => updateUserRole(user.id, value)}
+                    >  
+                      <SelectTrigger className="w-40">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="user">Usuário</SelectItem>
+                        <SelectItem value="kitchen">Cozinha</SelectItem>
+                        <SelectItem value="admin">Administrador</SelectItem>
+                        {isSuperAdmin && (
+                          <SelectItem value="super_admin">Super Admin</SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    
+                    {(getCurrentRole(user.user_roles) === 'admin' || getCurrentRole(user.user_roles) === 'kitchen') && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleAssignRestaurants(user)}
+                      >
+                        <Link className="h-4 w-4 mr-1" />
+                        Restaurantes
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -200,6 +253,24 @@ const UsersManagement = () => {
           </p>
         </div>
       )}
+
+      <Dialog open={showAssignmentDialog} onOpenChange={setShowAssignmentDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Associar Restaurantes</DialogTitle>
+            <DialogDescription>
+              Selecione os restaurantes que este usuário pode gerenciar.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedUser && (
+            <UserRestaurantAssignment
+              userId={selectedUser.id}
+              userName={selectedUser.full_name || 'Usuário'}
+              onClose={handleCloseAssignment}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

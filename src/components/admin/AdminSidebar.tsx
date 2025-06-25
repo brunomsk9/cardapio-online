@@ -1,9 +1,10 @@
 
 import { useState } from 'react';
-import { ChefHat, Users, ShoppingBag, UtensilsCrossed, Settings, Menu, X, Building2 } from 'lucide-react';
+import { ChefHat, Users, ShoppingBag, UtensilsCrossed, Settings, Menu, X, Building2, UserCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import RestaurantSelector from '@/components/RestaurantSelector';
+import { useUserRole } from '@/hooks/useUserRole';
 
 interface AdminSidebarProps {
   activeSection: string;
@@ -12,12 +13,14 @@ interface AdminSidebarProps {
 
 const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { isSuperAdmin } = useUserRole();
 
   const menuItems = [
     { id: 'menu', label: 'Cardápio', icon: UtensilsCrossed },
     { id: 'orders', label: 'Pedidos', icon: ShoppingBag },
-    { id: 'restaurants', label: 'Restaurantes', icon: Building2 },
+    ...(isSuperAdmin ? [{ id: 'restaurants', label: 'Restaurantes', icon: Building2 }] : []),
     { id: 'users', label: 'Usuários', icon: Users },
+    { id: 'profile', label: 'Meu Perfil', icon: UserCircle },
     { id: 'settings', label: 'Configurações', icon: Settings },
   ];
 
@@ -76,4 +79,3 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
 };
 
 export default AdminSidebar;
-
