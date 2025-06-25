@@ -1,13 +1,10 @@
 
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { toast } from '@/hooks/use-toast';
-import { UserPlus, X, AlertTriangle } from 'lucide-react';
-import { createUser } from '@/utils/userCreationUtils';
+import { UserPlus, X } from 'lucide-react';
+import { useUserCreationForm } from '@/hooks/useUserCreationForm';
+import { UserCreationWarning } from './UserCreationWarning';
+import { UserCreationFormFields } from './UserCreationFormFields';
 
 interface UserCreationFormProps {
   isOpen: boolean;
@@ -16,66 +13,10 @@ interface UserCreationFormProps {
 }
 
 const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormProps) => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    fullName: '',
-    phone: ''
+  const { formData, loading, handleSubmit, handleInputChange } = useUserCreationForm({
+    onUserCreated,
+    onClose
   });
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      await createUser(formData);
-
-      toast({
-        title: "Usuário criado com sucesso!",
-        description: `${formData.fullName} foi criado. Um email de confirmação foi enviado para ${formData.email}.`,
-      });
-
-      // Reset form
-      setFormData({
-        email: '',
-        password: '',
-        fullName: '',
-        phone: ''
-      });
-
-      onUserCreated();
-      onClose();
-    } catch (error: any) {
-      console.error('Error creating user:', error);
-      
-      let errorMessage = error.message;
-      
-      if (error.message?.includes('User already registered')) {
-        errorMessage = 'Este email já está cadastrado no sistema.';
-      } else if (error.message?.includes('Password should be at least')) {
-        errorMessage = 'A senha deve ter pelo menos 6 caracteres.';
-      } else if (error.message?.includes('Invalid email')) {
-        errorMessage = 'Por favor, insira um email válido.';
-      } else if (error.message?.includes('duplicate key value')) {
-        errorMessage = 'Erro interno: dados duplicados no sistema. Tente novamente.';
-      } else if (error.message?.includes('Database error saving new user')) {
-        errorMessage = 'Erro interno do banco de dados. Tente novamente em alguns segundos.';
-      }
-      
-      toast({
-        title: "Erro ao criar usuário",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -90,62 +31,13 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
           </DialogDescription>
         </DialogHeader>
 
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
-          <div className="flex items-start space-x-2">
-            <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
-            <div className="text-sm text-amber-800">
-              <p className="font-medium">Informação importante:</p>
-              <p>O usuário será criado com papel padrão (usuário) e receberá um email de confirmação. O papel pode ser alterado posteriormente na lista de usuários.</p>
-            </div>
-          </div>
-        </div>
+        <UserCreationWarning />
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="fullName">Nome Completo *</Label>
-            <Input
-              id="fullName"
-              value={formData.fullName}
-              onChange={(e) => handleInputChange('fullName', e.target.value)}
-              placeholder="Digite o nome completo"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email *</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleInputChange('email', e.target.value)}
-              placeholder="usuario@email.com"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password">Senha *</Label>
-            <Input
-              id="password"
-              type="password"
-              value={formData.password}
-              onChange={(e) => handleInputChange('password', e.target.value)}
-              placeholder="Mínimo 6 caracteres"
-              minLength={6}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="phone">Telefone</Label>
-            <Input
-              id="phone"
-              value={formData.phone}
-              onChange={(e) => handleInputChange('phone', e.target.value)}
-              placeholder="(11) 99999-9999"
-            />
-          </div>
+          <UserCreationFormFields 
+            formData={formData} 
+            onInputChange={handleInputChange} 
+          />
 
           <div className="flex gap-2 pt-4">
             <Button type="submit" disabled={loading} className="flex-1">
