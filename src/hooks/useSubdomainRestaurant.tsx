@@ -49,7 +49,30 @@ export const useSubdomainRestaurant = () => {
           return;
         }
 
-        // Buscar restaurante pelo subdomínio (sem considerar o domínio principal)
+        // Primeiro, vamos listar TODOS os restaurantes para debug
+        console.log('DEBUG: Fetching ALL restaurants first...');
+        const { data: allRestaurants, error: allError } = await supabase
+          .from('restaurants')
+          .select('*');
+
+        if (allError) {
+          console.error('Error fetching all restaurants:', allError);
+        } else {
+          console.log('DEBUG: All restaurants in database:', allRestaurants);
+          console.log('DEBUG: Total restaurants found:', allRestaurants?.length || 0);
+          
+          // Log cada restaurante individualmente
+          allRestaurants?.forEach((rest, index) => {
+            console.log(`DEBUG: Restaurant ${index + 1}:`, {
+              id: rest.id,
+              name: rest.name,
+              subdomain: rest.subdomain,
+              is_active: rest.is_active
+            });
+          });
+        }
+
+        // Agora buscar especificamente pelo subdomínio
         console.log('Searching for restaurant with subdomain:', subdomain);
         const { data, error: fetchError } = await supabase
           .from('restaurants')
@@ -63,15 +86,31 @@ export const useSubdomainRestaurant = () => {
           throw fetchError;
         }
 
+        console.log('DEBUG: Query result for subdomain', subdomain, ':', data);
+
         if (!data) {
           console.log('No restaurant found for subdomain:', subdomain);
-          // Listar todos os restaurantes disponíveis para debug
-          const { data: allRestaurants } = await supabase
+          
+          // Debug adicional: buscar sem filtro de is_active
+          console.log('DEBUG: Searching without is_active filter...');
+          const { data: dataWithoutFilter, error: errorWithoutFilter } = await supabase
             .from('restaurants')
-            .select('name, subdomain')
+            .select('*')
+            .eq('subdomain', subdomain);
+            
+          console.log('DEBUG: Result without is_active filter:', dataWithoutFilter);
+          
+          if (errorWithoutFilter) {
+            console.error('Error in query without filter:', errorWithoutFilter);
+          }
+          
+          // Listar todos os restaurantes ativos para debug
+          const { data: activeRestaurants } = await supabase
+            .from('restaurants')
+            .select('name, subdomain, is_active')
             .eq('is_active', true);
           
-          console.log('Available restaurants:', allRestaurants);
+          console.log('Available active restaurants:', activeRestaurants);
           throw new Error(`Restaurante não encontrado para o subdomínio: ${subdomain}`);
         }
 
