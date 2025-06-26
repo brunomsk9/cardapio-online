@@ -17,8 +17,8 @@ const CategoryFilter = ({ categories, activeCategory, onCategoryChange }: Catego
           onClick={() => onCategoryChange(category.key)}
           className={
             activeCategory === category.key
-              ? 'bg-koombo-grafite hover:bg-koombo-grafite/90 text-koombo-branco border-koombo-grafite'
-              : 'hover:bg-koombo-grafite/10 border-koombo-grafite text-koombo-grafite hover:text-koombo-grafite'
+              ? 'bg-koombo-branco hover:bg-koombo-branco/90 text-koombo-grafite border-koombo-branco font-semibold'
+              : 'hover:bg-koombo-branco/20 border-koombo-branco text-koombo-branco hover:text-koombo-branco font-medium'
           }
         >
           {category.label}
