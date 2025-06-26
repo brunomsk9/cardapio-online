@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -98,6 +97,12 @@ const Index = () => {
   const filteredItems = activeCategory === 'all'
     ? menuItems
     : menuItems.filter(item => item.category === activeCategory);
+
+  // Helper function to get cart quantity for an item
+  const getCartQuantity = (itemId: string) => {
+    const cartItem = cart.find(item => item.id === itemId);
+    return cartItem ? cartItem.quantity : 0;
+  };
 
   // Mostrar loading se estiver carregando dados críticos
   if (authLoading || restaurantLoading || (restaurant && menuLoading)) {
@@ -219,7 +224,6 @@ const Index = () => {
     );
   }
 
-  // ... keep existing code (código para subdomínios de restaurantes)
   return (
     <div className="min-h-screen bg-gray-50">
       <Header 
@@ -257,6 +261,8 @@ const Index = () => {
                 key={item.id}
                 item={item}
                 onAddToCart={() => addToCart(item)}
+                cartQuantity={getCartQuantity(item.id)}
+                onUpdateQuantity={updateQuantity}
               />
             ))}
           </div>

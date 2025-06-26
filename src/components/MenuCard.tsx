@@ -21,10 +21,17 @@ const categoryLabels = {
 
 const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: MenuCardProps) => {
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 hover:scale-105 transform">
+    <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02] relative bg-white">
+      {/* Quantity Badge - appears only when item is in cart */}
+      {cartQuantity > 0 && (
+        <Badge className="absolute top-3 left-3 bg-koombo-laranja text-white font-bold text-sm z-10 w-8 h-8 rounded-full flex items-center justify-center">
+          {cartQuantity}
+        </Badge>
+      )}
+
       <div className="relative h-48 overflow-hidden">
         <img
-          src={item.image_url || ''}
+          src={item.image_url || '/placeholder.svg'}
           alt={item.name}
           className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
         />
@@ -42,8 +49,8 @@ const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: Men
       
       <CardContent>
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-green-600">
-            R$ {item.price.toFixed(2)}
+          <span className="text-2xl font-bold text-koombo-laranja">
+            R$ {item.price.toFixed(2).replace('.', ',')}
           </span>
           {!item.available && (
             <Badge variant="destructive">Indisponível</Badge>
@@ -55,21 +62,23 @@ const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: Men
         {item.available ? (
           <div className="flex items-center justify-between w-full">
             {cartQuantity > 0 ? (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center justify-between w-full">
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => onUpdateQuantity?.(item.id, cartQuantity - 1)}
-                  className="border-koombo-laranja text-koombo-laranja hover:bg-koombo-cream"
+                  className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white w-10 h-10 rounded-full p-0"
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-                <span className="font-semibold text-koombo-grafite">{cartQuantity}</span>
+                <span className="font-bold text-lg text-koombo-grafite mx-4">
+                  {cartQuantity}
+                </span>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => onUpdateQuantity?.(item.id, cartQuantity + 1)}
-                  className="border-koombo-laranja text-koombo-laranja hover:bg-koombo-cream"
+                  className="border-koombo-laranja text-koombo-laranja hover:bg-koombo-laranja hover:text-white w-10 h-10 rounded-full p-0"
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -77,10 +86,10 @@ const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: Men
             ) : (
               <Button
                 onClick={() => onAddToCart(item)}
-                className="w-full bg-koombo-laranja hover:bg-koombo-laranja/90 text-koombo-branco"
+                className="w-full bg-koombo-laranja hover:bg-koombo-laranja/90 text-koombo-branco rounded-xl py-3"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Adicionar
+                Adicionar ao Carrinho
               </Button>
             )}
           </div>
