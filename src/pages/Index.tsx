@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -38,6 +37,8 @@ const Index = () => {
   } = useCart();
 
   const [showCheckout, setShowCheckout] = useState(false);
+
+  console.log('Index component - isMainDomain:', isMainDomain);
 
   const handleAdminToggle = () => {
     if (authLoading || roleLoading) {
@@ -140,6 +141,7 @@ const Index = () => {
 
   // Se for o domínio principal, mostrar a página de apresentação do produto
   if (isMainDomain) {
+    console.log('Rendering main domain page');
     return (
       <div className="min-h-screen bg-gray-50">
         <Header 
@@ -177,15 +179,15 @@ const Index = () => {
         {/* WhatsApp CTA Section */}
         <WhatsAppCTA />
 
-        {/* Features Section */}
-        <section className="py-20 bg-gray-600">
+        {/* Features Section - Updated with explicit styling */}
+        <section className="py-20" style={{ backgroundColor: '#4B5563' }}>
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl">
-              <h1 className="text-5xl font-bold text-white mb-8">
-                TUDO O QUE VOCÊ PRECISA EM UM <span className="text-koombo-laranja">KOOMBO</span> SÓ.
+            <div className="max-w-4xl mx-auto">
+              <h1 className="text-5xl font-bold mb-8" style={{ color: 'white' }}>
+                TUDO O QUE VOCÊ PRECISA EM UM <span style={{ color: '#FF521D' }}>KOOMBO</span> SÓ.
               </h1>
               
-              <h2 className="text-2xl font-light text-white/90 mb-16">
+              <h2 className="text-2xl font-light mb-16" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
                 Tenha sua gestão de pedidos tudo sob controle.
               </h2>
 
@@ -194,9 +196,9 @@ const Index = () => {
                   <div className="bg-koombo-laranja text-white rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0">
                     <ShoppingCart className="h-8 w-8" />
                   </div>
-                  <div>
+                  <div className="text-left">
                     <h3 className="text-2xl font-bold text-white mb-3">Gestão de Pedidos</h3>
-                    <p className="text-lg text-white/80 leading-relaxed">
+                    <p className="text-lg leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                       Controle total sobre todos os pedidos, desde o recebimento até a entrega.
                       Acompanhe o status em tempo real e mantenha seus clientes sempre informados.
                     </p>
@@ -207,9 +209,9 @@ const Index = () => {
                   <div className="bg-koombo-laranja text-white rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0">
                     <Utensils className="h-8 w-8" />
                   </div>
-                  <div>
+                  <div className="text-left">
                     <h3 className="text-2xl font-bold text-white mb-3">Cozinha Integrada</h3>
-                    <p className="text-lg text-white/80 leading-relaxed">
+                    <p className="text-lg leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                       Sistema integrado para a cozinha acompanhar e gerenciar os pedidos em tempo real.
                       Otimize o fluxo de trabalho e reduza o tempo de preparo.
                     </p>
@@ -220,9 +222,9 @@ const Index = () => {
                   <div className="bg-koombo-laranja text-white rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0">
                     <BarChart3 className="h-8 w-8" />
                   </div>
-                  <div>
+                  <div className="text-left">
                     <h3 className="text-2xl font-bold text-white mb-3">Relatórios Completos</h3>
-                    <p className="text-lg text-white/80 leading-relaxed">
+                    <p className="text-lg leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                       Acompanhe vendas, clientes e performance com relatórios detalhados.
                       Tome decisões baseadas em dados e faça seu negócio crescer.
                     </p>
@@ -242,6 +244,7 @@ const Index = () => {
     );
   }
 
+  console.log('Rendering restaurant-specific page');
   return (
     <div className="min-h-screen bg-gray-50">
       <Header 
