@@ -64,6 +64,7 @@ const UsersList = ({
             user={user}
             onRoleUpdate={onRoleUpdate}
             onAssignRestaurants={onAssignRestaurants}
+            onUserDeleted={onRoleUpdate}
           />
         ))}
       </div>
