@@ -33,10 +33,6 @@ const RestaurantUsersManagement = () => {
     fetchUsers();
   };
 
-  const handleUserDeleted = () => {
-    fetchUsers();
-  };
-
   if (!selectedRestaurant) {
     return (
       <Card>
@@ -89,7 +85,6 @@ const RestaurantUsersManagement = () => {
                 user={user}
                 onRoleUpdate={fetchUsers}
                 onAssignRestaurants={() => {}} // Não permitir reatribuição aqui
-                onUserDeleted={handleUserDeleted}
                 hideRestaurantAssignment={true}
               />
             ))}

@@ -2,11 +2,9 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { User, Mail, Phone, Building2, Settings, Trash2 } from 'lucide-react';
+import { User, Mail, Phone, Building2, Settings } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 import UserRoleSelect from './UserRoleSelect';
-import { useState } from 'react';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 type UserProfile = Database['public']['Tables']['profiles']['Row'] & {
   user_roles?: Array<{ role: string }>;
@@ -18,13 +16,10 @@ interface UserCardProps {
   user: UserProfile;
   onRoleUpdate: () => void;
   onAssignRestaurants: (user: UserProfile) => void;
-  onUserDeleted?: () => void;
   hideRestaurantAssignment?: boolean;
 }
 
-const UserCard = ({ user, onRoleUpdate, onAssignRestaurants, onUserDeleted, hideRestaurantAssignment = false }: UserCardProps) => {
-  const [isDeleting, setIsDeleting] = useState(false);
-
+const UserCard = ({ user, onRoleUpdate, onAssignRestaurants, hideRestaurantAssignment = false }: UserCardProps) => {
   const getCurrentRole = (roles: { role: string }[] | undefined): 'user' | 'admin' | 'kitchen' | 'super_admin' => {
     if (!roles || roles.length === 0) return 'user';
     return roles[0].role as 'user' | 'admin' | 'kitchen' | 'super_admin';
@@ -53,21 +48,6 @@ const UserCard = ({ user, onRoleUpdate, onAssignRestaurants, onUserDeleted, hide
         return 'Cozinha';
       default:
         return 'Usuário';
-    }
-  };
-
-  const handleDeleteUser = async () => {
-    if (!onUserDeleted) return;
-    
-    setIsDeleting(true);
-    try {
-      const { deleteUser } = await import('@/utils/userDeletionUtils');
-      await deleteUser(user.id, user.full_name || 'Usuário');
-      onUserDeleted();
-    } catch (error) {
-      console.error('Error deleting user:', error);
-    } finally {
-      setIsDeleting(false);
     }
   };
 
@@ -138,47 +118,6 @@ const UserCard = ({ user, onRoleUpdate, onAssignRestaurants, onUserDeleted, hide
                 <Settings className="h-3 w-3" />
                 <span>Restaurantes</span>
               </Button>
-            )}
-
-            {onUserDeleted && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex items-center space-x-1 text-red-600 hover:text-red-700 border-red-300 hover:border-red-400"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Tem certeza que deseja excluir o usuário <strong>{user.full_name}</strong>?
-                      <br />
-                      <br />
-                      Esta ação é irreversível e removerá:
-                      <ul className="list-disc list-inside mt-2 space-y-1">
-                        <li>O perfil do usuário</li>
-                        <li>Suas permissões e papéis</li>
-                        <li>Suas associações com restaurantes</li>
-                        <li>Sua conta de autenticação</li>
-                      </ul>
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleDeleteUser}
-                      disabled={isDeleting}
-                      className="bg-red-600 hover:bg-red-700"
-                    >
-                      {isDeleting ? 'Excluindo...' : 'Excluir Usuário'}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
             )}
           </div>
         </div>
