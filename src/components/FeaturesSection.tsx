@@ -15,34 +15,34 @@ const FeaturesSection = () => {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="flex flex-col items-center p-8 bg-koombo-grafite border border-koombo-laranja/20 rounded-xl hover:border-koombo-laranja/40 transition-colors">
+            <div className="flex flex-col items-center p-8 bg-koombo-branco border border-koombo-laranja/20 rounded-xl hover:border-koombo-laranja/40 transition-colors">
               <div className="bg-koombo-laranja text-koombo-branco rounded-full w-20 h-20 flex items-center justify-center mb-6 shadow-lg">
                 <ShoppingCart className="h-10 w-10" />
               </div>
-              <h3 className="text-xl font-bold text-koombo-branco mb-4">Gestão de Pedidos</h3>
-              <p className="text-koombo-branco/80 leading-relaxed text-center">
+              <h3 className="text-xl font-bold text-koombo-grafite mb-4">Gestão de Pedidos</h3>
+              <p className="text-koombo-grafite leading-relaxed text-center">
                 Controle total sobre todos os pedidos, desde o recebimento até a entrega. 
                 Sistema completo para acompanhar o status de cada pedido em tempo real.
               </p>
             </div>
 
-            <div className="flex flex-col items-center p-8 bg-koombo-grafite border border-koombo-laranja/20 rounded-xl hover:border-koombo-laranja/40 transition-colors">
+            <div className="flex flex-col items-center p-8 bg-koombo-branco border border-koombo-laranja/20 rounded-xl hover:border-koombo-laranja/40 transition-colors">
               <div className="bg-koombo-laranja text-koombo-branco rounded-full w-20 h-20 flex items-center justify-center mb-6 shadow-lg">
                 <Utensils className="h-10 w-10" />
               </div>
-              <h3 className="text-xl font-bold text-koombo-branco mb-4">Cozinha Integrada</h3>
-              <p className="text-koombo-branco/80 leading-relaxed text-center">
+              <h3 className="text-xl font-bold text-koombo-grafite mb-4">Cozinha Integrada</h3>
+              <p className="text-koombo-grafite leading-relaxed text-center">
                 Sistema integrado para a cozinha acompanhar pedidos em tempo real. 
                 Interface otimizada para facilitar o trabalho da equipe da cozinha.
               </p>
             </div>
 
-            <div className="flex flex-col items-center p-8 bg-koombo-grafite border border-koombo-laranja/20 rounded-xl hover:border-koombo-laranja/40 transition-colors">
+            <div className="flex flex-col items-center p-8 bg-koombo-branco border border-koombo-laranja/20 rounded-xl hover:border-koombo-laranja/40 transition-colors">
               <div className="bg-koombo-laranja text-koombo-branco rounded-full w-20 h-20 flex items-center justify-center mb-6 shadow-lg">
                 <BarChart3 className="h-10 w-10" />
               </div>
-              <h3 className="text-xl font-bold text-koombo-branco mb-4">Relatórios Completos</h3>
-              <p className="text-koombo-branco/80 leading-relaxed text-center">
+              <h3 className="text-xl font-bold text-koombo-grafite mb-4">Relatórios Completos</h3>
+              <p className="text-koombo-grafite leading-relaxed text-center">
                 Acompanhe vendas e performance com relatórios detalhados. 
                 Dados precisos para tomar melhores decisões no seu negócio.
               </p>
