@@ -20,17 +20,15 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				'venice': ['Inter', 'sans-serif'], // Usando Inter como fallback para Venice Blvd
+				'venice': ['Inter', 'sans-serif'],
 				'sans': ['Inter', 'sans-serif'],
 			},
 			colors: {
-				// Cores da Koombo
+				// Cores da Koombo - Novas cores específicas
 				koombo: {
-					black: '#000000',    // Preto
-					graphite: '#262626', // Grafite  
-					orange: '#FF5D24',   // Laranja
-					cream: '#F8F4E2',    // Cream
-					white: '#FFFFFF',    // Branco
+					orange: '#FF521D',    // Laranja principal
+					graphite: '#282828', // Grafite escuro
+					white: '#FFFFFF',    // Branco puro
 				},
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -38,24 +36,24 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#FF5D24', // Laranja da Koombo como cor primária
+					DEFAULT: '#FF521D', // Laranja da Koombo
 					foreground: '#FFFFFF'
 				},
 				secondary: {
-					DEFAULT: '#F8F4E2', // Cream como secundária
-					foreground: '#262626'
+					DEFAULT: '#F8F8F8', // Cinza muito claro para contraste suave
+					foreground: '#282828'
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
 					foreground: 'hsl(var(--destructive-foreground))'
 				},
 				muted: {
-					DEFAULT: '#F8F4E2',
-					foreground: '#262626'
+					DEFAULT: '#F5F5F5',
+					foreground: '#282828'
 				},
 				accent: {
-					DEFAULT: '#F8F4E2',
-					foreground: '#262626'
+					DEFAULT: '#F8F8F8',
+					foreground: '#282828'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',

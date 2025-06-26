@@ -131,7 +131,7 @@ const Index = () => {
     : 'Sistema de Pedidos & Gestão - Descubra os melhores sabores da nossa cozinha.';
 
   return (
-    <div className="min-h-screen bg-koombo-cream">
+    <div className="min-h-screen bg-white">
       <Header 
         cartItemsCount={getTotalItems()}
         onCartClick={() => setShowCart(true)}
@@ -142,18 +142,18 @@ const Index = () => {
         isKitchen={isKitchen}
       />
 
-      <section className="bg-gradient-to-br from-koombo-orange to-red-500 py-16">
-        <div className="container mx-auto text-center px-4">
-          <h2 className="text-4xl md:text-5xl font-bold font-venice text-white mb-4 tracking-wide">
-            Bem-vindo ao {pageTitle}!
+      <section className="bg-gradient-to-br from-koombo-orange to-orange-600 py-20">
+        <div className="container mx-auto text-center px-6">
+          <h2 className="text-5xl md:text-6xl font-bold font-venice text-white mb-6 tracking-tight">
+            {pageTitle}
           </h2>
-          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto font-light leading-relaxed">
             {pageDescription}
           </p>
         </div>
       </section>
 
-      <section className="container mx-auto mt-8 px-4">
+      <section className="container mx-auto py-16 px-6">
         <CategoryFilter
           categories={categories}
           activeCategory={activeCategory}
@@ -161,7 +161,7 @@ const Index = () => {
         />
 
         {filteredItems.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {filteredItems.map(item => (
               <MenuCard
                 key={item.id}
@@ -171,13 +171,15 @@ const Index = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <p className="text-koombo-graphite text-lg">
-              {restaurant 
-                ? `${restaurant.name} ainda não possui itens no cardápio.`
-                : 'Nenhum item encontrado nesta categoria.'
-              }
-            </p>
+          <div className="text-center py-20">
+            <div className="bg-gray-50 rounded-2xl p-12 max-w-md mx-auto">
+              <p className="text-koombo-graphite text-lg font-medium">
+                {restaurant 
+                  ? `${restaurant.name} ainda não possui itens no cardápio.`
+                  : 'Nenhum item encontrado nesta categoria.'
+                }
+              </p>
+            </div>
           </div>
         )}
       </section>

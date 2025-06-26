@@ -3,86 +3,87 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
+/* Design system com as cores específicas da Koombo */
 
 @layer base {
   :root {
-    --background: 255 255 255; /* Branco */
-    --foreground: 38 38 38; /* Grafite */
+    --background: 255 255 255; /* Branco puro */
+    --foreground: 40 40 40; /* Grafite */
 
     --card: 255 255 255;
-    --card-foreground: 38 38 38;
+    --card-foreground: 40 40 40;
 
     --popover: 255 255 255;
-    --popover-foreground: 38 38 38;
+    --popover-foreground: 40 40 40;
 
-    --primary: 255 93 36; /* Laranja Koombo */
+    --primary: 255 82 29; /* FF521D - Laranja Koombo */
     --primary-foreground: 255 255 255;
 
-    --secondary: 248 244 226; /* Cream */
-    --secondary-foreground: 38 38 38;
+    --secondary: 248 248 248; /* Cinza muito claro */
+    --secondary-foreground: 40 40 40;
 
-    --muted: 248 244 226; /* Cream */
-    --muted-foreground: 38 38 38;
+    --muted: 245 245 245;
+    --muted-foreground: 40 40 40;
 
-    --accent: 248 244 226; /* Cream */
-    --accent-foreground: 38 38 38;
+    --accent: 248 248 248;
+    --accent-foreground: 40 40 40;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 255 255 255;
 
-    --border: 248 244 226; /* Cream para bordas */
-    --input: 248 244 226;
-    --ring: 255 93 36; /* Laranja para focus */
+    --border: 229 229 229; /* Bordas suaves */
+    --input: 245 245 245;
+    --ring: 255 82 29; /* Laranja para focus */
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 255 255 255;
-    --sidebar-foreground: 38 38 38;
-    --sidebar-primary: 255 93 36;
+    --sidebar-foreground: 40 40 40;
+    --sidebar-primary: 255 82 29;
     --sidebar-primary-foreground: 255 255 255;
-    --sidebar-accent: 248 244 226;
-    --sidebar-accent-foreground: 38 38 38;
-    --sidebar-border: 248 244 226;
-    --sidebar-ring: 255 93 36;
+    --sidebar-accent: 248 248 248;
+    --sidebar-accent-foreground: 40 40 40;
+    --sidebar-border: 229 229 229;
+    --sidebar-ring: 255 82 29;
   }
 
   .dark {
-    --background: 38 38 38; /* Grafite */
+    --background: 40 40 40; /* Grafite */
     --foreground: 255 255 255;
 
-    --card: 38 38 38;
+    --card: 40 40 40;
     --card-foreground: 255 255 255;
 
-    --popover: 38 38 38;
+    --popover: 40 40 40;
     --popover-foreground: 255 255 255;
 
-    --primary: 255 93 36; /* Laranja Koombo */
+    --primary: 255 82 29; /* Laranja Koombo */
     --primary-foreground: 255 255 255;
 
-    --secondary: 0 0 0; /* Preto */
+    --secondary: 32 32 32;
     --secondary-foreground: 255 255 255;
 
-    --muted: 0 0 0;
-    --muted-foreground: 248 244 226;
+    --muted: 32 32 32;
+    --muted-foreground: 200 200 200;
 
-    --accent: 0 0 0;
+    --accent: 32 32 32;
     --accent-foreground: 255 255 255;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 255 255 255;
 
-    --border: 0 0 0;
-    --input: 0 0 0;
-    --ring: 255 93 36;
-    --sidebar-background: 0 0 0;
-    --sidebar-foreground: 248 244 226;
-    --sidebar-primary: 255 93 36;
+    --border: 64 64 64;
+    --input: 32 32 32;
+    --ring: 255 82 29;
+    
+    --sidebar-background: 32 32 32;
+    --sidebar-foreground: 200 200 200;
+    --sidebar-primary: 255 82 29;
     --sidebar-primary-foreground: 255 255 255;
-    --sidebar-accent: 38 38 38;
-    --sidebar-accent-foreground: 248 244 226;
-    --sidebar-border: 38 38 38;
-    --sidebar-ring: 255 93 36;
+    --sidebar-accent: 40 40 40;
+    --sidebar-accent-foreground: 200 200 200;
+    --sidebar-border: 64 64 64;
+    --sidebar-ring: 255 82 29;
   }
 }
 
@@ -92,6 +93,6 @@
   }
 
   body {
-    @apply bg-background text-foreground font-venice;
+    @apply bg-background text-foreground font-venice antialiased;
   }
 }
