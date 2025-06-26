@@ -10,7 +10,7 @@ const FeaturesSection = () => {
             RECURSOS <span className="text-koombo-laranja">PRINCIPAIS</span>
           </h2>
           
-          <p className="text-lg md:text-xl font-light mb-16 text-koombo-branco/90">
+          <p className="text-lg md:text-xl font-light mb-16 text-koombo-branco">
             Tudo que você precisa para gerenciar seu restaurante de forma eficiente.
           </p>
 
