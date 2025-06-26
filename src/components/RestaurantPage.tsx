@@ -133,8 +133,8 @@ const RestaurantPage = ({
               <div 
                 className="w-full h-[350px] lg:h-[400px] bg-cover bg-center rounded-2xl shadow-2xl"
                 style={{
-                  backgroundImage: restaurant?.image_url 
-                    ? `url('${restaurant.image_url}')`
+                  backgroundImage: restaurant?.logo_url 
+                    ? `url('${restaurant.logo_url}')`
                     : `url('/lovable-uploads/0c88a4e4-020c-4637-bce1-b2b693821e08.png')`
                 }}
               >
