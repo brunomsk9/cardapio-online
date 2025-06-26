@@ -16,6 +16,7 @@ import SettingsManagement from '@/components/admin/SettingsManagement';
 import RestaurantUsersManagement from '@/components/admin/RestaurantUsersManagement';
 import RestaurantSettings from '@/components/admin/RestaurantSettings';
 import CustomersManagement from '@/components/admin/CustomersManagement';
+import ReportsManagement from '@/components/admin/ReportsManagement';
 import { useUserRole } from '@/hooks/useUserRole';
 
 const Admin = () => {
@@ -52,6 +53,8 @@ const Admin = () => {
         return isSuperAdmin ? <UsersManagement /> : <RestaurantUsersManagement />;
       case 'customers':
         return <CustomersManagement />;
+      case 'reports':
+        return <ReportsManagement />;
       case 'profile':
         return <UserProfile />;
       case 'settings':

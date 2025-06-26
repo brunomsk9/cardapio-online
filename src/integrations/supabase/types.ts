@@ -329,7 +329,50 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      customer_reports: {
+        Row: {
+          average_order_value: number | null
+          completed_orders: number | null
+          customer_email: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          first_order_date: string | null
+          last_order_date: string | null
+          restaurant_id: string | null
+          total_orders: number | null
+          total_spent: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_reports: {
+        Row: {
+          average_order_value: number | null
+          cancelled_orders: number | null
+          date: string | null
+          delivered_orders: number | null
+          restaurant_id: string | null
+          total_orders: number | null
+          total_revenue: number | null
+          unique_customers: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       get_all_users_profiles: {

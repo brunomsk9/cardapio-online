@@ -9,7 +9,8 @@ import {
   UserCheck,
   ClipboardList,
   Eye,
-  ChefHat
+  ChefHat,
+  BarChart3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -29,6 +30,7 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
     { id: 'orders', label: 'Pedidos', icon: ShoppingCart },
     { id: 'tracking', label: 'Acompanhar', icon: Eye },
     { id: 'customers', label: 'Clientes', icon: UserCheck },
+    { id: 'reports', label: 'Relatórios', icon: BarChart3 },
     ...(isSuperAdmin ? [
       { id: 'restaurants', label: 'Restaurantes', icon: Building2 },
       { id: 'users', label: 'Usuários', icon: Users }
