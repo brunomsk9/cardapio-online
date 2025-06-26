@@ -3,15 +3,32 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Building2, Users, Settings, ArrowRight } from 'lucide-react';
+import { Plus, Building2, Users, Settings, ArrowRight, LogOut } from 'lucide-react';
 import { useUserRole } from '@/hooks/useUserRole';
-import { Link } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 import RestaurantsManagement from '@/components/admin/RestaurantsManagement';
 import UsersManagement from '@/components/admin/UsersManagement';
 
 const SuperAdmin = () => {
   const { isSuperAdmin, loading } = useUserRole();
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('restaurants');
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast({
+        title: "Erro ao sair",
+        description: "Não foi possível fazer logout. Tente novamente.",
+        variant: "destructive",
+      });
+    } else {
+      navigate('/');
+    }
+  };
 
   if (loading) {
     return (
@@ -56,6 +73,14 @@ const SuperAdmin = () => {
               <Badge variant="secondary" className="bg-purple-100 text-purple-800">
                 Super Administrador
               </Badge>
+              <Button
+                variant="outline"
+                onClick={handleSignOut}
+                className="flex items-center space-x-2"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Sair</span>
+              </Button>
             </div>
           </div>
         </div>
