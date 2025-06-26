@@ -49,17 +49,36 @@ export const useSubdomainRestaurant = () => {
           return;
         }
 
-        // Primeiro, vamos listar TODOS os restaurantes para debug
-        console.log('DEBUG: Fetching ALL restaurants first...');
-        const { data: allRestaurants, error: allError } = await supabase
+        // Debug da sessão do usuário
+        console.log('DEBUG: Checking user session...');
+        const { data: session, error: sessionError } = await supabase.auth.getSession();
+        console.log('DEBUG: Session data:', session);
+        console.log('DEBUG: Session error:', sessionError);
+
+        // Primeiro, vamos listar TODOS os restaurantes para debug - SEM FILTROS
+        console.log('DEBUG: Fetching ALL restaurants (no filters)...');
+        const { data: allRestaurantsNoFilter, error: allErrorNoFilter } = await supabase
           .from('restaurants')
           .select('*');
 
+        console.log('DEBUG: Raw query result (no filters):', allRestaurantsNoFilter);
+        console.log('DEBUG: Raw query error (no filters):', allErrorNoFilter);
+
+        // Agora com filtro is_active
+        console.log('DEBUG: Fetching restaurants with is_active filter...');
+        const { data: allRestaurants, error: allError } = await supabase
+          .from('restaurants')
+          .select('*')
+          .eq('is_active', true);
+
+        console.log('DEBUG: Filtered query result:', allRestaurants);
+        console.log('DEBUG: Filtered query error:', allError);
+
         if (allError) {
-          console.error('Error fetching all restaurants:', allError);
+          console.error('Error fetching restaurants:', allError);
         } else {
-          console.log('DEBUG: All restaurants in database:', allRestaurants);
-          console.log('DEBUG: Total restaurants found:', allRestaurants?.length || 0);
+          console.log('DEBUG: All active restaurants in database:', allRestaurants);
+          console.log('DEBUG: Total active restaurants found:', allRestaurants?.length || 0);
           
           // Log cada restaurante individualmente
           allRestaurants?.forEach((rest, index) => {
@@ -73,7 +92,7 @@ export const useSubdomainRestaurant = () => {
         }
 
         // Agora buscar especificamente pelo subdomínio
-        console.log('Searching for restaurant with subdomain:', subdomain);
+        console.log('DEBUG: Searching for restaurant with subdomain:', subdomain);
         const { data, error: fetchError } = await supabase
           .from('restaurants')
           .select('*')
@@ -81,12 +100,13 @@ export const useSubdomainRestaurant = () => {
           .eq('is_active', true)
           .maybeSingle();
 
+        console.log('DEBUG: Specific subdomain query result:', data);
+        console.log('DEBUG: Specific subdomain query error:', fetchError);
+
         if (fetchError) {
           console.error('Error fetching restaurant by subdomain:', fetchError);
           throw fetchError;
         }
-
-        console.log('DEBUG: Query result for subdomain', subdomain, ':', data);
 
         if (!data) {
           console.log('No restaurant found for subdomain:', subdomain);
@@ -99,18 +119,8 @@ export const useSubdomainRestaurant = () => {
             .eq('subdomain', subdomain);
             
           console.log('DEBUG: Result without is_active filter:', dataWithoutFilter);
+          console.log('DEBUG: Error without is_active filter:', errorWithoutFilter);
           
-          if (errorWithoutFilter) {
-            console.error('Error in query without filter:', errorWithoutFilter);
-          }
-          
-          // Listar todos os restaurantes ativos para debug
-          const { data: activeRestaurants } = await supabase
-            .from('restaurants')
-            .select('name, subdomain, is_active')
-            .eq('is_active', true);
-          
-          console.log('Available active restaurants:', activeRestaurants);
           throw new Error(`Restaurante não encontrado para o subdomínio: ${subdomain}`);
         }
 
