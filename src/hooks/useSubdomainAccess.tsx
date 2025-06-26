@@ -27,17 +27,19 @@ export const useSubdomainAccess = (): SubdomainAccessResult => {
 
   useEffect(() => {
     const checkAccess = async () => {
-      // Se ainda está carregando auth ou roles, aguarda
-      if (authLoading || roleLoading || restaurantsLoading || !domainInfo) {
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-      setShouldRedirect(false);
-      setRedirectUrl(undefined);
-
       try {
+        // Se ainda está carregando qualquer dependência, aguarda
+        if (authLoading || roleLoading || restaurantsLoading || !domainInfo) {
+          console.log('🔄 Still loading dependencies, waiting...');
+          return;
+        }
+
+        console.log('🔍 Checking subdomain access...');
+        setLoading(true);
+        setError(null);
+        setShouldRedirect(false);
+        setRedirectUrl(undefined);
+
         // Se não há usuário logado, permite acesso (será tratado pela autenticação)
         if (!user) {
           console.log('👤 No user logged in, allowing access for authentication');
@@ -61,7 +63,7 @@ export const useSubdomainAccess = (): SubdomainAccessResult => {
           setError('Apenas super administradores podem acessar o domínio principal.');
           
           // Redireciona para o primeiro restaurante do usuário, se houver
-          if (restaurants.length > 0) {
+          if (restaurants && restaurants.length > 0) {
             const firstRestaurant = restaurants[0];
             if (firstRestaurant.subdomain) {
               const redirectDomain = window.location.hostname.includes('koombo.online') 
@@ -81,7 +83,7 @@ export const useSubdomainAccess = (): SubdomainAccessResult => {
 
         // Verifica se o usuário tem acesso ao subdomínio atual
         const currentSubdomain = domainInfo.subdomain;
-        const userHasAccessToSubdomain = restaurants.some(restaurant => 
+        const userHasAccessToSubdomain = restaurants && restaurants.some(restaurant => 
           restaurant.subdomain === currentSubdomain
         );
 
@@ -91,7 +93,7 @@ export const useSubdomainAccess = (): SubdomainAccessResult => {
           setError(`Você não tem permissão para acessar este restaurante.`);
           
           // Redireciona para o primeiro restaurante do usuário, se houver
-          if (restaurants.length > 0) {
+          if (restaurants && restaurants.length > 0) {
             const firstRestaurant = restaurants[0];
             if (firstRestaurant.subdomain) {
               const redirectDomain = window.location.hostname.includes('koombo.online') 

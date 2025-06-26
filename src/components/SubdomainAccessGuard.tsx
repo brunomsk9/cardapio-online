@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { AlertTriangle, Building2, ArrowRight } from 'lucide-react';
 import { useSubdomainAccess } from '@/hooks/useSubdomainAccess';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from '@/hooks/use-toast';
 
 interface SubdomainAccessGuardProps {
   children: React.ReactNode;
@@ -45,9 +44,13 @@ const SubdomainAccessGuard = ({ children }: SubdomainAccessGuardProps) => {
 
   // Se não tem acesso, mostra tela de bloqueio
   const handleSignOut = async () => {
-    await signOut();
-    if (redirectUrl) {
-      window.location.href = redirectUrl;
+    try {
+      await signOut();
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      }
+    } catch (error) {
+      console.error('Error signing out:', error);
     }
   };
 
