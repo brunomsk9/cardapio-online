@@ -141,7 +141,7 @@ const UserRestaurantAssignment = ({ userId, userName, userRole, onClose }: UserR
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-koombo-orange"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
       </div>
     );
   }
@@ -156,10 +156,10 @@ const UserRestaurantAssignment = ({ userId, userName, userRole, onClose }: UserR
       </div>
 
       {isKitchenUser && (
-        <div className="bg-koombo-graphite/5 border border-koombo-graphite/20 rounded-lg p-4 mb-4">
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
           <div className="flex items-center space-x-2">
-            <AlertTriangle className="h-4 w-4 text-koombo-graphite" />
-            <p className="text-sm text-koombo-graphite">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+            <p className="text-sm text-amber-800">
               <strong>Atenção:</strong> Usuários com papel Kitchen podem ser associados a apenas um restaurante.
             </p>
           </div>
@@ -176,11 +176,11 @@ const UserRestaurantAssignment = ({ userId, userName, userRole, onClose }: UserR
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <Building2 className="h-4 w-4 text-koombo-orange" />
+                    <Building2 className="h-4 w-4 text-orange-500" />
                     <div>
                       <h4 className="font-medium">{restaurant.name}</h4>
                       {restaurant.description && (
-                        <p className="text-sm text-koombo-graphite/70">{restaurant.description}</p>
+                        <p className="text-sm text-gray-600">{restaurant.description}</p>
                       )}
                     </div>
                   </div>
@@ -200,18 +200,18 @@ const UserRestaurantAssignment = ({ userId, userName, userRole, onClose }: UserR
 
       {restaurants.length === 0 && (
         <div className="text-center py-8">
-          <Building2 className="h-12 w-12 text-koombo-graphite/40 mx-auto mb-4" />
-          <p className="text-koombo-graphite/70">
+          <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-500">
             Nenhum restaurante ativo encontrado.
           </p>
         </div>
       )}
 
       <div className="flex gap-2 pt-4">
-        <Button onClick={handleSave} disabled={saving} className="bg-koombo-orange hover:bg-koombo-orange/90 text-koombo-white">
+        <Button onClick={handleSave} disabled={saving}>
           {saving ? 'Salvando...' : 'Salvar Associações'}
         </Button>
-        <Button variant="outline" onClick={onClose} className="border-koombo-graphite text-koombo-graphite hover:bg-koombo-white/50">
+        <Button variant="outline" onClick={onClose}>
           Cancelar
         </Button>
       </div>

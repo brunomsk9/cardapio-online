@@ -9,7 +9,7 @@ interface CategoryFilterProps {
 
 const CategoryFilter = ({ categories, activeCategory, onCategoryChange }: CategoryFilterProps) => {
   return (
-    <div className="flex flex-wrap gap-3 mb-12 justify-center">
+    <div className="flex flex-wrap gap-2 mb-6 justify-center">
       {categories.map((category) => (
         <Button
           key={category.key}
@@ -17,8 +17,8 @@ const CategoryFilter = ({ categories, activeCategory, onCategoryChange }: Catego
           onClick={() => onCategoryChange(category.key)}
           className={
             activeCategory === category.key
-              ? 'bg-koombo-orange hover:bg-koombo-orange/90 text-koombo-white font-medium px-6 py-3 rounded-xl border-0 shadow-md'
-              : 'text-koombo-graphite hover:bg-koombo-white font-medium px-6 py-3 rounded-xl border-koombo-graphite bg-koombo-white'
+              ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
+              : 'hover:bg-orange-50'
           }
         >
           {category.label}

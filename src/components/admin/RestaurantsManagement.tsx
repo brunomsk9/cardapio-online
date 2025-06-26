@@ -122,7 +122,7 @@ const RestaurantsManagement = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-koombo-orange"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
       </div>
     );
   }
@@ -130,10 +130,10 @@ const RestaurantsManagement = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-2xl font-bold text-koombo-graphite">Gerenciar Restaurantes</h3>
+        <h3 className="text-2xl font-bold">Gerenciar Restaurantes</h3>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-koombo-orange hover:bg-koombo-orange/90 text-koombo-white">
+            <Button className="bg-gradient-to-r from-green-500 to-green-600">
               <Plus className="h-4 w-4 mr-2" />
               Novo Restaurante
             </Button>

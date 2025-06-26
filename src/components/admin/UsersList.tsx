@@ -33,7 +33,7 @@ const UsersList = ({
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-koombo-orange"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
       </div>
     );
   }
@@ -41,15 +41,15 @@ const UsersList = ({
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-2xl font-bold text-koombo-graphite">Gerenciar Usuários</h3>
+        <h3 className="text-2xl font-bold">Gerenciar Usuários</h3>
         <div className="flex items-center gap-4">
-          <div className="text-sm text-koombo-graphite/70">
+          <div className="text-sm text-gray-600">
             Total: {users.length} usuários
           </div>
           <UserSyncButton onSync={onSync} syncing={syncing} />
           <Button
             onClick={onCreateUser}
-            className="bg-koombo-orange hover:bg-koombo-orange/90 text-koombo-white"
+            className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
           >
             <Plus className="h-4 w-4 mr-2" />
             Criar Usuário
@@ -70,10 +70,10 @@ const UsersList = ({
 
       {users.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-koombo-graphite/70 text-lg">
+          <p className="text-gray-500 text-lg">
             Nenhum usuário encontrado.
           </p>
-          <p className="text-sm text-koombo-graphite/50 mt-2">
+          <p className="text-sm text-gray-400 mt-2">
             Clique em "Sincronizar" para buscar usuários da tabela de autenticação.
           </p>
         </div>

@@ -2,13 +2,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
+import MenuCard from '@/components/MenuCard';
 import Cart from '@/components/Cart';
+import CategoryFilter from '@/components/CategoryFilter';
 import CheckoutModal from '@/components/checkout/CheckoutModal';
 import AuthModal from '@/components/auth/AuthModal';
-import LoadingState from '@/components/LoadingState';
-import ErrorState from '@/components/ErrorState';
-import HeroSection from '@/components/HeroSection';
-import MenuSection from '@/components/MenuSection';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -101,17 +99,28 @@ const Index = () => {
 
   // Mostrar loading se estiver carregando dados críticos
   if (authLoading || restaurantLoading || (restaurant && menuLoading)) {
-    return <LoadingState />;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Carregando...</p>
+        </div>
+      </div>
+    );
   }
 
   // Mostrar erro se houver problema ao carregar restaurante
   if (restaurantError) {
     return (
-      <ErrorState
-        title="Restaurante não encontrado"
-        message={restaurantError.message}
-        subtitle="Verifique se o endereço está correto ou entre em contato conosco."
-      />
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Restaurante não encontrado</h2>
+          <p className="text-gray-600 mb-4">{restaurantError.message}</p>
+          <p className="text-sm text-gray-500">
+            Verifique se o endereço está correto ou entre em contato conosco.
+          </p>
+        </div>
+      </div>
     );
   }
 
@@ -122,7 +131,7 @@ const Index = () => {
     : 'Sistema de Pedidos & Gestão - Descubra os melhores sabores da nossa cozinha.';
 
   return (
-    <div className="min-h-screen bg-koombo-graphite">
+    <div className="min-h-screen bg-koombo-cream">
       <Header 
         cartItemsCount={getTotalItems()}
         onCartClick={() => setShowCart(true)}
@@ -133,20 +142,45 @@ const Index = () => {
         isKitchen={isKitchen}
       />
 
-      <HeroSection 
-        title={pageTitle}
-        description={pageDescription}
-      />
+      <section className="bg-gradient-to-br from-koombo-orange to-red-500 py-16">
+        <div className="container mx-auto text-center px-4">
+          <h2 className="text-4xl md:text-5xl font-bold font-venice text-white mb-4 tracking-wide">
+            Bem-vindo ao {pageTitle}!
+          </h2>
+          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
+            {pageDescription}
+          </p>
+        </div>
+      </section>
 
-      <MenuSection
-        categories={categories}
-        activeCategory={activeCategory}
-        onCategoryChange={setActiveCategory}
-        menuItems={menuItems}
-        filteredItems={filteredItems}
-        onAddToCart={addToCart}
-        restaurantName={restaurant?.name}
-      />
+      <section className="container mx-auto mt-8 px-4">
+        <CategoryFilter
+          categories={categories}
+          activeCategory={activeCategory}
+          onCategoryChange={setActiveCategory}
+        />
+
+        {filteredItems.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filteredItems.map(item => (
+              <MenuCard
+                key={item.id}
+                item={item}
+                onAddToCart={() => addToCart(item)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-koombo-graphite text-lg">
+              {restaurant 
+                ? `${restaurant.name} ainda não possui itens no cardápio.`
+                : 'Nenhum item encontrado nesta categoria.'
+              }
+            </p>
+          </div>
+        )}
+      </section>
 
       {showCart && (
         <Cart

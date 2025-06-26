@@ -107,30 +107,30 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-koombo-white border-koombo-graphite">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-koombo-graphite">Finalizar Pedido</DialogTitle>
+          <DialogTitle>Finalizar Pedido</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           {/* Resumo do Pedido */}
           <div>
-            <h3 className="font-semibold mb-3 text-koombo-graphite">Resumo do Pedido</h3>
+            <h3 className="font-semibold mb-3">Resumo do Pedido</h3>
             <div className="space-y-2">
               {cart.map((item, index) => (
-                <div key={index} className="flex justify-between text-sm text-koombo-graphite">
+                <div key={index} className="flex justify-between text-sm">
                   <span>{item.quantity}x {item.name}</span>
                   <span>R$ {(item.price * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
-            <Separator className="my-2 bg-koombo-graphite/20" />
-            <div className="flex justify-between font-semibold text-koombo-graphite">
+            <Separator className="my-2" />
+            <div className="flex justify-between font-semibold">
               <span>Total</span>
               <span>R$ {totalPrice.toFixed(2)}</span>
             </div>
             {restaurant && (
-              <p className="text-sm text-koombo-graphite/70 mt-2">
+              <p className="text-sm text-gray-600 mt-2">
                 Restaurante: {restaurant.name}
               </p>
             )}
@@ -138,85 +138,80 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
 
           {/* Dados do Cliente */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-koombo-graphite">Dados do Cliente</h3>
+            <h3 className="font-semibold">Dados do Cliente</h3>
             
             <div>
-              <Label htmlFor="customerName" className="text-koombo-graphite">Nome *</Label>
+              <Label htmlFor="customerName">Nome *</Label>
               <Input
                 id="customerName"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 placeholder="Seu nome completo"
-                className="border-koombo-graphite/30 text-koombo-graphite focus:border-koombo-orange"
               />
             </div>
 
             <div>
-              <Label htmlFor="customerPhone" className="text-koombo-graphite">Telefone *</Label>
+              <Label htmlFor="customerPhone">Telefone *</Label>
               <Input
                 id="customerPhone"
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
                 placeholder="(11) 99999-9999"
-                className="border-koombo-graphite/30 text-koombo-graphite focus:border-koombo-orange"
               />
             </div>
 
             <div>
-              <Label htmlFor="customerEmail" className="text-koombo-graphite">E-mail</Label>
+              <Label htmlFor="customerEmail">E-mail</Label>
               <Input
                 id="customerEmail"
                 type="email"
                 value={customerEmail}
                 onChange={(e) => setCustomerEmail(e.target.value)}
                 placeholder="seu@email.com"
-                className="border-koombo-graphite/30 text-koombo-graphite focus:border-koombo-orange"
               />
             </div>
           </div>
 
           {/* Endereço de Entrega */}
           <div>
-            <Label htmlFor="deliveryAddress" className="text-koombo-graphite">Endereço de Entrega *</Label>
+            <Label htmlFor="deliveryAddress">Endereço de Entrega *</Label>
             <Textarea
               id="deliveryAddress"
               value={deliveryAddress}
               onChange={(e) => setDeliveryAddress(e.target.value)}
               placeholder="Rua, número, bairro, cidade"
               rows={3}
-              className="border-koombo-graphite/30 text-koombo-graphite focus:border-koombo-orange"
             />
           </div>
 
           {/* Método de Pagamento */}
           <div>
-            <Label className="text-koombo-graphite">Método de Pagamento</Label>
+            <Label>Método de Pagamento</Label>
             <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="pix" id="pix" className="border-koombo-graphite text-koombo-orange" />
-                <Label htmlFor="pix" className="text-koombo-graphite">PIX</Label>
+                <RadioGroupItem value="pix" id="pix" />
+                <Label htmlFor="pix">PIX</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="dinheiro" id="dinheiro" className="border-koombo-graphite text-koombo-orange" />
-                <Label htmlFor="dinheiro" className="text-koombo-graphite">Dinheiro</Label>
+                <RadioGroupItem value="dinheiro" id="dinheiro" />
+                <Label htmlFor="dinheiro">Dinheiro</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="cartao" id="cartao" className="border-koombo-graphite text-koombo-orange" />
-                <Label htmlFor="cartao" className="text-koombo-graphite">Cartão (na entrega)</Label>
+                <RadioGroupItem value="cartao" id="cartao" />
+                <Label htmlFor="cartao">Cartão (na entrega)</Label>
               </div>
             </RadioGroup>
           </div>
 
           {/* Observações */}
           <div>
-            <Label htmlFor="notes" className="text-koombo-graphite">Observações</Label>
+            <Label htmlFor="notes">Observações</Label>
             <Textarea
               id="notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Alguma observação especial para o pedido?"
               rows={2}
-              className="border-koombo-graphite/30 text-koombo-graphite focus:border-koombo-orange"
             />
           </div>
 
@@ -225,7 +220,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
             <Button
               onClick={handleCheckout}
               disabled={isSubmitting}
-              className="flex-1 bg-koombo-orange hover:bg-koombo-orange/90 text-koombo-white"
+              className="flex-1"
             >
               {isSubmitting ? 'Processando...' : 'Confirmar Pedido'}
             </Button>
@@ -233,7 +228,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
               variant="outline"
               onClick={onClose}
               disabled={isSubmitting}
-              className="flex-1 border-koombo-graphite text-koombo-graphite hover:bg-koombo-white/50"
+              className="flex-1"
             >
               Cancelar
             </Button>

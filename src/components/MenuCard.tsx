@@ -21,55 +21,53 @@ const categoryLabels = {
 
 const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: MenuCardProps) => {
   return (
-    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-koombo-graphite shadow-md bg-koombo-white rounded-2xl">
-      <div className="relative h-56 overflow-hidden">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 hover:scale-105 transform">
+      <div className="relative h-48 overflow-hidden">
         <img
           src={item.image_url || ''}
           alt={item.name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
         />
-        <Badge className="absolute top-4 right-4 bg-koombo-orange text-koombo-white font-medium px-3 py-1 rounded-lg border-0">
+        <Badge className="absolute top-2 right-2 bg-orange-500">
           {categoryLabels[item.category]}
         </Badge>
       </div>
       
-      <CardHeader className="p-6 pb-4">
-        <CardTitle className="text-xl font-bold text-koombo-graphite">{item.name}</CardTitle>
-        <CardDescription className="text-koombo-graphite/70 text-sm leading-relaxed">
+      <CardHeader>
+        <CardTitle className="text-lg">{item.name}</CardTitle>
+        <CardDescription className="text-sm text-gray-600">
           {item.description}
         </CardDescription>
       </CardHeader>
       
-      <CardContent className="px-6 pb-4">
+      <CardContent>
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-koombo-graphite">
+          <span className="text-2xl font-bold text-green-600">
             R$ {item.price.toFixed(2)}
           </span>
           {!item.available && (
-            <Badge variant="destructive" className="rounded-lg bg-koombo-orange text-koombo-white">Indisponível</Badge>
+            <Badge variant="destructive">Indisponível</Badge>
           )}
         </div>
       </CardContent>
       
-      <CardFooter className="p-6 pt-0">
+      <CardFooter>
         {item.available ? (
           <div className="flex items-center justify-between w-full">
             {cartQuantity > 0 ? (
-              <div className="flex items-center space-x-3 w-full justify-center">
+              <div className="flex items-center space-x-2">
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => onUpdateQuantity?.(item.id, cartQuantity - 1)}
-                  className="rounded-xl border-koombo-graphite hover:bg-koombo-white p-2 bg-koombo-white text-koombo-graphite"
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-                <span className="font-bold text-lg text-koombo-graphite min-w-[2rem] text-center">{cartQuantity}</span>
+                <span className="font-semibold">{cartQuantity}</span>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => onUpdateQuantity?.(item.id, cartQuantity + 1)}
-                  className="rounded-xl border-koombo-graphite hover:bg-koombo-white p-2 bg-koombo-white text-koombo-graphite"
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -77,7 +75,7 @@ const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: Men
             ) : (
               <Button
                 onClick={() => onAddToCart(item)}
-                className="w-full bg-koombo-orange hover:bg-koombo-orange/90 text-koombo-white font-medium py-3 rounded-xl border-0"
+                className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Adicionar
@@ -85,7 +83,7 @@ const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: Men
             )}
           </div>
         ) : (
-          <Button disabled className="w-full rounded-xl bg-koombo-graphite/20 text-koombo-graphite/50">
+          <Button disabled className="w-full">
             Indisponível
           </Button>
         )}

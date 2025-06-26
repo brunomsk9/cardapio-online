@@ -3,87 +3,86 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Design system com as cores específicas da Koombo */
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
 
 @layer base {
   :root {
-    --background: 255 255 255; /* #FFFFFF - Branco puro */
-    --foreground: 40 40 40; /* #282828 - Grafite */
+    --background: 255 255 255; /* Branco */
+    --foreground: 38 38 38; /* Grafite */
 
     --card: 255 255 255;
-    --card-foreground: 40 40 40;
+    --card-foreground: 38 38 38;
 
     --popover: 255 255 255;
-    --popover-foreground: 40 40 40;
+    --popover-foreground: 38 38 38;
 
-    --primary: 255 82 29; /* #FF521D - Laranja Koombo */
+    --primary: 255 93 36; /* Laranja Koombo */
     --primary-foreground: 255 255 255;
 
-    --secondary: 255 255 255; /* Branco para contraste suave */
-    --secondary-foreground: 40 40 40;
+    --secondary: 248 244 226; /* Cream */
+    --secondary-foreground: 38 38 38;
 
-    --muted: 245 245 245; /* Tom bem claro do branco */
-    --muted-foreground: 40 40 40;
+    --muted: 248 244 226; /* Cream */
+    --muted-foreground: 38 38 38;
 
-    --accent: 255 255 255;
-    --accent-foreground: 40 40 40;
+    --accent: 248 244 226; /* Cream */
+    --accent-foreground: 38 38 38;
 
-    --destructive: 255 82 29; /* Usando laranja para destructive também */
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 255 255 255;
 
-    --border: 40 40 40; /* Grafite para bordas */
-    --input: 255 255 255;
-    --ring: 255 82 29; /* Laranja para focus */
+    --border: 248 244 226; /* Cream para bordas */
+    --input: 248 244 226;
+    --ring: 255 93 36; /* Laranja para focus */
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
     --sidebar-background: 255 255 255;
-    --sidebar-foreground: 40 40 40;
-    --sidebar-primary: 255 82 29;
+    --sidebar-foreground: 38 38 38;
+    --sidebar-primary: 255 93 36;
     --sidebar-primary-foreground: 255 255 255;
-    --sidebar-accent: 255 255 255;
-    --sidebar-accent-foreground: 40 40 40;
-    --sidebar-border: 40 40 40;
-    --sidebar-ring: 255 82 29;
+    --sidebar-accent: 248 244 226;
+    --sidebar-accent-foreground: 38 38 38;
+    --sidebar-border: 248 244 226;
+    --sidebar-ring: 255 93 36;
   }
 
   .dark {
-    --background: 40 40 40; /* #282828 - Grafite */
+    --background: 38 38 38; /* Grafite */
     --foreground: 255 255 255;
 
-    --card: 40 40 40;
+    --card: 38 38 38;
     --card-foreground: 255 255 255;
 
-    --popover: 40 40 40;
+    --popover: 38 38 38;
     --popover-foreground: 255 255 255;
 
-    --primary: 255 82 29; /* #FF521D - Laranja Koombo */
+    --primary: 255 93 36; /* Laranja Koombo */
     --primary-foreground: 255 255 255;
 
-    --secondary: 40 40 40;
+    --secondary: 0 0 0; /* Preto */
     --secondary-foreground: 255 255 255;
 
-    --muted: 40 40 40;
-    --muted-foreground: 255 255 255;
+    --muted: 0 0 0;
+    --muted-foreground: 248 244 226;
 
-    --accent: 40 40 40;
+    --accent: 0 0 0;
     --accent-foreground: 255 255 255;
 
-    --destructive: 255 82 29;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 255 255 255;
 
-    --border: 255 255 255;
-    --input: 40 40 40;
-    --ring: 255 82 29;
-    
-    --sidebar-background: 40 40 40;
-    --sidebar-foreground: 255 255 255;
-    --sidebar-primary: 255 82 29;
+    --border: 0 0 0;
+    --input: 0 0 0;
+    --ring: 255 93 36;
+    --sidebar-background: 0 0 0;
+    --sidebar-foreground: 248 244 226;
+    --sidebar-primary: 255 93 36;
     --sidebar-primary-foreground: 255 255 255;
-    --sidebar-accent: 40 40 40;
-    --sidebar-accent-foreground: 255 255 255;
-    --sidebar-border: 255 255 255;
-    --sidebar-ring: 255 82 29;
+    --sidebar-accent: 38 38 38;
+    --sidebar-accent-foreground: 248 244 226;
+    --sidebar-border: 38 38 38;
+    --sidebar-ring: 255 93 36;
   }
 }
 
@@ -93,61 +92,6 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-  }
-}
-
-/* Utility classes para as cores da Koombo */
-@layer utilities {
-  .text-koombo-orange {
-    color: #FF521D;
-  }
-  
-  .text-koombo-graphite {
-    color: #282828;
-  }
-  
-  .text-koombo-white {
-    color: #FFFFFF;
-  }
-  
-  .bg-koombo-orange {
-    background-color: #FF521D;
-  }
-  
-  .bg-koombo-graphite {
-    background-color: #282828;
-  }
-  
-  .bg-koombo-white {
-    background-color: #FFFFFF;
-  }
-  
-  .border-koombo-orange {
-    border-color: #FF521D;
-  }
-  
-  .border-koombo-graphite {
-    border-color: #282828;
-  }
-  
-  .border-koombo-white {
-    border-color: #FFFFFF;
-  }
-  
-  .hover\:bg-koombo-orange:hover {
-    background-color: #FF521D;
-  }
-  
-  .hover\:bg-koombo-orange\/90:hover {
-    background-color: rgba(255, 82, 29, 0.9);
-  }
-  
-  .hover\:bg-koombo-white:hover {
-    background-color: #FFFFFF;
-  }
-  
-  .hover\:bg-koombo-white\/50:hover {
-    background-color: rgba(255, 255, 255, 0.5);
+    @apply bg-background text-foreground font-venice;
   }
 }

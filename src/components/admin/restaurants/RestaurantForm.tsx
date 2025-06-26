@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -56,12 +57,12 @@ const RestaurantForm = ({ isOpen, onClose, onSubmit, editingRestaurant }: Restau
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto bg-koombo-white border-koombo-graphite">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader className="pb-2">
-          <DialogTitle className="text-lg text-koombo-graphite">
+          <DialogTitle className="text-lg">
             {editingRestaurant ? 'Editar Restaurante' : 'Novo Restaurante'}
           </DialogTitle>
-          <DialogDescription className="text-sm text-koombo-graphite/70">
+          <DialogDescription className="text-sm">
             Preencha as informações básicas do restaurante.
           </DialogDescription>
         </DialogHeader>

@@ -25,29 +25,27 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
   };
 
   return (
-    <header className="bg-koombo-white border-b border-koombo-graphite shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+    <header className="bg-gradient-to-r from-koombo-orange to-red-500 shadow-lg sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
-          <div className="bg-koombo-orange p-2 rounded-xl">
-            <ChefHat className="h-6 w-6 text-koombo-white" />
-          </div>
-          <div className="text-koombo-graphite">
-            <h1 className="text-2xl font-bold font-venice tracking-tight">KOOMBO</h1>
-            <p className="text-xs text-koombo-graphite/70 -mt-1 font-medium">PEDIDOS & GESTÃO</p>
+          <ChefHat className="h-8 w-8 text-white" />
+          <div className="text-white">
+            <h1 className="text-2xl font-bold font-venice tracking-wide">KOOMBO</h1>
+            <p className="text-sm opacity-90 -mt-1">PEDIDOS & GESTÃO</p>
           </div>
         </div>
         
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-4">
           {!isAdmin && !isKitchen && (
             <Button
               variant="ghost"
               size="sm"
               onClick={onCartClick}
-              className="text-koombo-graphite hover:bg-koombo-white/50 relative p-3 rounded-xl"
+              className="text-white hover:bg-white/20 relative"
             >
               <ShoppingCart className="h-5 w-5" />
               {cartItemsCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 bg-koombo-orange text-koombo-white text-xs h-5 w-5 flex items-center justify-center p-0 rounded-full">
+                <Badge className="absolute -top-2 -right-2 bg-koombo-cream text-koombo-graphite">
                   {cartItemsCount}
                 </Badge>
               )}
@@ -61,24 +59,24 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
                   variant="ghost"
                   size="sm"
                   onClick={handleKitchenClick}
-                  className="text-koombo-graphite hover:bg-koombo-white/50 px-4 py-2 rounded-xl"
+                  className="text-white hover:bg-white/20"
                 >
-                  <Utensils className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:block font-medium">Cozinha</span>
+                  <Utensils className="h-5 w-5 mr-2" />
+                  <span className="hidden sm:block">Cozinha</span>
                 </Button>
               )}
               
-              <div className="flex items-center space-x-3">
-                <span className="text-koombo-graphite text-sm font-medium hidden sm:block">
-                  {user.user_metadata?.full_name || user.email}
+              <div className="flex items-center space-x-2">
+                <span className="text-white text-sm hidden sm:block">
+                  Olá, {user.user_metadata?.full_name || user.email}
                 </span>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={onSignOut}
-                  className="text-koombo-graphite hover:bg-koombo-white/50 p-3 rounded-xl"
+                  className="text-white hover:bg-white/20"
                 >
-                  <LogOut className="h-4 w-4" />
+                  <LogOut className="h-5 w-5" />
                 </Button>
               </div>
             </>
@@ -89,10 +87,10 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
               variant="ghost"
               size="sm"
               onClick={onAdminClick}
-              className="text-koombo-graphite hover:bg-koombo-white/50 px-4 py-2 rounded-xl"
+              className="text-white hover:bg-white/20"
             >
-              <Settings className="h-4 w-4 mr-2" />
-              <span className="font-medium">Admin</span>
+              <Settings className="h-5 w-5" />
+              Admin
             </Button>
           )}
           
@@ -101,10 +99,10 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
               variant="ghost"
               size="sm"
               onClick={onAdminClick}
-              className="text-koombo-graphite hover:bg-koombo-white/50 px-4 py-2 rounded-xl"
+              className="text-white hover:bg-white/20"
             >
-              <User className="h-4 w-4 mr-2" />
-              <span className="font-medium">Login</span>
+              <User className="h-5 w-5" />
+              Login
             </Button>
           )}
         </div>

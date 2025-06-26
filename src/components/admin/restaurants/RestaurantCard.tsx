@@ -16,18 +16,18 @@ interface RestaurantCardProps {
 
 const RestaurantCard = ({ restaurant, onEdit, onDelete, onToggleStatus }: RestaurantCardProps) => {
   return (
-    <Card key={restaurant.id} className="bg-koombo-white border-koombo-graphite">
+    <Card key={restaurant.id}>
       <CardContent className="p-6">
         <div className="flex justify-between items-start">
           <div className="space-y-3 flex-1">
             <div className="flex items-center space-x-3">
-              <div className="bg-koombo-orange/10 p-2 rounded-full">
-                <Building2 className="h-4 w-4 text-koombo-orange" />
+              <div className="bg-orange-100 p-2 rounded-full">
+                <Building2 className="h-4 w-4 text-orange-600" />
               </div>
               <div>
-                <h4 className="font-semibold text-lg text-koombo-graphite">{restaurant.name}</h4>
+                <h4 className="font-semibold text-lg">{restaurant.name}</h4>
                 {restaurant.description && (
-                  <p className="text-koombo-graphite/70 text-sm">{restaurant.description}</p>
+                  <p className="text-gray-600 text-sm">{restaurant.description}</p>
                 )}
               </div>
             </div>
@@ -35,25 +35,25 @@ const RestaurantCard = ({ restaurant, onEdit, onDelete, onToggleStatus }: Restau
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {restaurant.subdomain && (
                 <div className="flex items-center text-sm">
-                  <Globe className="h-4 w-4 mr-2 text-koombo-graphite/50" />
-                  <span className="text-koombo-orange">{restaurant.subdomain}.koombo.online</span>
+                  <Globe className="h-4 w-4 mr-2 text-gray-500" />
+                  <span className="text-blue-600">{restaurant.subdomain}.koombo.online</span>
                 </div>
               )}
               {restaurant.phone && (
-                <div className="flex items-center text-sm text-koombo-graphite">
-                  <Phone className="h-4 w-4 mr-2 text-koombo-graphite/50" />
+                <div className="flex items-center text-sm">
+                  <Phone className="h-4 w-4 mr-2 text-gray-500" />
                   {restaurant.phone}
                 </div>
               )}
               {restaurant.email && (
-                <div className="flex items-center text-sm text-koombo-graphite">
-                  <Mail className="h-4 w-4 mr-2 text-koombo-graphite/50" />
+                <div className="flex items-center text-sm">
+                  <Mail className="h-4 w-4 mr-2 text-gray-500" />
                   {restaurant.email}
                 </div>
               )}
               {restaurant.address && (
-                <div className="flex items-center text-sm text-koombo-graphite">
-                  <MapPin className="h-4 w-4 mr-2 text-koombo-graphite/50" />
+                <div className="flex items-center text-sm">
+                  <MapPin className="h-4 w-4 mr-2 text-gray-500" />
                   {restaurant.address}
                 </div>
               )}
@@ -61,11 +61,7 @@ const RestaurantCard = ({ restaurant, onEdit, onDelete, onToggleStatus }: Restau
           </div>
 
           <div className="space-y-2 flex flex-col items-end">
-            <Badge variant={restaurant.is_active ? "default" : "secondary"} 
-                   className={restaurant.is_active ? 
-                     "bg-koombo-orange text-koombo-white" : 
-                     "bg-koombo-graphite/20 text-koombo-graphite"
-                   }>
+            <Badge variant={restaurant.is_active ? "default" : "secondary"}>
               {restaurant.is_active ? 'Ativo' : 'Inativo'}
             </Badge>
             <div className="flex gap-2">
@@ -73,18 +69,13 @@ const RestaurantCard = ({ restaurant, onEdit, onDelete, onToggleStatus }: Restau
                 variant="outline"
                 size="sm"
                 onClick={() => onEdit(restaurant)}
-                className="border-koombo-graphite text-koombo-graphite hover:bg-koombo-white/50"
               >
                 <Edit className="h-4 w-4" />
               </Button>
               <Button
-                variant={restaurant.is_active ? "outline" : "default"}
+                variant={restaurant.is_active ? "secondary" : "default"}
                 size="sm"
                 onClick={() => onToggleStatus(restaurant)}
-                className={restaurant.is_active ? 
-                  "border-koombo-graphite text-koombo-graphite hover:bg-koombo-white/50" : 
-                  "bg-koombo-orange text-koombo-white hover:bg-koombo-orange/90"
-                }
               >
                 {restaurant.is_active ? 'Desativar' : 'Ativar'}
               </Button>
@@ -92,7 +83,6 @@ const RestaurantCard = ({ restaurant, onEdit, onDelete, onToggleStatus }: Restau
                 variant="destructive"
                 size="sm"
                 onClick={() => onDelete(restaurant)}
-                className="bg-koombo-orange text-koombo-white hover:bg-koombo-orange/90"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
