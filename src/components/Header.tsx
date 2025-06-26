@@ -1,5 +1,5 @@
 
-import { ShoppingCart, User, ChefHat, LogOut, Utensils, Settings } from 'lucide-react';
+import { ShoppingCart, User, LogOut, Utensils, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { User as SupabaseUser } from '@supabase/supabase-js';
@@ -27,9 +27,12 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
   return (
     <header className="bg-gradient-to-r from-orange-500 to-red-500 shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate('/')}>
-          <ChefHat className="h-8 w-8 text-white" />
-          <h1 className="text-2xl font-bold text-white">Sabor & Arte</h1>
+        <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
+          <img 
+            src="/lovable-uploads/4dbc6f49-08b6-40fc-b91a-70f6ee6f7ee6.png" 
+            alt="Koombo Logo" 
+            className="h-10 w-auto"
+          />
         </div>
         
         <div className="flex items-center space-x-4">

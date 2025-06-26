@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -125,10 +124,10 @@ const Index = () => {
   }
 
   // Título e descrição baseados no contexto
-  const pageTitle = restaurant ? restaurant.name : 'Sabor & Arte';
+  const pageTitle = restaurant ? restaurant.name : 'Koombo';
   const pageDescription = restaurant 
     ? (restaurant.description || `Descubra os deliciosos pratos do ${restaurant.name}`)
-    : 'Descubra os melhores sabores da nossa cozinha.';
+    : 'Pedidos & Gestão - Descubra os melhores sabores da nossa cozinha.';
 
   return (
     <div className="min-h-screen bg-gray-50">
