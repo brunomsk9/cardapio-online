@@ -5,16 +5,22 @@ const HeroSection = () => {
       <div className="container mx-auto px-4 z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           {/* Lado esquerdo - Texto */}
-          <div className="text-white space-y-6">
+          <div className="text-koombo-branco space-y-6">
             <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
               TUDO O QUE VOCÊ <br />
               PRECISA EM UM <br />
               <span className="text-koombo-laranja">KOOMBO</span> SÓ.
             </h1>
             
-            <p className="text-xl lg:text-2xl font-light text-white/90 max-w-md">
+            <p className="text-xl lg:text-2xl font-light text-koombo-branco/90 max-w-md">
               Tenha sua gestão de pedidos tudo sob controle.
             </p>
+            
+            <div className="pt-4">
+              <button className="bg-koombo-laranja hover:bg-koombo-laranja/90 text-koombo-branco font-semibold px-8 py-4 rounded-lg text-lg transition-colors shadow-lg">
+                Começar Agora
+              </button>
+            </div>
           </div>
 
           {/* Lado direito - Imagem */}
