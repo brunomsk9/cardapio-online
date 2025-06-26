@@ -21,7 +21,7 @@ const categoryLabels = {
 
 const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: MenuCardProps) => {
   return (
-    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-[1.02] relative bg-koombo-branco border-0 shadow-lg">
+    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-[1.02] relative bg-koombo-grafite border-0 shadow-lg">
       {/* Quantity Badge - appears only when item is in cart */}
       {cartQuantity > 0 && (
         <Badge className="absolute top-3 left-3 bg-koombo-laranja text-koombo-branco font-bold text-sm z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-lg">
@@ -29,20 +29,20 @@ const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: Men
         </Badge>
       )}
 
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative h-48 overflow-hidden bg-transparent">
         <img
           src={item.image_url || '/placeholder.svg'}
           alt={item.name}
-          className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+          className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
         />
-        <Badge className="absolute top-2 right-2 bg-koombo-grafite/90 text-koombo-branco shadow-lg">
+        <Badge className="absolute top-2 right-2 bg-koombo-laranja text-koombo-branco shadow-lg">
           {categoryLabels[item.category]}
         </Badge>
       </div>
       
       <CardHeader>
-        <CardTitle className="text-lg text-koombo-grafite font-bold">{item.name}</CardTitle>
-        <CardDescription className="text-sm text-koombo-grafite/70">
+        <CardTitle className="text-lg text-koombo-branco font-bold">{item.name}</CardTitle>
+        <CardDescription className="text-sm text-koombo-branco/70">
           {item.description}
         </CardDescription>
       </CardHeader>
@@ -71,7 +71,7 @@ const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: Men
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-                <span className="font-bold text-lg text-koombo-grafite mx-4">
+                <span className="font-bold text-lg text-koombo-branco mx-4">
                   {cartQuantity}
                 </span>
                 <Button
