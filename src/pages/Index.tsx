@@ -151,26 +151,25 @@ const Index = () => {
           isKitchen={isKitchen}
         />
 
-        {/* Hero Section com Imagem */}
-        <section className="relative bg-gradient-koombo py-20 text-white overflow-hidden">
-          <div className="absolute inset-0">
-            <img 
-              src="/lovable-uploads/f3744f5a-f25c-4524-aa86-7e94ba1df4dd.png" 
-              alt="Koombo - Gestão de Restaurantes" 
-              className="w-full h-full object-cover opacity-30"
-            />
-          </div>
+        {/* Hero Section com Slide Estático */}
+        <section className="relative bg-gradient-to-r from-orange-500 to-red-600 py-20 text-white overflow-hidden">
           <div className="relative container mx-auto text-center px-4 z-10">
-            <h1 className="text-5xl font-bold mb-6">
-              KOOMBO
-            </h1>
-            <p className="text-2xl font-light mb-8">
-              PEDIDOS & GESTÃO
-            </p>
-            <p className="text-xl mb-12 max-w-3xl mx-auto">
-              O sistema completo para gerenciar seu restaurante. 
-              Controle pedidos, delivery, estoque e muito mais em uma única plataforma.
-            </p>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-12 max-w-4xl mx-auto border border-white/20">
+              <h1 className="text-6xl font-bold mb-6 text-white">
+                KOOMBO
+              </h1>
+              <p className="text-2xl font-light mb-8 text-white/90">
+                PEDIDOS & GESTÃO
+              </p>
+              <div className="bg-white/20 backdrop-blur rounded-xl p-8 mb-8">
+                <h2 className="text-4xl font-bold text-white mb-4">
+                  PERFEITO PARA SUA OPERAÇÃO.
+                </h2>
+                <p className="text-xl text-white/90">
+                  O sistema completo para gerenciar seu restaurante com eficiência total.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
