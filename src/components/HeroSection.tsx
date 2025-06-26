@@ -1,22 +1,33 @@
 
 const HeroSection = () => {
   return (
-    <section className="relative bg-gray-50 py-20 overflow-hidden">
-      <div className="relative container mx-auto text-center px-4 z-10">
-        <div className="bg-white shadow-lg rounded-2xl p-12 max-w-4xl mx-auto border border-gray-200">
-          <h1 className="text-6xl font-bold mb-6 text-koombo-grafite">
-            KOOMBO
-          </h1>
-          <p className="text-2xl font-light mb-8 text-koombo-grafite/70">
-            PEDIDOS & GESTÃO
-          </p>
-          <div className="bg-koombo-laranja rounded-xl p-8 mb-8">
-            <h2 className="text-4xl font-bold text-white mb-4">
-              PERFEITO PARA SUA OPERAÇÃO.
-            </h2>
-            <p className="text-xl text-white/90">
-              O sistema completo para gerenciar seu restaurante com eficiência total.
+    <section className="relative bg-koombo-grafite min-h-[600px] flex items-center overflow-hidden">
+      <div className="container mx-auto px-4 z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          {/* Lado esquerdo - Texto */}
+          <div className="text-white space-y-6">
+            <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
+              TUDO O QUE VOCÊ <br />
+              PRECISA EM UM <br />
+              <span className="text-koombo-laranja">KOOMBO</span> SÓ.
+            </h1>
+            
+            <p className="text-xl lg:text-2xl font-light text-white/90 max-w-md">
+              Tenha sua gestão de pedidos tudo sob controle.
             </p>
+          </div>
+
+          {/* Lado direito - Imagem */}
+          <div className="relative">
+            <div 
+              className="w-full h-[400px] lg:h-[500px] bg-cover bg-center rounded-2xl shadow-2xl"
+              style={{
+                backgroundImage: `url('/lovable-uploads/fde4e1ad-34f3-424b-834a-cfaccde5473d.png')`
+              }}
+            >
+              {/* Overlay para melhor contraste se necessário */}
+              <div className="absolute inset-0 bg-black/10 rounded-2xl"></div>
+            </div>
           </div>
         </div>
       </div>
