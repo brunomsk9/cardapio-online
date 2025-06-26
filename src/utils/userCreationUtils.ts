@@ -11,7 +11,7 @@ export interface CreateUserData {
 export const createUser = async (userData: CreateUserData) => {
   console.log('Creating user with data:', { ...userData, password: '[HIDDEN]' });
   
-  // 1. Criar usuário via signUp
+  // 1. Criar usuário via signUp com email customizado
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email: userData.email,
     password: userData.password,
