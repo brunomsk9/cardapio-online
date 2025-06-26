@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { MessageCircle, Phone, User, Building2 } from 'lucide-react';
+import { MessageCircle, Phone, User, Building2, ShoppingCart, Utensils, BarChart3, Zap } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const WhatsAppCTA = () => {
@@ -70,25 +70,25 @@ Aguardo retorno. Obrigado!`;
               </h2>
               <div className="space-y-4 text-lg">
                 <p className="flex items-center gap-3">
-                  <span className="text-2xl">🍽️</span>
+                  <Utensils className="h-6 w-6 text-yellow-300" />
                   Gestão completa de pedidos
                 </p>
                 <p className="flex items-center gap-3">
-                  <span className="text-2xl">📱</span>
+                  <ShoppingCart className="h-6 w-6 text-yellow-300" />
                   Sistema integrado de delivery
                 </p>
                 <p className="flex items-center gap-3">
-                  <span className="text-2xl">📊</span>
+                  <BarChart3 className="h-6 w-6 text-yellow-300" />
                   Relatórios e controle total
                 </p>
                 <p className="flex items-center gap-3">
-                  <span className="text-2xl">⚡</span>
+                  <Zap className="h-6 w-6 text-yellow-300" />
                   Implementação rápida e fácil
                 </p>
               </div>
               <div className="mt-8 p-4 bg-white/10 rounded-lg backdrop-blur">
                 <p className="text-xl font-semibold">
-                  CONTROLE TUDO, DO <span className="text-yellow-300">👍</span> SALÃO À COZINHA, COM UM CLIQUE. <span className="text-yellow-300">🤘</span>
+                  CONTROLE TUDO, DO SALÃO À COZINHA, COM UM CLIQUE.
                 </p>
               </div>
             </div>

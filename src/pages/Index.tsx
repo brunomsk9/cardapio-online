@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -14,6 +15,7 @@ import { useSubdomainRestaurant } from '@/hooks/useSubdomainRestaurant';
 import { useRestaurantMenu } from '@/hooks/useRestaurantMenu';
 import { mockMenuItems } from '@/data/mockData';
 import { toast } from '@/hooks/use-toast';
+import { ShoppingCart, Utensils, BarChart3 } from 'lucide-react';
 
 const Index = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -144,9 +146,16 @@ const Index = () => {
           isKitchen={isKitchen}
         />
 
-        {/* Hero Section */}
-        <section className="bg-gradient-koombo py-20 text-white">
-          <div className="container mx-auto text-center px-4">
+        {/* Hero Section com Imagem */}
+        <section className="relative bg-gradient-koombo py-20 text-white overflow-hidden">
+          <div className="absolute inset-0">
+            <img 
+              src="/lovable-uploads/f3744f5a-f25c-4524-aa86-7e94ba1df4dd.png" 
+              alt="Koombo - Gestão de Restaurantes" 
+              className="w-full h-full object-cover opacity-30"
+            />
+          </div>
+          <div className="relative container mx-auto text-center px-4 z-10">
             <h1 className="text-5xl font-bold mb-6">
               KOOMBO
             </h1>
@@ -172,7 +181,7 @@ const Index = () => {
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center">
                 <div className="bg-koombo-laranja text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">📱</span>
+                  <ShoppingCart className="h-8 w-8" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Gestão de Pedidos</h3>
                 <p className="text-gray-600">
@@ -181,7 +190,7 @@ const Index = () => {
               </div>
               <div className="text-center">
                 <div className="bg-koombo-laranja text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">🍽️</span>
+                  <Utensils className="h-8 w-8" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Cozinha Integrada</h3>
                 <p className="text-gray-600">
@@ -190,7 +199,7 @@ const Index = () => {
               </div>
               <div className="text-center">
                 <div className="bg-koombo-laranja text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">📊</span>
+                  <BarChart3 className="h-8 w-8" />
                 </div>
                 <h3 className="text-xl font-semibold mb-3">Relatórios Completos</h3>
                 <p className="text-gray-600">
