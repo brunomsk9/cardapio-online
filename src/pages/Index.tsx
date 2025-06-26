@@ -100,10 +100,10 @@ const Index = () => {
   // Mostrar loading se estiver carregando dados críticos
   if (authLoading || restaurantLoading || (restaurant && menuLoading)) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-koombo-graphite">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-koombo-orange mx-auto"></div>
+          <p className="mt-4 text-koombo-white">Carregando...</p>
         </div>
       </div>
     );
@@ -112,11 +112,11 @@ const Index = () => {
   // Mostrar erro se houver problema ao carregar restaurante
   if (restaurantError) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-koombo-graphite">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Restaurante não encontrado</h2>
-          <p className="text-gray-600 mb-4">{restaurantError.message}</p>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-2xl font-bold text-koombo-white mb-4">Restaurante não encontrado</h2>
+          <p className="text-koombo-white mb-4">{restaurantError.message}</p>
+          <p className="text-sm text-koombo-white/70">
             Verifique se o endereço está correto ou entre em contato conosco.
           </p>
         </div>
@@ -131,7 +131,7 @@ const Index = () => {
     : 'Sistema de Pedidos & Gestão - Descubra os melhores sabores da nossa cozinha.';
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-koombo-graphite">
       <Header 
         cartItemsCount={getTotalItems()}
         onCartClick={() => setShowCart(true)}
@@ -144,10 +144,10 @@ const Index = () => {
 
       <section className="bg-gradient-to-br from-koombo-orange to-orange-600 py-20">
         <div className="container mx-auto text-center px-6">
-          <h2 className="text-5xl md:text-6xl font-bold font-venice text-white mb-6 tracking-tight">
+          <h2 className="text-5xl md:text-6xl font-bold font-sans text-koombo-white mb-6 tracking-tight">
             {pageTitle}
           </h2>
-          <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto font-light leading-relaxed">
+          <p className="text-xl md:text-2xl text-koombo-white/90 max-w-3xl mx-auto font-light leading-relaxed">
             {pageDescription}
           </p>
         </div>
@@ -172,7 +172,7 @@ const Index = () => {
           </div>
         ) : (
           <div className="text-center py-20">
-            <div className="bg-gray-50 rounded-2xl p-12 max-w-md mx-auto">
+            <div className="bg-koombo-white rounded-2xl p-12 max-w-md mx-auto">
               <p className="text-koombo-graphite text-lg font-medium">
                 {restaurant 
                   ? `${restaurant.name} ainda não possui itens no cardápio.`
