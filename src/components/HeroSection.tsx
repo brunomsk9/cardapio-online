@@ -22,11 +22,11 @@ const HeroSection = () => {
             <div 
               className="w-full h-[400px] lg:h-[500px] bg-cover bg-center rounded-2xl shadow-2xl"
               style={{
-                backgroundImage: `url('/lovable-uploads/fde4e1ad-34f3-424b-834a-cfaccde5473d.png')`
+                backgroundImage: `url('/lovable-uploads/0c88a4e4-020c-4637-bce1-b2b693821e08.png')`
               }}
             >
-              {/* Overlay para melhor contraste se necessário */}
-              <div className="absolute inset-0 bg-black/10 rounded-2xl"></div>
+              {/* Overlay sutil para melhor contraste */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
             </div>
           </div>
         </div>
