@@ -93,6 +93,61 @@
   }
 
   body {
-    @apply bg-background text-foreground font-venice antialiased;
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+/* Utility classes para as cores da Koombo */
+@layer utilities {
+  .text-koombo-orange {
+    color: #FF521D;
+  }
+  
+  .text-koombo-graphite {
+    color: #282828;
+  }
+  
+  .text-koombo-white {
+    color: #FFFFFF;
+  }
+  
+  .bg-koombo-orange {
+    background-color: #FF521D;
+  }
+  
+  .bg-koombo-graphite {
+    background-color: #282828;
+  }
+  
+  .bg-koombo-white {
+    background-color: #FFFFFF;
+  }
+  
+  .border-koombo-orange {
+    border-color: #FF521D;
+  }
+  
+  .border-koombo-graphite {
+    border-color: #282828;
+  }
+  
+  .border-koombo-white {
+    border-color: #FFFFFF;
+  }
+  
+  .hover\:bg-koombo-orange:hover {
+    background-color: #FF521D;
+  }
+  
+  .hover\:bg-koombo-orange\/90:hover {
+    background-color: rgba(255, 82, 29, 0.9);
+  }
+  
+  .hover\:bg-koombo-white:hover {
+    background-color: #FFFFFF;
+  }
+  
+  .hover\:bg-koombo-white\/50:hover {
+    background-color: rgba(255, 255, 255, 0.5);
   }
 }

@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -155,9 +155,9 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-koombo-white border-koombo-graphite shadow-2xl rounded-2xl">
+      <DialogContent className="sm:max-w-md bg-white border-gray-700 shadow-2xl rounded-2xl">
         <DialogHeader className="space-y-4 pb-6">
-          <DialogTitle className="text-center text-2xl font-bold text-koombo-graphite">
+          <DialogTitle className="text-center text-2xl font-bold text-gray-800">
             {isResetPassword 
               ? 'Recuperar Senha' 
               : isLogin 
@@ -165,14 +165,22 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
                 : 'Criar Conta'
             }
           </DialogTitle>
+          <DialogDescription className="text-center text-gray-600">
+            {isResetPassword 
+              ? 'Digite seu email para receber as instruções de recuperação de senha'
+              : isLogin 
+                ? 'Entre com suas credenciais para acessar sua conta'
+                : 'Crie sua conta para começar a usar o sistema'
+            }
+          </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           {!isLogin && !isResetPassword && (
             <>
               <div className="space-y-3">
-                <Label htmlFor="fullName" className="flex items-center gap-2 text-koombo-graphite font-medium">
-                  <User className="h-4 w-4 text-koombo-orange" />
+                <Label htmlFor="fullName" className="flex items-center gap-2 text-gray-800 font-medium">
+                  <User className="h-4 w-4 text-orange-500" />
                   Nome Completo
                 </Label>
                 <Input
@@ -181,13 +189,13 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Seu nome completo"
-                  className="h-12 border-koombo-graphite rounded-xl focus:border-koombo-orange focus:ring-koombo-orange bg-koombo-white text-koombo-graphite"
+                  className="h-12 border-gray-700 rounded-xl focus:border-orange-500 focus:ring-orange-500 bg-white text-gray-800"
                   required
                 />
               </div>
               <div className="space-y-3">
-                <Label htmlFor="phone" className="flex items-center gap-2 text-koombo-graphite font-medium">
-                  <Phone className="h-4 w-4 text-koombo-orange" />
+                <Label htmlFor="phone" className="flex items-center gap-2 text-gray-800 font-medium">
+                  <Phone className="h-4 w-4 text-orange-500" />
                   Telefone
                 </Label>
                 <Input
@@ -196,7 +204,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="(11) 99999-9999"
-                  className="h-12 border-koombo-graphite rounded-xl focus:border-koombo-orange focus:ring-koombo-orange bg-koombo-white text-koombo-graphite"
+                  className="h-12 border-gray-700 rounded-xl focus:border-orange-500 focus:ring-orange-500 bg-white text-gray-800"
                   required
                 />
               </div>
@@ -204,8 +212,8 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
           )}
           
           <div className="space-y-3">
-            <Label htmlFor="email" className="flex items-center gap-2 text-koombo-graphite font-medium">
-              <Mail className="h-4 w-4 text-koombo-orange" />
+            <Label htmlFor="email" className="flex items-center gap-2 text-gray-800 font-medium">
+              <Mail className="h-4 w-4 text-orange-500" />
               Email
             </Label>
             <Input
@@ -214,15 +222,15 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
-              className="h-12 border-koombo-graphite rounded-xl focus:border-koombo-orange focus:ring-koombo-orange bg-koombo-white text-koombo-graphite"
+              className="h-12 border-gray-700 rounded-xl focus:border-orange-500 focus:ring-orange-500 bg-white text-gray-800"
               required
             />
           </div>
           
           {!isResetPassword && (
             <div className="space-y-3">
-              <Label htmlFor="password" className="flex items-center gap-2 text-koombo-graphite font-medium">
-                <Lock className="h-4 w-4 text-koombo-orange" />
+              <Label htmlFor="password" className="flex items-center gap-2 text-gray-800 font-medium">
+                <Lock className="h-4 w-4 text-orange-500" />
                 Senha
               </Label>
               <div className="relative">
@@ -232,14 +240,14 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Sua senha"
-                  className="h-12 border-koombo-graphite rounded-xl focus:border-koombo-orange focus:ring-koombo-orange bg-koombo-white text-koombo-graphite pr-12"
+                  className="h-12 border-gray-700 rounded-xl focus:border-orange-500 focus:ring-orange-500 bg-white text-gray-800 pr-12"
                   required
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-koombo-graphite/50 hover:text-koombo-orange"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-gray-400 hover:text-orange-500"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -250,7 +258,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
           
           <Button 
             type="submit" 
-            className="w-full h-12 bg-koombo-orange hover:bg-koombo-orange/90 text-koombo-white font-semibold rounded-xl border-0 shadow-md transition-all duration-200" 
+            className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl border-0 shadow-md transition-all duration-200" 
             disabled={loading}
           >
             {loading ? 'Carregando...' : (
@@ -262,12 +270,12 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
             )}
           </Button>
           
-          <div className="space-y-3 pt-4 border-t border-koombo-graphite/20">
+          <div className="space-y-3 pt-4 border-t border-gray-200">
             {isResetPassword ? (
               <Button
                 type="button"
                 variant="ghost"
-                className="w-full text-koombo-graphite hover:bg-koombo-white/50 rounded-xl"
+                className="w-full text-gray-800 hover:bg-gray-50 rounded-xl"
                 onClick={switchBackToLogin}
               >
                 Voltar ao Login
@@ -277,7 +285,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
                 <Button
                   type="button"
                   variant="ghost"
-                  className="w-full text-koombo-graphite hover:bg-koombo-white/50 rounded-xl font-medium"
+                  className="w-full text-gray-800 hover:bg-gray-50 rounded-xl font-medium"
                   onClick={switchMode}
                 >
                   {isLogin ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Faça login'}
@@ -287,7 +295,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
                   <Button
                     type="button"
                     variant="link"
-                    className="w-full text-sm text-koombo-orange hover:text-koombo-orange/80"
+                    className="w-full text-sm text-orange-500 hover:text-orange-600"
                     onClick={switchToResetPassword}
                   >
                     Esqueceu a senha?
