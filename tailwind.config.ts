@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -19,43 +18,31 @@ export default {
 			}
 		},
 		extend: {
-			fontFamily: {
-				'venice': ['Inter', 'sans-serif'], // Usando Inter como fallback para Venice Blvd
-				'sans': ['Inter', 'sans-serif'],
-			},
 			colors: {
-				// Cores da Koombo
-				koombo: {
-					black: '#000000',    // Preto
-					graphite: '#262626', // Grafite  
-					orange: '#FF5D24',   // Laranja
-					cream: '#F8F4E2',    // Cream
-					white: '#FFFFFF',    // Branco
-				},
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#FF5D24', // Laranja da Koombo como cor primária
-					foreground: '#FFFFFF'
+					DEFAULT: 'hsl(var(--primary))',
+					foreground: 'hsl(var(--primary-foreground))'
 				},
 				secondary: {
-					DEFAULT: '#F8F4E2', // Cream como secundária
-					foreground: '#262626'
+					DEFAULT: 'hsl(var(--secondary))',
+					foreground: 'hsl(var(--secondary-foreground))'
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
 					foreground: 'hsl(var(--destructive-foreground))'
 				},
 				muted: {
-					DEFAULT: '#F8F4E2',
-					foreground: '#262626'
+					DEFAULT: 'hsl(var(--muted))',
+					foreground: 'hsl(var(--muted-foreground))'
 				},
 				accent: {
-					DEFAULT: '#F8F4E2',
-					foreground: '#262626'
+					DEFAULT: 'hsl(var(--accent))',
+					foreground: 'hsl(var(--accent-foreground))'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
