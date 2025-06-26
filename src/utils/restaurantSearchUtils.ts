@@ -11,50 +11,70 @@ interface SearchResult {
 
 export const searchRestaurantBySubdomain = async (subdomain: string): Promise<SearchResult> => {
   try {
-    console.log('🔍 TESTING DATABASE CONNECTION...');
+    console.log('🔍 SEARCHING for restaurant with subdomain:', subdomain);
     
-    // First attempt: count total restaurants
-    const { count: totalCount, error: countError } = await supabase
+    // Buscar restaurante específico por subdomínio (sem autenticação necessária)
+    const { data: restaurant, error: searchError } = await supabase
       .from('restaurants')
-      .select('*', { count: 'exact', head: true });
+      .select('*')
+      .eq('subdomain', subdomain)
+      .eq('is_active', true)
+      .maybeSingle();
 
-    console.log('📊 TOTAL RESTAURANTS COUNT:', {
-      count: totalCount,
-      error: countError?.message
+    console.log('📊 DIRECT SUBDOMAIN SEARCH:', {
+      subdomain,
+      found: !!restaurant,
+      restaurant: restaurant?.name || 'Not found',
+      error: searchError?.message,
+      errorCode: searchError?.code
     });
 
-    // Second attempt: fetch all restaurants
-    console.log('📋 Fetching ALL restaurants for comparison...');
+    if (searchError) {
+      console.error('❌ Database error during search:', searchError);
+      return { restaurant: null, error: searchError };
+    }
+
+    if (restaurant) {
+      console.log('✅ Restaurant found:', restaurant.name);
+      return { restaurant, error: null };
+    }
+
+    // Se não encontrou com busca direta, tentar busca case-insensitive
+    console.log('🔍 Trying case-insensitive search...');
+    const { data: caseInsensitiveResult, error: caseError } = await supabase
+      .from('restaurants')
+      .select('*')
+      .ilike('subdomain', subdomain)
+      .eq('is_active', true)
+      .maybeSingle();
+
+    console.log('📊 CASE-INSENSITIVE SEARCH:', {
+      subdomain,
+      found: !!caseInsensitiveResult,
+      restaurant: caseInsensitiveResult?.name || 'Not found',
+      error: caseError?.message
+    });
+
+    if (caseInsensitiveResult) {
+      return { restaurant: caseInsensitiveResult, error: null };
+    }
+
+    // Buscar todos os restaurantes ativos para debug
     const { data: allRestaurants, error: allError } = await supabase
       .from('restaurants')
-      .select('*');
+      .select('id, name, subdomain, is_active')
+      .eq('is_active', true);
 
-    console.log('📊 ALL RESTAURANTS QUERY:', {
-      data: allRestaurants,
+    console.log('📋 ALL ACTIVE RESTAURANTS:', {
       count: allRestaurants?.length || 0,
-      error: allError?.message,
-      errorCode: allError?.code,
-      errorDetails: allError?.details,
-      hint: allError?.hint
+      restaurants: allRestaurants?.map(r => ({
+        name: r.name,
+        subdomain: r.subdomain,
+        matches: r.subdomain === subdomain || r.subdomain?.toLowerCase() === subdomain.toLowerCase()
+      })) || [],
+      error: allError?.message
     });
 
-    if (allError) {
-      console.error('❌ RLS ERROR detected:', allError);
-      // Try public restaurant search as fallback
-      return await searchPublicRestaurants(subdomain);
-    }
-
-    if (allRestaurants && allRestaurants.length > 0) {
-      console.log('🔍 Database has restaurants, proceeding with search...');
-      logRestaurantDetails(allRestaurants, subdomain);
-      
-      const foundRestaurant = findRestaurantMatch(allRestaurants, subdomain);
-      if (foundRestaurant) {
-        return { restaurant: foundRestaurant, error: null };
-      }
-    }
-
-    // No restaurant found
     const errorMessage = `Restaurante não encontrado para o subdomínio: ${subdomain}`;
     return { restaurant: null, error: new Error(errorMessage) };
 
@@ -62,78 +82,4 @@ export const searchRestaurantBySubdomain = async (subdomain: string): Promise<Se
     console.error('💥 ERROR in searchRestaurantBySubdomain:', err);
     return { restaurant: null, error: err as Error };
   }
-};
-
-const searchPublicRestaurants = async (subdomain: string): Promise<SearchResult> => {
-  console.log('🔍 Trying public restaurant search...');
-  const { data: publicRestaurants, error: publicError } = await supabase
-    .from('restaurants')
-    .select('id, name, subdomain, is_active')
-    .eq('is_active', true);
-
-  console.log('🌐 PUBLIC RESTAURANTS:', {
-    data: publicRestaurants,
-    count: publicRestaurants?.length || 0,
-    error: publicError?.message
-  });
-
-  if (publicRestaurants && publicRestaurants.length > 0) {
-    const found = publicRestaurants.find(r => 
-      r.subdomain === subdomain || 
-      r.subdomain?.toLowerCase() === subdomain.toLowerCase()
-    );
-
-    if (found) {
-      console.log('✅ Found restaurant via public search:', found.name);
-      // Fetch complete restaurant data
-      const { data: fullRestaurant, error: fullError } = await supabase
-        .from('restaurants')
-        .select('*')
-        .eq('id', found.id)
-        .single();
-
-      if (fullRestaurant && !fullError) {
-        return { restaurant: fullRestaurant, error: null };
-      }
-    }
-  }
-
-  const errorMessage = `Erro de permissão ao buscar restaurante: Acesso negado`;
-  return { restaurant: null, error: new Error(errorMessage) };
-};
-
-const logRestaurantDetails = (restaurants: Restaurant[], subdomain: string) => {
-  restaurants.forEach((rest, index) => {
-    console.log(`Restaurant ${index + 1}:`, {
-      id: rest.id,
-      name: rest.name,
-      subdomain: rest.subdomain,
-      subdomain_length: rest.subdomain?.length || 0,
-      subdomain_type: typeof rest.subdomain,
-      is_active: rest.is_active,
-      exact_match: rest.subdomain === subdomain,
-      lowercase_match: rest.subdomain?.toLowerCase() === subdomain.toLowerCase(),
-      trimmed_match: rest.subdomain?.trim() === subdomain.trim()
-    });
-  });
-};
-
-const findRestaurantMatch = (restaurants: Restaurant[], subdomain: string): Restaurant | null => {
-  // Try exact match first
-  const exactMatch = restaurants.find(r => r.subdomain === subdomain && r.is_active);
-  if (exactMatch) {
-    console.log('✅ Found exact match:', exactMatch.name);
-    return exactMatch;
-  }
-
-  // Try case-insensitive match
-  const caseMatch = restaurants.find(r => 
-    r.subdomain?.toLowerCase() === subdomain.toLowerCase() && r.is_active
-  );
-  if (caseMatch) {
-    console.log('✅ Found case-insensitive match:', caseMatch.name);
-    return caseMatch;
-  }
-
-  return null;
 };
