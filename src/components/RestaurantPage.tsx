@@ -152,13 +152,13 @@ const RestaurantPage = ({
       </section>
 
       {/* Seção do Cardápio */}
-      <section id="cardapio" className="bg-koombo-cream py-16">
+      <section id="cardapio" className="bg-koombo-laranja py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-koombo-grafite mb-4">
-              NOSSO <span className="text-koombo-laranja">CARDÁPIO</span>
+            <h2 className="text-4xl font-bold text-koombo-branco mb-4">
+              NOSSO <span className="text-koombo-grafite">CARDÁPIO</span>
             </h2>
-            <p className="text-lg text-koombo-grafite/80">
+            <p className="text-lg text-koombo-branco/90">
               Escolha entre nossos deliciosos pratos e sabores únicos
             </p>
           </div>
@@ -183,14 +183,14 @@ const RestaurantPage = ({
             </div>
           ) : (
             <div className="text-center py-12">
-              <div className="bg-white rounded-xl p-8 shadow-lg max-w-md mx-auto">
-                <p className="text-koombo-grafite text-lg font-semibold mb-2">
+              <div className="bg-koombo-grafite rounded-xl p-8 shadow-lg max-w-md mx-auto">
+                <p className="text-koombo-branco text-lg font-semibold mb-2">
                   {restaurant 
                     ? `${restaurant.name} ainda não possui itens no cardápio.`
                     : 'Nenhum item encontrado nesta categoria.'
                   }
                 </p>
-                <p className="text-koombo-grafite/60">
+                <p className="text-koombo-branco/60">
                   Volte em breve para conferir nossas novidades!
                 </p>
               </div>

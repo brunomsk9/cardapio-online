@@ -21,7 +21,7 @@ const categoryLabels = {
 
 const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: MenuCardProps) => {
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02] relative bg-white">
+    <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02] relative bg-koombo-grafite">
       {/* Quantity Badge - appears only when item is in cart */}
       {cartQuantity > 0 && (
         <Badge className="absolute top-3 left-3 bg-koombo-laranja text-white font-bold text-sm z-10 w-8 h-8 rounded-full flex items-center justify-center">
@@ -41,8 +41,8 @@ const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: Men
       </div>
       
       <CardHeader>
-        <CardTitle className="text-lg text-koombo-grafite">{item.name}</CardTitle>
-        <CardDescription className="text-sm text-gray-600">
+        <CardTitle className="text-lg text-koombo-branco">{item.name}</CardTitle>
+        <CardDescription className="text-sm text-koombo-branco/70">
           {item.description}
         </CardDescription>
       </CardHeader>
@@ -71,7 +71,7 @@ const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: Men
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-                <span className="font-bold text-lg text-koombo-grafite mx-4">
+                <span className="font-bold text-lg text-koombo-branco mx-4">
                   {cartQuantity}
                 </span>
                 <Button
