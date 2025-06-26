@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useDomainDetection } from './useDomainDetection';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -10,6 +11,7 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const domainInfo = useDomainDetection();
 
   useEffect(() => {
     let mounted = true;
@@ -23,8 +25,8 @@ export const useAuth = () => {
         setUser(session?.user ?? null);
         setLoading(false);
         
-        // Check for super admin role and redirect only if on home page
-        if (session?.user && event === 'SIGNED_IN' && location.pathname === '/') {
+        // Check for super admin role and redirect only if on home page and main domain
+        if (session?.user && event === 'SIGNED_IN' && location.pathname === '/' && domainInfo?.isMainDomain) {
           setTimeout(async () => {
             try {
               const { data: roleData } = await supabase
@@ -107,7 +109,7 @@ export const useAuth = () => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate, location.pathname]);
+  }, [navigate, location.pathname, domainInfo?.isMainDomain]);
 
   const signOut = async () => {
     try {
