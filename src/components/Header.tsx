@@ -25,7 +25,7 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
   };
 
   return (
-    <header className="bg-gradient-to-r from-orange-500 to-red-500 shadow-lg sticky top-0 z-50">
+    <header className="bg-gradient-koombo shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
           <img 
@@ -41,11 +41,11 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
               variant="ghost"
               size="sm"
               onClick={onCartClick}
-              className="text-white hover:bg-white/20 relative"
+              className="text-koombo-branco hover:bg-white/20 relative"
             >
               <ShoppingCart className="h-5 w-5" />
               {cartItemsCount > 0 && (
-                <Badge className="absolute -top-2 -right-2 bg-yellow-400 text-black">
+                <Badge className="absolute -top-2 -right-2 bg-koombo-cream text-koombo-grafite">
                   {cartItemsCount}
                 </Badge>
               )}
@@ -59,7 +59,7 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
                   variant="ghost"
                   size="sm"
                   onClick={handleKitchenClick}
-                  className="text-white hover:bg-white/20"
+                  className="text-koombo-branco hover:bg-white/20"
                 >
                   <Utensils className="h-5 w-5 mr-2" />
                   <span className="hidden sm:block">Cozinha</span>
@@ -67,14 +67,14 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
               )}
               
               <div className="flex items-center space-x-2">
-                <span className="text-white text-sm hidden sm:block">
+                <span className="text-koombo-branco text-sm hidden sm:block">
                   Olá, {user.user_metadata?.full_name || user.email}
                 </span>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={onSignOut}
-                  className="text-white hover:bg-white/20"
+                  className="text-koombo-branco hover:bg-white/20"
                 >
                   <LogOut className="h-5 w-5" />
                 </Button>
@@ -87,7 +87,7 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
               variant="ghost"
               size="sm"
               onClick={onAdminClick}
-              className="text-white hover:bg-white/20"
+              className="text-koombo-branco hover:bg-white/20"
             >
               <Settings className="h-5 w-5" />
               Admin
@@ -99,7 +99,7 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
               variant="ghost"
               size="sm"
               onClick={onAdminClick}
-              className="text-white hover:bg-white/20"
+              className="text-koombo-branco hover:bg-white/20"
             >
               <User className="h-5 w-5" />
               Login

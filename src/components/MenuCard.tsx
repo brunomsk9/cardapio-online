@@ -28,13 +28,13 @@ const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: Men
           alt={item.name}
           className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
         />
-        <Badge className="absolute top-2 right-2 bg-orange-500">
+        <Badge className="absolute top-2 right-2 bg-koombo-laranja text-koombo-branco">
           {categoryLabels[item.category]}
         </Badge>
       </div>
       
       <CardHeader>
-        <CardTitle className="text-lg">{item.name}</CardTitle>
+        <CardTitle className="text-lg text-koombo-grafite">{item.name}</CardTitle>
         <CardDescription className="text-sm text-gray-600">
           {item.description}
         </CardDescription>
@@ -60,14 +60,16 @@ const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: Men
                   size="sm"
                   variant="outline"
                   onClick={() => onUpdateQuantity?.(item.id, cartQuantity - 1)}
+                  className="border-koombo-laranja text-koombo-laranja hover:bg-koombo-cream"
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-                <span className="font-semibold">{cartQuantity}</span>
+                <span className="font-semibold text-koombo-grafite">{cartQuantity}</span>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => onUpdateQuantity?.(item.id, cartQuantity + 1)}
+                  className="border-koombo-laranja text-koombo-laranja hover:bg-koombo-cream"
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -75,7 +77,7 @@ const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: Men
             ) : (
               <Button
                 onClick={() => onAddToCart(item)}
-                className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                className="w-full bg-koombo-laranja hover:bg-koombo-laranja/90 text-koombo-branco"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Adicionar

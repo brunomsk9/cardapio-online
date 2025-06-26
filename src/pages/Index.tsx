@@ -141,12 +141,12 @@ const Index = () => {
         isKitchen={isKitchen}
       />
 
-      <section className="bg-orange-100 py-16">
+      <section className="bg-koombo-cream py-16">
         <div className="container mx-auto text-center">
-          <h2 className="text-4xl font-bold text-orange-700 mb-4">
+          <h2 className="text-4xl font-bold text-koombo-grafite mb-4">
             Bem-vindo ao {pageTitle}!
           </h2>
-          <p className="text-lg text-gray-700">
+          <p className="text-lg text-koombo-grafite/80">
             {pageDescription}
           </p>
         </div>
