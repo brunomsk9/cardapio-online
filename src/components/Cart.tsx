@@ -1,7 +1,7 @@
 
-import { X, Minus, Plus, ShoppingBag, MapPin, Clock } from 'lucide-react';
+import { X, Minus, Plus, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CartItem } from '@/types';
 
@@ -36,18 +36,7 @@ const Cart = ({ cart, onUpdateQuantity, onClose, totalPrice, onCheckout }: CartP
               </Button>
               <div>
                 <h2 className="text-xl font-bold text-koombo-laranja">KOOMBO</h2>
-                <div className="flex items-center gap-2 text-sm text-gray-300">
-                  <Clock className="h-4 w-4" />
-                  <span>Hoje 12:07 AM</span>
-                </div>
               </div>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-300">Delivery time</p>
-              <Badge className="bg-koombo-laranja text-white">
-                <MapPin className="h-3 w-3 mr-1" />
-                Entrega: 30-45 min
-              </Badge>
             </div>
           </div>
         </CardHeader>
@@ -67,7 +56,7 @@ const Cart = ({ cart, onUpdateQuantity, onClose, totalPrice, onCheckout }: CartP
                       size="sm"
                       variant="outline"
                       onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                      className="w-8 h-8 p-0 border-gray-600 text-white hover:bg-koombo-laranja hover:border-koombo-laranja"
+                      className="w-8 h-8 p-0 border-gray-500 bg-gray-600 text-white hover:bg-gray-500 hover:border-gray-400"
                     >
                       <Plus className="h-3 w-3" />
                     </Button>
@@ -75,7 +64,7 @@ const Cart = ({ cart, onUpdateQuantity, onClose, totalPrice, onCheckout }: CartP
                       size="sm"
                       variant="outline"
                       onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-                      className="w-8 h-8 p-0 border-gray-600 text-white hover:bg-red-500 hover:border-red-500"
+                      className="w-8 h-8 p-0 border-gray-500 bg-gray-600 text-white hover:bg-gray-500 hover:border-gray-400"
                     >
                       <Minus className="h-3 w-3" />
                     </Button>
@@ -126,7 +115,6 @@ const Cart = ({ cart, onUpdateQuantity, onClose, totalPrice, onCheckout }: CartP
             </div>
             <div className="text-right">
               <p className="text-gray-300 text-sm">{cart.length} itens</p>
-              <p className="text-gray-400 text-xs">Taxa de entrega: Grátis</p>
             </div>
           </div>
           
@@ -137,10 +125,6 @@ const Cart = ({ cart, onUpdateQuantity, onClose, totalPrice, onCheckout }: CartP
             <ShoppingBag className="h-5 w-5 mr-2" />
             Finalizar Pedido
           </Button>
-          
-          <p className="text-center text-gray-400 text-xs mt-2">
-            Tempo estimado de entrega: 30-45 minutos
-          </p>
         </div>
       </Card>
     </div>
