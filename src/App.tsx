@@ -19,8 +19,8 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <SubdomainAccessGuard>
-        <BrowserRouter>
+      <BrowserRouter>
+        <SubdomainAccessGuard>
           <Routes>
             <Route path="/" element={<Index />} />
             
@@ -42,8 +42,8 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </BrowserRouter>
-      </SubdomainAccessGuard>
+        </SubdomainAccessGuard>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
