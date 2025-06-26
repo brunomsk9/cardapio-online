@@ -2,11 +2,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
-import MenuCard from '@/components/MenuCard';
 import Cart from '@/components/Cart';
-import CategoryFilter from '@/components/CategoryFilter';
 import CheckoutModal from '@/components/checkout/CheckoutModal';
 import AuthModal from '@/components/auth/AuthModal';
+import LoadingState from '@/components/LoadingState';
+import ErrorState from '@/components/ErrorState';
+import HeroSection from '@/components/HeroSection';
+import MenuSection from '@/components/MenuSection';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -99,28 +101,17 @@ const Index = () => {
 
   // Mostrar loading se estiver carregando dados críticos
   if (authLoading || restaurantLoading || (restaurant && menuLoading)) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-koombo-graphite">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-koombo-orange mx-auto"></div>
-          <p className="mt-4 text-koombo-white">Carregando...</p>
-        </div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   // Mostrar erro se houver problema ao carregar restaurante
   if (restaurantError) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-koombo-graphite">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-koombo-white mb-4">Restaurante não encontrado</h2>
-          <p className="text-koombo-white mb-4">{restaurantError.message}</p>
-          <p className="text-sm text-koombo-white/70">
-            Verifique se o endereço está correto ou entre em contato conosco.
-          </p>
-        </div>
-      </div>
+      <ErrorState
+        title="Restaurante não encontrado"
+        message={restaurantError.message}
+        subtitle="Verifique se o endereço está correto ou entre em contato conosco."
+      />
     );
   }
 
@@ -142,47 +133,20 @@ const Index = () => {
         isKitchen={isKitchen}
       />
 
-      <section className="bg-gradient-to-br from-koombo-orange to-orange-600 py-20">
-        <div className="container mx-auto text-center px-6">
-          <h2 className="text-5xl md:text-6xl font-bold font-sans text-koombo-white mb-6 tracking-tight">
-            {pageTitle}
-          </h2>
-          <p className="text-xl md:text-2xl text-koombo-white/90 max-w-3xl mx-auto font-light leading-relaxed">
-            {pageDescription}
-          </p>
-        </div>
-      </section>
+      <HeroSection 
+        title={pageTitle}
+        description={pageDescription}
+      />
 
-      <section className="container mx-auto py-16 px-6">
-        <CategoryFilter
-          categories={categories}
-          activeCategory={activeCategory}
-          onCategoryChange={setActiveCategory}
-        />
-
-        {filteredItems.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {filteredItems.map(item => (
-              <MenuCard
-                key={item.id}
-                item={item}
-                onAddToCart={() => addToCart(item)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-20">
-            <div className="bg-koombo-white rounded-2xl p-12 max-w-md mx-auto">
-              <p className="text-koombo-graphite text-lg font-medium">
-                {restaurant 
-                  ? `${restaurant.name} ainda não possui itens no cardápio.`
-                  : 'Nenhum item encontrado nesta categoria.'
-                }
-              </p>
-            </div>
-          </div>
-        )}
-      </section>
+      <MenuSection
+        categories={categories}
+        activeCategory={activeCategory}
+        onCategoryChange={setActiveCategory}
+        menuItems={menuItems}
+        filteredItems={filteredItems}
+        onAddToCart={addToCart}
+        restaurantName={restaurant?.name}
+      />
 
       {showCart && (
         <Cart
