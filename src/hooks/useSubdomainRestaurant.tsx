@@ -54,17 +54,87 @@ export const useSubdomainRestaurant = () => {
           return;
         }
 
-        // Primeiro, vamos buscar TODOS os restaurantes para debug
+        // 🚨 NOVO: Verificar autenticação
+        const { data: { session }, error: authError } = await supabase.auth.getSession();
+        console.log('🔐 AUTH STATUS:', {
+          hasSession: !!session,
+          userId: session?.user?.id,
+          authError: authError?.message
+        });
+
+        // 🚨 NOVO: Tentar busca sem RLS (usando service_role seria ideal, mas vamos tentar contornar)
+        console.log('🔍 TESTING DATABASE CONNECTION...');
+        
+        // Primeira tentativa: contar total de restaurantes (isso deve funcionar mesmo com RLS)
+        const { count: totalCount, error: countError } = await supabase
+          .from('restaurants')
+          .select('*', { count: 'exact', head: true });
+
+        console.log('📊 TOTAL RESTAURANTS COUNT:', {
+          count: totalCount,
+          error: countError?.message
+        });
+
+        // Segunda tentativa: buscar todos restaurantes (pode falhar por RLS)
         console.log('📋 Fetching ALL restaurants for comparison...');
         const { data: allRestaurants, error: allError } = await supabase
           .from('restaurants')
           .select('*');
 
+        console.log('📊 ALL RESTAURANTS QUERY:', {
+          data: allRestaurants,
+          count: allRestaurants?.length || 0,
+          error: allError?.message,
+          errorCode: allError?.code,
+          errorDetails: allError?.details,
+          hint: allError?.hint
+        });
+
         if (allError) {
-          console.error('❌ Error fetching all restaurants:', allError);
-        } else {
-          console.log('📊 ALL RESTAURANTS IN DATABASE:', allRestaurants?.length || 0);
-          allRestaurants?.forEach((rest, index) => {
+          console.error('❌ RLS ERROR detected:', allError);
+          // Se há erro de RLS, vamos tentar uma abordagem diferente
+          
+          // Tentar buscar apenas restaurantes ativos publicamente
+          console.log('🔍 Trying public restaurant search...');
+          const { data: publicRestaurants, error: publicError } = await supabase
+            .from('restaurants')
+            .select('id, name, subdomain, is_active')
+            .eq('is_active', true);
+
+          console.log('🌐 PUBLIC RESTAURANTS:', {
+            data: publicRestaurants,
+            count: publicRestaurants?.length || 0,
+            error: publicError?.message
+          });
+
+          if (publicRestaurants && publicRestaurants.length > 0) {
+            // Filtrar por subdomínio no JavaScript
+            const found = publicRestaurants.find(r => 
+              r.subdomain === subdomain || 
+              r.subdomain?.toLowerCase() === subdomain.toLowerCase()
+            );
+
+            if (found) {
+              console.log('✅ Found restaurant via public search:', found.name);
+              // Buscar dados completos do restaurante encontrado
+              const { data: fullRestaurant, error: fullError } = await supabase
+                .from('restaurants')
+                .select('*')
+                .eq('id', found.id)
+                .single();
+
+              if (fullRestaurant && !fullError) {
+                setRestaurant(fullRestaurant);
+                setIsMainDomain(false);
+                return;
+              }
+            }
+          }
+        }
+
+        if (allRestaurants && allRestaurants.length > 0) {
+          console.log('🔍 Database has restaurants, proceeding with search...');
+          allRestaurants.forEach((rest, index) => {
             console.log(`Restaurant ${index + 1}:`, {
               id: rest.id,
               name: rest.name,
@@ -77,112 +147,26 @@ export const useSubdomainRestaurant = () => {
               trimmed_match: rest.subdomain?.trim() === subdomain.trim()
             });
           });
-        }
 
-        // Tentativa 1: Busca exata
-        console.log('🔍 ATTEMPT 1: Exact match search...');
-        const { data: exactMatch, error: exactError } = await supabase
-          .from('restaurants')
-          .select('*')
-          .eq('subdomain', subdomain)
-          .eq('is_active', true);
-
-        console.log('📤 Exact match query result:', {
-          data: exactMatch,
-          error: exactError,
-          count: exactMatch?.length || 0
-        });
-
-        if (exactMatch && exactMatch.length > 0) {
-          console.log('✅ Found restaurant via exact match:', exactMatch[0].name);
-          setRestaurant(exactMatch[0]);
-          setIsMainDomain(false);
-          return;
-        }
-
-        // Tentativa 2: Busca case-insensitive
-        console.log('🔍 ATTEMPT 2: Case insensitive search...');
-        const { data: caseInsensitiveMatch, error: caseError } = await supabase
-          .from('restaurants')
-          .select('*')
-          .ilike('subdomain', subdomain)
-          .eq('is_active', true);
-
-        console.log('📤 Case insensitive query result:', {
-          data: caseInsensitiveMatch,
-          error: caseError,
-          count: caseInsensitiveMatch?.length || 0
-        });
-
-        if (caseInsensitiveMatch && caseInsensitiveMatch.length > 0) {
-          console.log('✅ Found restaurant via case insensitive match:', caseInsensitiveMatch[0].name);
-          setRestaurant(caseInsensitiveMatch[0]);
-          setIsMainDomain(false);
-          return;
-        }
-
-        // Tentativa 3: Buscar todos ativos e filtrar no JavaScript
-        console.log('🔍 ATTEMPT 3: JavaScript filter search...');
-        const { data: activeRestaurants, error: activeError } = await supabase
-          .from('restaurants')
-          .select('*')
-          .eq('is_active', true);
-
-        console.log('📤 Active restaurants query result:', {
-          data: activeRestaurants,
-          error: activeError,
-          count: activeRestaurants?.length || 0
-        });
-
-        if (activeRestaurants && activeRestaurants.length > 0) {
-          console.log('🔍 Filtering restaurants in JavaScript...');
-          
-          // Diferentes tentativas de match
-          const matches = {
-            exact: activeRestaurants.filter(r => r.subdomain === subdomain),
-            lowercase: activeRestaurants.filter(r => r.subdomain?.toLowerCase() === subdomain.toLowerCase()),
-            trimmed: activeRestaurants.filter(r => r.subdomain?.trim() === subdomain.trim()),
-            bothTrimmedLower: activeRestaurants.filter(r => r.subdomain?.trim().toLowerCase() === subdomain.trim().toLowerCase())
-          };
-
-          console.log('🎯 JavaScript filter results:', {
-            searchTerm: subdomain,
-            exact: matches.exact.length,
-            lowercase: matches.lowercase.length,
-            trimmed: matches.trimmed.length,
-            bothTrimmedLower: matches.bothTrimmedLower.length
-          });
-
-          // Tentar cada tipo de match
-          for (const [matchType, matchResults] of Object.entries(matches)) {
-            if (matchResults.length > 0) {
-              console.log(`✅ Found restaurant via ${matchType} match:`, matchResults[0].name);
-              setRestaurant(matchResults[0]);
-              setIsMainDomain(false);
-              return;
-            }
+          // Buscar correspondência exata primeiro
+          const exactMatch = allRestaurants.find(r => r.subdomain === subdomain && r.is_active);
+          if (exactMatch) {
+            console.log('✅ Found exact match:', exactMatch.name);
+            setRestaurant(exactMatch);
+            setIsMainDomain(false);
+            return;
           }
-        }
 
-        // Tentativa 4: Busca com LIKE pattern
-        console.log('🔍 ATTEMPT 4: LIKE pattern search...');
-        const { data: likeMatch, error: likeError } = await supabase
-          .from('restaurants')
-          .select('*')
-          .like('subdomain', `%${subdomain}%`)
-          .eq('is_active', true);
-
-        console.log('📤 LIKE pattern query result:', {
-          data: likeMatch,
-          error: likeError,
-          count: likeMatch?.length || 0
-        });
-
-        if (likeMatch && likeMatch.length > 0) {
-          console.log('✅ Found restaurant via LIKE pattern:', likeMatch[0].name);
-          setRestaurant(likeMatch[0]);
-          setIsMainDomain(false);
-          return;
+          // Buscar correspondência case-insensitive
+          const caseMatch = allRestaurants.find(r => 
+            r.subdomain?.toLowerCase() === subdomain.toLowerCase() && r.is_active
+          );
+          if (caseMatch) {
+            console.log('✅ Found case-insensitive match:', caseMatch.name);
+            setRestaurant(caseMatch);
+            setIsMainDomain(false);
+            return;
+          }
         }
 
         // Se chegou até aqui, não encontrou o restaurante
@@ -191,12 +175,17 @@ export const useSubdomainRestaurant = () => {
           hostname,
           extractedSubdomain: subdomain,
           totalRestaurants: allRestaurants?.length || 0,
-          activeRestaurants: activeRestaurants?.length || 0,
-          searchAttempts: 4,
-          found: false
+          searchAttempts: 'all',
+          found: false,
+          hasAuthSession: !!session,
+          hasRLSError: !!allError
         });
         
-        throw new Error(`Restaurante não encontrado para o subdomínio: ${subdomain}`);
+        const errorMessage = allError 
+          ? `Erro de permissão ao buscar restaurante: ${allError.message}`
+          : `Restaurante não encontrado para o subdomínio: ${subdomain}`;
+        
+        throw new Error(errorMessage);
 
       } catch (err) {
         console.error('💥 ERROR in detectRestaurantFromSubdomain:', err);
