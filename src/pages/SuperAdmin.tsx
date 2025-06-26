@@ -65,7 +65,7 @@ const SuperAdmin = () => {
             </div>
             <div className="flex items-center space-x-4">
               <Link to="/admin">
-                <Button variant="outline" className="flex items-center space-x-2 border-koombo-graphite text-koombo-graphite hover:bg-koombo-white">
+                <Button variant="outline" className="flex items-center space-x-2 border-koombo-graphite text-koombo-graphite hover:bg-koombo-white/50">
                   <span>Acessar Admin</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -76,7 +76,7 @@ const SuperAdmin = () => {
               <Button
                 variant="outline"
                 onClick={handleSignOut}
-                className="flex items-center space-x-2 border-koombo-graphite text-koombo-graphite hover:bg-koombo-white"
+                className="flex items-center space-x-2 border-koombo-graphite text-koombo-graphite hover:bg-koombo-white/50"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Sair</span>
