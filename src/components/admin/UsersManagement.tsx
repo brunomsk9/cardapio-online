@@ -52,10 +52,10 @@ const UsersManagement = () => {
       />
 
       <Dialog open={showAssignmentDialog} onOpenChange={setShowAssignmentDialog}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl bg-koombo-white border-koombo-graphite">
           <DialogHeader>
-            <DialogTitle>Associar Restaurantes</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-koombo-graphite">Associar Restaurantes</DialogTitle>
+            <DialogDescription className="text-koombo-graphite/70">
               Selecione os restaurantes que este usuário pode gerenciar.
             </DialogDescription>
           </DialogHeader>

@@ -63,26 +63,26 @@ const Admin = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-koombo-white">
       <AdminSidebar
         activeSection={activeSection}
         onSectionChange={setActiveSection}
       />
       <div className="flex-1 flex flex-col">
-        <div className="bg-white border-b px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">
+        <div className="bg-koombo-white border-b border-koombo-graphite px-8 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-koombo-graphite">
             {isSuperAdmin ? 'Super Admin' : 'Administração'}
           </h1>
           <Button
             variant="outline"
             onClick={handleSignOut}
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-2 border-koombo-graphite text-koombo-graphite hover:bg-koombo-white/50"
           >
             <LogOut className="h-4 w-4" />
             <span>Sair</span>
           </Button>
         </div>
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-8 bg-koombo-white">
           {renderContent()}
         </div>
       </div>

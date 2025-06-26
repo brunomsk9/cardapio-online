@@ -20,13 +20,13 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md bg-koombo-white border-koombo-graphite">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 text-koombo-graphite">
             <UserPlus className="h-5 w-5" />
             Criar Novo Usuário
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-koombo-graphite/70">
             Preencha os dados para criar um novo usuário no sistema.
           </DialogDescription>
         </DialogHeader>
@@ -40,10 +40,19 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
           />
 
           <div className="flex gap-2 pt-4">
-            <Button type="submit" disabled={loading} className="flex-1">
+            <Button 
+              type="submit" 
+              disabled={loading} 
+              className="flex-1 bg-koombo-orange hover:bg-koombo-orange/90 text-koombo-white"
+            >
               {loading ? 'Criando...' : 'Criar Usuário'}
             </Button>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              className="border-koombo-graphite text-koombo-graphite hover:bg-koombo-white/50"
+            >
               <X className="h-4 w-4" />
             </Button>
           </div>

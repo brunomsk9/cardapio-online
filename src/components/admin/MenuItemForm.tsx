@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -64,12 +63,12 @@ const MenuItemForm = ({ isOpen, onClose, onSubmit, editingItem }: MenuItemFormPr
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl bg-koombo-white border-koombo-graphite">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-koombo-graphite">
             {editingItem ? 'Editar Item' : 'Novo Item do Cardápio'}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-koombo-graphite/70">
             Preencha as informações do item do cardápio.
           </DialogDescription>
         </DialogHeader>
