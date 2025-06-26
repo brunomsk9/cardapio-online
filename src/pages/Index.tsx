@@ -6,6 +6,7 @@ import Cart from '@/components/Cart';
 import CategoryFilter from '@/components/CategoryFilter';
 import CheckoutModal from '@/components/checkout/CheckoutModal';
 import AuthModal from '@/components/auth/AuthModal';
+import WhatsAppCTA from '@/components/WhatsAppCTA';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -129,6 +130,87 @@ const Index = () => {
     ? (restaurant.description || `Descubra os deliciosos pratos do ${restaurant.name}`)
     : 'Pedidos & Gestão - Descubra os melhores sabores da nossa cozinha.';
 
+  // Se for o domínio principal, mostrar a página de apresentação do produto
+  if (isMainDomain) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header 
+          cartItemsCount={0}
+          onCartClick={() => {}}
+          onAdminClick={handleAdminToggle}
+          user={user}
+          onSignOut={handleSignOut}
+          isAdmin={isAdmin}
+          isKitchen={isKitchen}
+        />
+
+        {/* Hero Section */}
+        <section className="bg-gradient-koombo py-20 text-white">
+          <div className="container mx-auto text-center px-4">
+            <h1 className="text-5xl font-bold mb-6">
+              KOOMBO
+            </h1>
+            <p className="text-2xl font-light mb-8">
+              PEDIDOS & GESTÃO
+            </p>
+            <p className="text-xl mb-12 max-w-3xl mx-auto">
+              O sistema completo para gerenciar seu restaurante. 
+              Controle pedidos, delivery, estoque e muito mais em uma única plataforma.
+            </p>
+          </div>
+        </section>
+
+        {/* WhatsApp CTA Section */}
+        <WhatsAppCTA />
+
+        {/* Features Section */}
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-12 text-koombo-grafite">
+              Tudo o que você precisa em um KOOMBO só
+            </h2>
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="bg-koombo-laranja text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">📱</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Gestão de Pedidos</h3>
+                <p className="text-gray-600">
+                  Controle total sobre todos os pedidos, desde o recebimento até a entrega.
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="bg-koombo-laranja text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">🍽️</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Cozinha Integrada</h3>
+                <p className="text-gray-600">
+                  Sistema integrado para a cozinha acompanhar e gerenciar os pedidos em tempo real.
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="bg-koombo-laranja text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">📊</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-3">Relatórios Completos</h3>
+                <p className="text-gray-600">
+                  Acompanhe vendas, clientes e performance com relatórios detalhados.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={handleAuthSuccess}
+        />
+      </div>
+    );
+  }
+
+  // ... keep existing code (código para subdomínios de restaurantes)
   return (
     <div className="min-h-screen bg-gray-50">
       <Header 
