@@ -25,11 +25,14 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
   };
 
   return (
-    <header className="bg-gradient-to-r from-orange-500 to-red-500 shadow-lg sticky top-0 z-50">
+    <header className="bg-gradient-to-r from-koombo-orange to-red-500 shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate('/')}>
+        <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
           <ChefHat className="h-8 w-8 text-white" />
-          <h1 className="text-2xl font-bold text-white">Sabor & Arte</h1>
+          <div className="text-white">
+            <h1 className="text-2xl font-bold font-venice tracking-wide">KOOMBO</h1>
+            <p className="text-sm opacity-90 -mt-1">PEDIDOS & GESTÃO</p>
+          </div>
         </div>
         
         <div className="flex items-center space-x-4">
@@ -42,7 +45,7 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
             >
               <ShoppingCart className="h-5 w-5" />
               {cartItemsCount > 0 && (
-                <Badge className="absolute -top-2 -right-2 bg-yellow-400 text-black">
+                <Badge className="absolute -top-2 -right-2 bg-koombo-cream text-koombo-graphite">
                   {cartItemsCount}
                 </Badge>
               )}

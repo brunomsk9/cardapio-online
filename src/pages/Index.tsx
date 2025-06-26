@@ -125,13 +125,13 @@ const Index = () => {
   }
 
   // Título e descrição baseados no contexto
-  const pageTitle = restaurant ? restaurant.name : 'Sabor & Arte';
+  const pageTitle = restaurant ? restaurant.name : 'Koombo';
   const pageDescription = restaurant 
     ? (restaurant.description || `Descubra os deliciosos pratos do ${restaurant.name}`)
-    : 'Descubra os melhores sabores da nossa cozinha.';
+    : 'Sistema de Pedidos & Gestão - Descubra os melhores sabores da nossa cozinha.';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-koombo-cream">
       <Header 
         cartItemsCount={getTotalItems()}
         onCartClick={() => setShowCart(true)}
@@ -142,18 +142,18 @@ const Index = () => {
         isKitchen={isKitchen}
       />
 
-      <section className="bg-orange-100 py-16">
-        <div className="container mx-auto text-center">
-          <h2 className="text-4xl font-bold text-orange-700 mb-4">
+      <section className="bg-gradient-to-br from-koombo-orange to-red-500 py-16">
+        <div className="container mx-auto text-center px-4">
+          <h2 className="text-4xl md:text-5xl font-bold font-venice text-white mb-4 tracking-wide">
             Bem-vindo ao {pageTitle}!
           </h2>
-          <p className="text-lg text-gray-700">
+          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
             {pageDescription}
           </p>
         </div>
       </section>
 
-      <section className="container mx-auto mt-8">
+      <section className="container mx-auto mt-8 px-4">
         <CategoryFilter
           categories={categories}
           activeCategory={activeCategory}
@@ -172,7 +172,7 @@ const Index = () => {
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">
+            <p className="text-koombo-graphite text-lg">
               {restaurant 
                 ? `${restaurant.name} ainda não possui itens no cardápio.`
                 : 'Nenhum item encontrado nesta categoria.'
