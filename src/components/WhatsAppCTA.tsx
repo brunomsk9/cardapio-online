@@ -70,19 +70,15 @@ Aguardo retorno. Obrigado!`;
               </h2>
               <div className="space-y-4 text-lg">
                 <p className="flex items-center gap-3">
-                  <Utensils className="h-6 w-6 text-yellow-300" />
+                  <Utensils className="h-6 w-6 text-white" />
                   Gestão completa de pedidos
                 </p>
                 <p className="flex items-center gap-3">
-                  <ShoppingCart className="h-6 w-6 text-yellow-300" />
-                  Sistema integrado de delivery
-                </p>
-                <p className="flex items-center gap-3">
-                  <BarChart3 className="h-6 w-6 text-yellow-300" />
+                  <BarChart3 className="h-6 w-6 text-white" />
                   Relatórios e controle total
                 </p>
                 <p className="flex items-center gap-3">
-                  <Zap className="h-6 w-6 text-yellow-300" />
+                  <Zap className="h-6 w-6 text-white" />
                   Implementação rápida e fácil
                 </p>
               </div>
