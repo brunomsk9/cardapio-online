@@ -25,7 +25,7 @@ const Header = ({ cartItemsCount, onCartClick, onAdminClick, user, onSignOut, is
   };
 
   return (
-    <header className="bg-gradient-koombo shadow-lg sticky top-0 z-50">
+    <header className="bg-koombo-grafite shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
           <img 
