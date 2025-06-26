@@ -92,7 +92,7 @@ const RestaurantPage = ({
   console.log('Rendering restaurant-specific page');
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-koombo-grafite">
       <Header 
         cartItemsCount={getTotalItems()}
         onCartClick={() => setShowCart(true)}
@@ -103,46 +103,100 @@ const RestaurantPage = ({
         isKitchen={isKitchen}
       />
 
-      <section className="bg-koombo-cream py-16">
-        <div className="container mx-auto text-center">
-          <h2 className="text-4xl font-bold text-koombo-grafite mb-4">
-            Bem-vindo ao {pageTitle}!
-          </h2>
-          <p className="text-lg text-koombo-grafite/80">
-            {pageDescription}
-          </p>
+      {/* Hero Section do Restaurante */}
+      <section className="relative bg-koombo-grafite min-h-[500px] flex items-center overflow-hidden">
+        <div className="container mx-auto px-4 z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            {/* Lado esquerdo - Texto */}
+            <div className="text-koombo-branco space-y-6">
+              <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
+                BEM-VINDO AO <br />
+                <span className="text-koombo-laranja">{pageTitle.toUpperCase()}</span>
+              </h1>
+              
+              <p className="text-lg lg:text-xl font-light text-koombo-branco/90 max-w-md">
+                {pageDescription}
+              </p>
+              
+              <div className="pt-4">
+                <button 
+                  onClick={() => document.querySelector('#cardapio')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="bg-koombo-laranja hover:bg-koombo-laranja/90 text-koombo-branco font-semibold px-8 py-4 rounded-lg text-lg transition-colors shadow-lg"
+                >
+                  Ver Cardápio
+                </button>
+              </div>
+            </div>
+
+            {/* Lado direito - Imagem do restaurante ou placeholder */}
+            <div className="relative">
+              <div 
+                className="w-full h-[350px] lg:h-[400px] bg-cover bg-center rounded-2xl shadow-2xl"
+                style={{
+                  backgroundImage: restaurant?.image_url 
+                    ? `url('${restaurant.image_url}')`
+                    : `url('/lovable-uploads/0c88a4e4-020c-4637-bce1-b2b693821e08.png')`
+                }}
+              >
+                {/* Overlay sutil para melhor contraste */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
+              </div>
+            </div>
+          </div>
         </div>
+        
+        {/* Elementos decorativos */}
+        <div className="absolute top-10 left-10 w-16 h-16 bg-koombo-laranja/10 rounded-full"></div>
+        <div className="absolute bottom-10 right-10 w-24 h-24 bg-koombo-laranja/5 rounded-full"></div>
+        <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-koombo-laranja/10 rounded-full"></div>
       </section>
 
-      <section className="container mx-auto mt-8">
-        <CategoryFilter
-          categories={categories}
-          activeCategory={activeCategory}
-          onCategoryChange={setActiveCategory}
-        />
-
-        {filteredItems.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredItems.map(item => (
-              <MenuCard
-                key={item.id}
-                item={item}
-                onAddToCart={() => onAddToCart(item)}
-                cartQuantity={getCartQuantity(item.id)}
-                onUpdateQuantity={onUpdateQuantity}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">
-              {restaurant 
-                ? `${restaurant.name} ainda não possui itens no cardápio.`
-                : 'Nenhum item encontrado nesta categoria.'
-              }
+      {/* Seção do Cardápio */}
+      <section id="cardapio" className="bg-koombo-cream py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-koombo-grafite mb-4">
+              NOSSO <span className="text-koombo-laranja">CARDÁPIO</span>
+            </h2>
+            <p className="text-lg text-koombo-grafite/80">
+              Escolha entre nossos deliciosos pratos e sabores únicos
             </p>
           </div>
-        )}
+
+          <CategoryFilter
+            categories={categories}
+            activeCategory={activeCategory}
+            onCategoryChange={setActiveCategory}
+          />
+
+          {filteredItems.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {filteredItems.map(item => (
+                <MenuCard
+                  key={item.id}
+                  item={item}
+                  onAddToCart={() => onAddToCart(item)}
+                  cartQuantity={getCartQuantity(item.id)}
+                  onUpdateQuantity={onUpdateQuantity}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="bg-white rounded-xl p-8 shadow-lg max-w-md mx-auto">
+                <p className="text-koombo-grafite text-lg font-semibold mb-2">
+                  {restaurant 
+                    ? `${restaurant.name} ainda não possui itens no cardápio.`
+                    : 'Nenhum item encontrado nesta categoria.'
+                  }
+                </p>
+                <p className="text-koombo-grafite/60">
+                  Volte em breve para conferir nossas novidades!
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </section>
 
       {showCart && (
