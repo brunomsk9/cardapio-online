@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -177,38 +178,56 @@ const Index = () => {
         <WhatsAppCTA />
 
         {/* Features Section */}
-        <section className="py-16 bg-white">
+        <section className="py-20 bg-gray-600">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12 text-koombo-grafite">
-              Tudo o que você precisa em um KOOMBO só
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="bg-koombo-laranja text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <ShoppingCart className="h-8 w-8" />
+            <div className="max-w-4xl">
+              <h1 className="text-5xl font-bold text-white mb-8">
+                TUDO O QUE VOCÊ PRECISA EM UM <span className="text-koombo-laranja">KOOMBO</span> SÓ.
+              </h1>
+              
+              <h2 className="text-2xl font-light text-white/90 mb-16">
+                Tenha sua gestão de pedidos tudo sob controle.
+              </h2>
+
+              <div className="space-y-12">
+                <div className="flex items-start gap-6">
+                  <div className="bg-koombo-laranja text-white rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0">
+                    <ShoppingCart className="h-8 w-8" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-3">Gestão de Pedidos</h3>
+                    <p className="text-lg text-white/80 leading-relaxed">
+                      Controle total sobre todos os pedidos, desde o recebimento até a entrega.
+                      Acompanhe o status em tempo real e mantenha seus clientes sempre informados.
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold mb-3">Gestão de Pedidos</h3>
-                <p className="text-gray-600">
-                  Controle total sobre todos os pedidos, desde o recebimento até a entrega.
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="bg-koombo-laranja text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <Utensils className="h-8 w-8" />
+
+                <div className="flex items-start gap-6">
+                  <div className="bg-koombo-laranja text-white rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0">
+                    <Utensils className="h-8 w-8" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-3">Cozinha Integrada</h3>
+                    <p className="text-lg text-white/80 leading-relaxed">
+                      Sistema integrado para a cozinha acompanhar e gerenciar os pedidos em tempo real.
+                      Otimize o fluxo de trabalho e reduza o tempo de preparo.
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold mb-3">Cozinha Integrada</h3>
-                <p className="text-gray-600">
-                  Sistema integrado para a cozinha acompanhar e gerenciar os pedidos em tempo real.
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="bg-koombo-laranja text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <BarChart3 className="h-8 w-8" />
+
+                <div className="flex items-start gap-6">
+                  <div className="bg-koombo-laranja text-white rounded-full w-16 h-16 flex items-center justify-center flex-shrink-0">
+                    <BarChart3 className="h-8 w-8" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-3">Relatórios Completos</h3>
+                    <p className="text-lg text-white/80 leading-relaxed">
+                      Acompanhe vendas, clientes e performance com relatórios detalhados.
+                      Tome decisões baseadas em dados e faça seu negócio crescer.
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold mb-3">Relatórios Completos</h3>
-                <p className="text-gray-600">
-                  Acompanhe vendas, clientes e performance com relatórios detalhados.
-                </p>
               </div>
             </div>
           </div>
