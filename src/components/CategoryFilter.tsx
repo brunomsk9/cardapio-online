@@ -17,8 +17,8 @@ const CategoryFilter = ({ categories, activeCategory, onCategoryChange }: Catego
           onClick={() => onCategoryChange(category.key)}
           className={
             activeCategory === category.key
-              ? 'bg-koombo-orange hover:bg-orange-600 text-white font-medium px-6 py-3 rounded-xl border-0 shadow-md'
-              : 'text-koombo-graphite hover:bg-gray-50 font-medium px-6 py-3 rounded-xl border-gray-200'
+              ? 'bg-koombo-orange hover:bg-koombo-orange/90 text-koombo-white font-medium px-6 py-3 rounded-xl border-0 shadow-md'
+              : 'text-koombo-graphite hover:bg-koombo-white font-medium px-6 py-3 rounded-xl border-koombo-graphite bg-koombo-white'
           }
         >
           {category.label}

@@ -32,51 +32,51 @@ const SuperAdmin = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+      <div className="flex items-center justify-center min-h-screen bg-koombo-white">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-koombo-orange"></div>
       </div>
     );
   }
 
   if (!isSuperAdmin) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-koombo-white">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Acesso Negado</h1>
-          <p className="text-gray-600">Apenas super administradores podem acessar esta página.</p>
+          <h1 className="text-2xl font-bold text-koombo-graphite mb-4">Acesso Negado</h1>
+          <p className="text-koombo-graphite/70">Apenas super administradores podem acessar esta página.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="border-b bg-white">
+    <div className="min-h-screen bg-koombo-white">
+      <div className="border-b border-koombo-graphite bg-koombo-white">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-3">
-              <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-2 rounded-lg">
-                <Settings className="h-6 w-6 text-white" />
+              <div className="bg-koombo-orange p-2 rounded-lg">
+                <Settings className="h-6 w-6 text-koombo-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Super Admin</h1>
-                <p className="text-gray-600">Gerenciamento global do sistema</p>
+                <h1 className="text-2xl font-bold text-koombo-graphite">Super Admin</h1>
+                <p className="text-koombo-graphite/70">Gerenciamento global do sistema</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
               <Link to="/admin">
-                <Button variant="outline" className="flex items-center space-x-2">
+                <Button variant="outline" className="flex items-center space-x-2 border-koombo-graphite text-koombo-graphite hover:bg-koombo-white">
                   <span>Acessar Admin</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+              <Badge variant="secondary" className="bg-koombo-orange text-koombo-white">
                 Super Administrador
               </Badge>
               <Button
                 variant="outline"
                 onClick={handleSignOut}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-2 border-koombo-graphite text-koombo-graphite hover:bg-koombo-white"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Sair</span>
@@ -87,11 +87,14 @@ const SuperAdmin = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="flex space-x-1 bg-white rounded-lg p-1 mb-8 shadow-sm">
+        <div className="flex space-x-1 bg-koombo-white rounded-lg p-1 mb-8 shadow-sm border border-koombo-graphite">
           <Button
             variant={activeTab === 'restaurants' ? 'default' : 'ghost'}
             onClick={() => setActiveTab('restaurants')}
-            className="flex items-center space-x-2"
+            className={activeTab === 'restaurants' ? 
+              'flex items-center space-x-2 bg-koombo-orange text-koombo-white hover:bg-koombo-orange/90' : 
+              'flex items-center space-x-2 text-koombo-graphite hover:bg-koombo-white/50'
+            }
           >
             <Building2 className="h-4 w-4" />
             <span>Restaurantes</span>
@@ -99,7 +102,10 @@ const SuperAdmin = () => {
           <Button
             variant={activeTab === 'users' ? 'default' : 'ghost'}
             onClick={() => setActiveTab('users')}
-            className="flex items-center space-x-2"
+            className={activeTab === 'users' ? 
+              'flex items-center space-x-2 bg-koombo-orange text-koombo-white hover:bg-koombo-orange/90' : 
+              'flex items-center space-x-2 text-koombo-graphite hover:bg-koombo-white/50'
+            }
           >
             <Users className="h-4 w-4" />
             <span>Usuários Globais</span>

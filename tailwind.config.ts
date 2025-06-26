@@ -24,11 +24,11 @@ export default {
 				'sans': ['Inter', 'sans-serif'],
 			},
 			colors: {
-				// Cores da Koombo - Novas cores específicas
+				// Cores da Koombo - Apenas as três cores específicas
 				koombo: {
 					orange: '#FF521D',    // Laranja principal
-					graphite: '#282828', // Grafite escuro
-					white: '#FFFFFF',    // Branco puro
+					graphite: '#282828',  // Grafite escuro
+					white: '#FFFFFF',     // Branco puro
 				},
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -40,19 +40,19 @@ export default {
 					foreground: '#FFFFFF'
 				},
 				secondary: {
-					DEFAULT: '#F8F8F8', // Cinza muito claro para contraste suave
+					DEFAULT: '#FFFFFF', // Branco para contraste suave
 					foreground: '#282828'
 				},
 				destructive: {
-					DEFAULT: 'hsl(var(--destructive))',
-					foreground: 'hsl(var(--destructive-foreground))'
+					DEFAULT: '#FF521D', // Usando laranja
+					foreground: '#FFFFFF'
 				},
 				muted: {
-					DEFAULT: '#F5F5F5',
+					DEFAULT: '#F5F5F5', // Tom bem claro do branco
 					foreground: '#282828'
 				},
 				accent: {
-					DEFAULT: '#F8F8F8',
+					DEFAULT: '#FFFFFF',
 					foreground: '#282828'
 				},
 				popover: {
