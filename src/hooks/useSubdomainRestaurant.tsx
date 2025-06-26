@@ -1,9 +1,8 @@
 
 import { useState, useEffect } from 'react';
 import { Database } from '@/integrations/supabase/types';
-import { extractDomainInfo } from '@/utils/domainUtils';
-import { searchRestaurantBySubdomain } from '@/utils/restaurantSearchUtils';
-import { checkAuthenticationStatus } from '@/utils/authUtils';
+import { useDomainDetection } from './useDomainDetection';
+import { detectRestaurantFromSubdomain, logDetectionSummary } from '@/utils/restaurantDetectionUtils';
 
 type Restaurant = Database['public']['Tables']['restaurants']['Row'];
 
@@ -12,48 +11,45 @@ export const useSubdomainRestaurant = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [isMainDomain, setIsMainDomain] = useState(false);
+  
+  const domainInfo = useDomainDetection();
 
   useEffect(() => {
-    const detectRestaurantFromSubdomain = async () => {
+    const handleRestaurantDetection = async () => {
+      if (!domainInfo) {
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
 
-        // Extract domain information
-        const domainInfo = extractDomainInfo();
-
         // Handle main domain case
         if (domainInfo.isMainDomain) {
+          console.log('🏠 Main domain detected, showing general menu');
           setIsMainDomain(true);
           setRestaurant(null);
           setLoading(false);
           return;
         }
 
-        // Check authentication status
-        await checkAuthenticationStatus();
-
-        // Search for restaurant by subdomain
-        const { restaurant: foundRestaurant, error: searchError } = await searchRestaurantBySubdomain(domainInfo.subdomain);
+        // Detect restaurant from subdomain
+        const { restaurant: foundRestaurant, error: detectionError } = await detectRestaurantFromSubdomain(domainInfo.subdomain);
 
         if (foundRestaurant) {
           setRestaurant(foundRestaurant);
           setIsMainDomain(false);
+          logDetectionSummary(domainInfo.hostname, domainInfo.subdomain, true);
         } else {
-          console.log('❌ FINAL RESULT: No restaurant found for subdomain:', domainInfo.subdomain);
-          console.log('🔍 SEARCH SUMMARY:', {
-            hostname: domainInfo.hostname,
-            extractedSubdomain: domainInfo.subdomain,
-            found: false
-          });
+          logDetectionSummary(domainInfo.hostname, domainInfo.subdomain, false);
           
-          if (searchError) {
-            throw searchError;
+          if (detectionError) {
+            throw detectionError;
           }
         }
 
       } catch (err) {
-        console.error('💥 ERROR in detectRestaurantFromSubdomain:', err);
+        console.error('💥 ERROR in handleRestaurantDetection:', err);
         setError(err as Error);
         setRestaurant(null);
         setIsMainDomain(false);
@@ -62,8 +58,8 @@ export const useSubdomainRestaurant = () => {
       }
     };
 
-    detectRestaurantFromSubdomain();
-  }, []);
+    handleRestaurantDetection();
+  }, [domainInfo]);
 
   return {
     restaurant,
