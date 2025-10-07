@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { createUser } from '@/utils/userCreationUtils';
 
@@ -15,6 +15,8 @@ interface UseUserCreationFormProps {
   onClose: () => void;
 }
 
+const STORAGE_KEY = 'form_draft_user_creation';
+
 export const useUserCreationForm = ({ onUserCreated, onClose }: UseUserCreationFormProps) => {
   const [formData, setFormData] = useState<FormData>({
     email: '',
@@ -23,6 +25,40 @@ export const useUserCreationForm = ({ onUserCreated, onClose }: UseUserCreationF
     phone: ''
   });
   const [loading, setLoading] = useState(false);
+
+  // Restore saved data on mount
+  useEffect(() => {
+    const savedData = localStorage.getItem(STORAGE_KEY);
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        setFormData(parsed);
+      } catch (error) {
+        console.error('Error restoring form data:', error);
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+  }, []);
+
+  // Auto-save on changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      // Only save if there's meaningful data
+      if (formData.email || formData.fullName || formData.phone) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+      }
+    }, 500); // Debounce 500ms
+
+    return () => clearTimeout(timeoutId);
+  }, [formData]);
+
+  const clearSavedData = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+  }, []);
+
+  const hasUnsavedData = useCallback((): boolean => {
+    return !!(formData.email || formData.fullName || formData.phone || formData.password);
+  }, [formData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +72,8 @@ export const useUserCreationForm = ({ onUserCreated, onClose }: UseUserCreationF
         description: `${formData.fullName} foi criado. Um email de confirmação foi enviado para ${formData.email}.`,
       });
 
-      // Reset form
+      // Clear saved data and reset form
+      clearSavedData();
       setFormData({
         email: '',
         password: '',
@@ -81,6 +118,8 @@ export const useUserCreationForm = ({ onUserCreated, onClose }: UseUserCreationF
     formData,
     loading,
     handleSubmit,
-    handleInputChange
+    handleInputChange,
+    clearSavedData,
+    hasUnsavedData
   };
 };
