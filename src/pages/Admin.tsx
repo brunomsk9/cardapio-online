@@ -10,6 +10,7 @@ import RestaurantsManagement from '@/components/admin/RestaurantsManagement';
 import UsersManagement from '@/components/admin/UsersManagement';
 import UserProfile from '@/components/UserProfile';
 import MenuManagement from '@/components/admin/MenuManagement';
+import CategoriesManagement from '@/components/admin/CategoriesManagement';
 import OrdersManagement from '@/components/admin/OrdersManagement';
 import OrdersTracking from '@/components/admin/OrdersTracking';
 import SettingsManagement from '@/components/admin/SettingsManagement';
@@ -42,6 +43,8 @@ const Admin = () => {
     switch (activeSection) {
       case 'menu':
         return <MenuManagement />;
+      case 'categories':
+        return <CategoriesManagement />;
       case 'orders':
         return <OrdersManagement />;
       case 'tracking':
