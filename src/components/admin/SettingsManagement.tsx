@@ -9,8 +9,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Save, Clock, MapPin, DollarSign, Smartphone, Mail, Globe } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useUserRestaurant } from '@/hooks/useUserRestaurant';
+import QRCodeGenerator from './QRCodeGenerator';
 
 const SettingsManagement = () => {
+  const { selectedRestaurant } = useUserRestaurant();
+  
   const [restaurantSettings, setRestaurantSettings] = useState({
     name: 'Meu Restaurante',
     description: 'O melhor da culinária brasileira',
@@ -109,8 +113,9 @@ const SettingsManagement = () => {
       </div>
 
       <Tabs defaultValue="restaurant" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="restaurant">Restaurante</TabsTrigger>
+          <TabsTrigger value="qrcode">QR Code</TabsTrigger>
           <TabsTrigger value="delivery">Entrega</TabsTrigger>
           <TabsTrigger value="hours">Horários</TabsTrigger>
           <TabsTrigger value="payment">Pagamento</TabsTrigger>
@@ -212,6 +217,20 @@ const SettingsManagement = () => {
               </Button>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="qrcode">
+          {selectedRestaurant ? (
+            <QRCodeGenerator restaurant={selectedRestaurant} />
+          ) : (
+            <Card>
+              <CardContent className="py-12">
+                <p className="text-center text-gray-500">
+                  Selecione um restaurante para gerar o QR Code.
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="delivery">
