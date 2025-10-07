@@ -27,6 +27,7 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
 
   const menuItems = [
     { id: 'menu', label: 'Cardápio', icon: Menu },
+    { id: 'categories', label: 'Categorias', icon: ClipboardList },
     { id: 'orders', label: 'Pedidos', icon: ShoppingCart },
     { id: 'tracking', label: 'Acompanhar', icon: Eye },
     { id: 'customers', label: 'Clientes', icon: UserCheck },

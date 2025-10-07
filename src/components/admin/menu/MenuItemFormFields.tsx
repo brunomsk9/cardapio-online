@@ -2,14 +2,18 @@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Control } from 'react-hook-form';
 import { MenuItemFormData } from './menuItemSchema';
+import { useMenuCategories } from '@/hooks/useMenuCategories';
 
 interface MenuItemFormFieldsProps {
   control: Control<MenuItemFormData>;
 }
 
 const MenuItemFormFields = ({ control }: MenuItemFormFieldsProps) => {
+  const { categories } = useMenuCategories();
+
   return (
     <>
       <FormField
@@ -64,9 +68,20 @@ const MenuItemFormFields = ({ control }: MenuItemFormFieldsProps) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Categoria *</FormLabel>
-              <FormControl>
-                <Input placeholder="Ex: Pratos Principais" {...field} />
-              </FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione uma categoria" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.name}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}

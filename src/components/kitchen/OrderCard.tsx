@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, User, CheckCircle, Utensils, Play, Ban } from 'lucide-react';
+import { Clock, User, CheckCircle, Utensils, Play, Ban, Printer } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 
 type Order = Database['public']['Tables']['orders']['Row'];
@@ -13,6 +13,61 @@ interface OrderCardProps {
 }
 
 const OrderCard = ({ order, onStatusUpdate }: OrderCardProps) => {
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Pedido #${order.id.slice(0, 8)}</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            h1 { font-size: 24px; margin-bottom: 10px; }
+            .info { margin: 10px 0; }
+            .items { margin-top: 20px; }
+            .item { padding: 10px; border-bottom: 1px solid #ccc; }
+            .total { font-weight: bold; font-size: 18px; margin-top: 20px; }
+            @media print {
+              button { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Pedido #${order.id.slice(0, 8)}</h1>
+          <div class="info">
+            <p><strong>Cliente:</strong> ${order.customer_name}</p>
+            <p><strong>Telefone:</strong> ${order.customer_phone}</p>
+            <p><strong>Status:</strong> ${order.status}</p>
+            <p><strong>Endereço:</strong> ${order.delivery_address}</p>
+            ${order.notes ? `<p><strong>Observações:</strong> ${order.notes}</p>` : ''}
+          </div>
+          <div class="items">
+            <h2>Itens do Pedido:</h2>
+            ${Array.isArray(order.items) ? order.items.map((item: any) => `
+              <div class="item">
+                <strong>${item.quantity}x ${item.name}</strong>
+                <span style="float: right;">R$ ${(item.price * item.quantity).toFixed(2)}</span>
+              </div>
+            `).join('') : ''}
+          </div>
+          <div class="total">
+            Total: R$ ${order.total.toFixed(2)}
+          </div>
+          <script>
+            window.onload = function() {
+              window.print();
+            }
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+  };
+
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       pending: { label: 'Pendente', color: 'bg-yellow-100 text-yellow-800' },
@@ -45,10 +100,22 @@ const OrderCard = ({ order, onStatusUpdate }: OrderCardProps) => {
   };
 
   const getActionButtons = () => {
+    const printButton = (
+      <Button
+        onClick={handlePrint}
+        variant="outline"
+        size="sm"
+        className="flex-shrink-0"
+      >
+        <Printer className="h-4 w-4" />
+      </Button>
+    );
+
     switch (order.status) {
       case 'pending':
         return (
           <div className="flex gap-2">
+            {printButton}
             <Button
               onClick={() => onStatusUpdate(order.id, 'confirmed')}
               className="flex-1 bg-blue-500 hover:bg-blue-600"
@@ -71,6 +138,7 @@ const OrderCard = ({ order, onStatusUpdate }: OrderCardProps) => {
       case 'confirmed':
         return (
           <div className="flex gap-2">
+            {printButton}
             <Button
               onClick={() => onStatusUpdate(order.id, 'preparing')}
               className="flex-1 bg-orange-500 hover:bg-orange-600"
@@ -92,26 +160,32 @@ const OrderCard = ({ order, onStatusUpdate }: OrderCardProps) => {
       
       case 'preparing':
         return (
-          <Button
-            onClick={() => onStatusUpdate(order.id, 'ready')}
-            className="w-full bg-green-500 hover:bg-green-600"
-            size="sm"
-          >
-            <CheckCircle className="h-4 w-4 mr-2" />
-            Marcar como Pronto
-          </Button>
+          <div className="flex gap-2">
+            {printButton}
+            <Button
+              onClick={() => onStatusUpdate(order.id, 'ready')}
+              className="flex-1 bg-green-500 hover:bg-green-600"
+              size="sm"
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Marcar como Pronto
+            </Button>
+          </div>
         );
       
       case 'ready':
         return (
-          <Button
-            onClick={() => onStatusUpdate(order.id, 'delivered')}
-            className="w-full bg-gray-500 hover:bg-gray-600"
-            size="sm"
-          >
-            <CheckCircle className="h-4 w-4 mr-2" />
-            Marcar como Entregue
-          </Button>
+          <div className="flex gap-2">
+            {printButton}
+            <Button
+              onClick={() => onStatusUpdate(order.id, 'delivered')}
+              className="flex-1 bg-gray-500 hover:bg-gray-600"
+              size="sm"
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Marcar como Entregue
+            </Button>
+          </div>
         );
       
       default:

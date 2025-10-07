@@ -5,6 +5,7 @@ import OrdersManagement from './admin/OrdersManagement';
 import UsersManagement from './admin/UsersManagement';
 import RestaurantsManagement from './admin/RestaurantsManagement';
 import SettingsManagement from './admin/SettingsManagement';
+import CategoriesManagement from './admin/CategoriesManagement';
 import MenuPanel from './admin/panels/MenuPanel';
 import { MenuItem } from '@/types';
 
@@ -29,6 +30,8 @@ const AdminPanel = ({ menuItems, onUpdateMenuItem, onDeleteMenuItem, onAddMenuIt
             onAddMenuItem={onAddMenuItem}
           />
         );
+      case 'categories':
+        return <CategoriesManagement />;
       case 'orders':
         return <OrdersManagement />;
       case 'restaurants':
