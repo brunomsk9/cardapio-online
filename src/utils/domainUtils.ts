@@ -15,8 +15,16 @@ export const extractDomainInfo = (): DomainInfo => {
   const hostname = window.location.hostname;
   console.log('🔍 HOSTNAME DETECTION:', hostname);
 
-  // Check if it's a main domain or preview environment
-  if (MAIN_DOMAINS.some(domain => hostname.includes(domain))) {
+  // Check if hostname is exactly a main domain or lovable preview
+  const isExactMainDomain = 
+    hostname === 'koombo.online' || 
+    hostname === 'www.koombo.online' ||
+    hostname === 'ko-ombo.online' ||
+    hostname === 'www.ko-ombo.online' ||
+    hostname === 'localhost' ||
+    hostname.endsWith('.lovable.app');
+
+  if (isExactMainDomain) {
     console.log('🏠 Main domain detected, showing general menu');
     return {
       hostname,
@@ -27,9 +35,9 @@ export const extractDomainInfo = (): DomainInfo => {
 
   // Extract subdomain from supported domains
   let subdomain = '';
-  if (hostname.includes('.koombo.online')) {
+  if (hostname.endsWith('.koombo.online')) {
     subdomain = hostname.replace('.koombo.online', '');
-  } else if (hostname.includes('.ko-ombo.online')) {
+  } else if (hostname.endsWith('.ko-ombo.online')) {
     subdomain = hostname.replace('.ko-ombo.online', '');
   }
 
@@ -37,7 +45,8 @@ export const extractDomainInfo = (): DomainInfo => {
     original: hostname,
     extracted: subdomain,
     length: subdomain.length,
-    type: typeof subdomain
+    type: typeof subdomain,
+    isMainDomain: !subdomain
   });
 
   return {
