@@ -9,14 +9,14 @@ export interface DomainInfo {
   isMainDomain: boolean;
 }
 
-const MAIN_DOMAINS = ['koombo.online', 'ko-ombo.online', 'localhost'];
+const MAIN_DOMAINS = ['koombo.online', 'ko-ombo.online', 'localhost', 'lovable.app'];
 
 export const extractDomainInfo = (): DomainInfo => {
   const hostname = window.location.hostname;
   console.log('🔍 HOSTNAME DETECTION:', hostname);
 
-  // Check if it's a main domain
-  if (MAIN_DOMAINS.includes(hostname)) {
+  // Check if it's a main domain or preview environment
+  if (MAIN_DOMAINS.some(domain => hostname.includes(domain))) {
     console.log('🏠 Main domain detected, showing general menu');
     return {
       hostname,
