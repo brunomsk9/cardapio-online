@@ -7,6 +7,7 @@ import { Building2, MessageSquare } from 'lucide-react';
 import { useUserRestaurant } from '@/hooks/useUserRestaurant';
 import RestaurantInfoForm from './settings/RestaurantInfoForm';
 import WhatsAppMessageForm from './settings/WhatsAppMessageForm';
+import QRCodeGenerator from './QRCodeGenerator';
 
 const RestaurantSettings = () => {
   const { selectedRestaurant } = useUserRestaurant();
@@ -176,6 +177,8 @@ Obrigado pela preferência! 🙏`;
           />
         </CardContent>
       </Card>
+
+      <QRCodeGenerator restaurant={selectedRestaurant} />
     </div>
   );
 };
