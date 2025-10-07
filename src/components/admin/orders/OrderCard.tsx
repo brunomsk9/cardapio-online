@@ -2,7 +2,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock, Phone, MapPin, User, DollarSign, MessageSquare } from 'lucide-react';
+import { Clock, Phone, MapPin, User, DollarSign, MessageSquare, Printer } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 import OrderStatusButtons from './OrderStatusButtons';
 
@@ -32,6 +32,185 @@ const OrderCard = ({ order, onStatusUpdate, onSendToCustomer }: OrderCardProps) 
         {config.label}
       </Badge>
     );
+  };
+
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const statusConfig: Record<string, string> = {
+      pending: 'Pendente',
+      confirmed: 'Confirmado',
+      preparing: 'Preparando',
+      ready: 'Pronto',
+      delivered: 'Entregue',
+      cancelled: 'Cancelado',
+    };
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Pedido #${order.id.slice(0, 8)}</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              padding: 20px;
+              max-width: 800px;
+              margin: 0 auto;
+            }
+            h1 {
+              color: #f97316;
+              border-bottom: 2px solid #f97316;
+              padding-bottom: 10px;
+            }
+            .status {
+              display: inline-block;
+              padding: 4px 12px;
+              border-radius: 4px;
+              font-weight: bold;
+              margin: 10px 0;
+            }
+            .section {
+              margin: 20px 0;
+              padding: 15px;
+              border: 1px solid #e5e7eb;
+              border-radius: 8px;
+            }
+            .section-title {
+              font-weight: bold;
+              margin-bottom: 10px;
+              font-size: 16px;
+            }
+            .info-row {
+              margin: 8px 0;
+              display: flex;
+              gap: 8px;
+            }
+            .info-label {
+              font-weight: bold;
+              min-width: 120px;
+            }
+            .items-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 10px 0;
+            }
+            .items-table th, .items-table td {
+              padding: 8px;
+              text-align: left;
+              border-bottom: 1px solid #e5e7eb;
+            }
+            .items-table th {
+              background-color: #f3f4f6;
+              font-weight: bold;
+            }
+            .total-row {
+              font-weight: bold;
+              font-size: 18px;
+              text-align: right;
+              margin-top: 10px;
+              padding-top: 10px;
+              border-top: 2px solid #000;
+            }
+            .notes {
+              background-color: #fef3c7;
+              padding: 10px;
+              border-radius: 4px;
+              margin: 10px 0;
+            }
+            @media print {
+              body {
+                padding: 0;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Pedido #${order.id.slice(0, 8)}</h1>
+          
+          <div class="section">
+            <div class="info-row">
+              <span class="info-label">Data/Hora:</span>
+              <span>${new Date(order.created_at).toLocaleString('pt-BR')}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Status:</span>
+              <span class="status">${statusConfig[order.status] || order.status}</span>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Informações do Cliente</div>
+            <div class="info-row">
+              <span class="info-label">Nome:</span>
+              <span>${order.customer_name}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Telefone:</span>
+              <span>${order.customer_phone}</span>
+            </div>
+            ${order.customer_email ? `
+            <div class="info-row">
+              <span class="info-label">Email:</span>
+              <span>${order.customer_email}</span>
+            </div>
+            ` : ''}
+            <div class="info-row">
+              <span class="info-label">Endereço:</span>
+              <span>${order.delivery_address}</span>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Itens do Pedido</div>
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th style="text-align: center">Qtd.</th>
+                  <th style="text-align: right">Preço Unit.</th>
+                  <th style="text-align: right">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${Array.isArray(order.items) ? order.items.map((item: any) => `
+                  <tr>
+                    <td>${item.name}</td>
+                    <td style="text-align: center">${item.quantity}</td>
+                    <td style="text-align: right">R$ ${item.price.toFixed(2)}</td>
+                    <td style="text-align: right">R$ ${(item.price * item.quantity).toFixed(2)}</td>
+                  </tr>
+                `).join('') : ''}
+              </tbody>
+            </table>
+            <div class="total-row">
+              Total: R$ ${order.total.toFixed(2)}
+            </div>
+            <div class="info-row" style="margin-top: 10px;">
+              <span class="info-label">Forma de Pagamento:</span>
+              <span>${order.payment_method.toUpperCase()}</span>
+            </div>
+          </div>
+
+          ${order.notes ? `
+          <div class="section">
+            <div class="section-title">Observações</div>
+            <div class="notes">${order.notes}</div>
+          </div>
+          ` : ''}
+
+          <script>
+            window.onload = function() {
+              window.print();
+            };
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(printContent);
+    printWindow.document.close();
   };
 
   return (
@@ -103,7 +282,16 @@ const OrderCard = ({ order, onStatusUpdate, onSendToCustomer }: OrderCardProps) 
             onStatusChange={(status) => onStatusUpdate(order.id, status)}
           />
           
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            <Button
+              onClick={handlePrint}
+              variant="outline"
+              size="sm"
+              className="bg-gray-50 border-gray-200 hover:bg-gray-100"
+            >
+              <Printer className="h-4 w-4 mr-2" />
+              Imprimir
+            </Button>
             <Button
               onClick={() => onSendToCustomer(order)}
               variant="outline"
