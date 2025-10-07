@@ -56,27 +56,11 @@ export const useSubdomainAccess = (): SubdomainAccessResult => {
           return;
         }
 
-        // Se estiver no domínio principal, apenas super admins podem acessar
+        // Se estiver no domínio principal (sem subdomínio específico)
+        // Permite acesso para usuários autenticados - útil para preview/desenvolvimento
         if (domainInfo.isMainDomain) {
-          console.log('🏠 Main domain access denied for non-super-admin user');
-          setHasAccess(false);
-          setError('Apenas super administradores podem acessar o domínio principal.');
-          
-          // Redireciona para o primeiro restaurante do usuário, se houver
-          if (restaurants && restaurants.length > 0) {
-            const firstRestaurant = restaurants[0];
-            if (firstRestaurant.subdomain) {
-              const redirectDomain = window.location.hostname.includes('koombo.online') 
-                ? `${firstRestaurant.subdomain}.koombo.online`
-                : window.location.hostname.includes('ko-ombo.online')
-                ? `${firstRestaurant.subdomain}.ko-ombo.online`
-                : `${firstRestaurant.subdomain}.localhost:3000`;
-              
-              setRedirectUrl(`${window.location.protocol}//${redirectDomain}`);
-              setShouldRedirect(true);
-            }
-          }
-          
+          console.log('🏠 Main domain detected, allowing access for authenticated users');
+          setHasAccess(true);
           setLoading(false);
           return;
         }
