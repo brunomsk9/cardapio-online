@@ -19,12 +19,16 @@ import RestaurantSettings from '@/components/admin/RestaurantSettings';
 import CustomersManagement from '@/components/admin/CustomersManagement';
 import ReportsManagement from '@/components/admin/ReportsManagement';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useOrderNotificationSound } from '@/hooks/useOrderNotificationSound';
 
 const Admin = () => {
   const [activeSection, setActiveSection] = useState('menu');
   const { isSuperAdmin } = useUserRole();
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  
+  // Enable order notification sound
+  useOrderNotificationSound(true);
 
   const handleSignOut = async () => {
     const { error } = await signOut();

@@ -10,12 +10,16 @@ import KitchenHeader from '@/components/kitchen/KitchenHeader';
 import OrdersStats from '@/components/kitchen/OrdersStats';
 import OrdersList from '@/components/kitchen/OrdersList';
 import LoadingSpinner from '@/components/kitchen/LoadingSpinner';
+import { useOrderNotificationSound } from '@/hooks/useOrderNotificationSound';
 
 const Kitchen = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, isKitchen, isSuperAdmin, loading: roleLoading } = useUserRole();
   const { orders, loading: ordersLoading, updateOrderStatus } = useKitchenOrders();
+  
+  // Enable order notification sound
+  useOrderNotificationSound(true);
 
   console.log('Kitchen page - Auth state:', { 
     user: user?.id, 
