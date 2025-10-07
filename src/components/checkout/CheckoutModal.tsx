@@ -193,12 +193,12 @@ const CheckoutModal = ({ isOpen, onClose, cart, totalPrice, user, onClearCart }:
                 <Label htmlFor="pix">PIX</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="dinheiro" id="dinheiro" />
-                <Label htmlFor="dinheiro">Dinheiro</Label>
+                <RadioGroupItem value="cash" id="cash" />
+                <Label htmlFor="cash">Dinheiro</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="cartao" id="cartao" />
-                <Label htmlFor="cartao">Cartão (na entrega)</Label>
+                <RadioGroupItem value="card" id="card" />
+                <Label htmlFor="card">Cartão (na entrega)</Label>
               </div>
             </RadioGroup>
           </div>
