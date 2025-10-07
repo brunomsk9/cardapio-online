@@ -20,29 +20,31 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <SubdomainAccessGuard>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            
-            {/* Rota protegida para Kitchen */}
-            <Route element={<ProtectedRoute allowedRoles={["kitchen", "admin", "super_admin"]} />}>
-              <Route path="/kitchen" element={<Kitchen />} />
-            </Route>
+        <Routes>
+          <Route path="/" element={
+            <SubdomainAccessGuard>
+              <Index />
+            </SubdomainAccessGuard>
+          } />
+          
+          {/* Rota protegida para Kitchen */}
+          <Route element={<ProtectedRoute allowedRoles={["kitchen", "admin", "super_admin"]} />}>
+            <Route path="/kitchen" element={<Kitchen />} />
+          </Route>
 
-            {/* Rota protegida para Admin */}
-            <Route element={<ProtectedRoute allowedRoles={["admin", "super_admin"]} />}>
-              <Route path="/admin" element={<Admin />} />
-            </Route>
+          {/* Rota protegida para Admin */}
+          <Route element={<ProtectedRoute allowedRoles={["admin", "super_admin"]} />}>
+            <Route path="/admin" element={<Admin />} />
+          </Route>
 
-            {/* Rota protegida para Super Admin */}
-            <Route element={<ProtectedRoute allowedRoles={["super_admin"]} />}>
-              <Route path="/super-admin" element={<SuperAdmin />} />
-            </Route>
+          {/* Rota protegida para Super Admin */}
+          <Route element={<ProtectedRoute allowedRoles={["super_admin"]} />}>
+            <Route path="/super-admin" element={<SuperAdmin />} />
+          </Route>
 
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </SubdomainAccessGuard>
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
