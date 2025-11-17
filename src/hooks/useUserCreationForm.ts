@@ -13,11 +13,12 @@ interface FormData {
 interface UseUserCreationFormProps {
   onUserCreated: () => void;
   onClose: () => void;
+  isOpen?: boolean;
 }
 
 const STORAGE_KEY = 'form_draft_user_creation';
 
-export const useUserCreationForm = ({ onUserCreated, onClose }: UseUserCreationFormProps) => {
+export const useUserCreationForm = ({ onUserCreated, onClose, isOpen = true }: UseUserCreationFormProps) => {
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
@@ -25,23 +26,34 @@ export const useUserCreationForm = ({ onUserCreated, onClose }: UseUserCreationF
     phone: ''
   });
   const [loading, setLoading] = useState(false);
+  const [hasRestored, setHasRestored] = useState(false);
 
-  // Restore saved data on mount
+  // Restore saved data on mount or when enabled
   useEffect(() => {
+    if (!isOpen) {
+      setHasRestored(false);
+      return;
+    }
+
+    if (hasRestored) return;
+
     const savedData = localStorage.getItem(STORAGE_KEY);
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
         setFormData(parsed);
+        setHasRestored(true);
       } catch (error) {
         console.error('Error restoring form data:', error);
         localStorage.removeItem(STORAGE_KEY);
       }
     }
-  }, []);
+  }, [isOpen, hasRestored]);
 
   // Auto-save on changes
   useEffect(() => {
+    if (!isOpen) return;
+
     const timeoutId = setTimeout(() => {
       // Only save if there's meaningful data
       if (formData.email || formData.fullName || formData.phone) {
@@ -50,7 +62,7 @@ export const useUserCreationForm = ({ onUserCreated, onClose }: UseUserCreationF
     }, 500); // Debounce 500ms
 
     return () => clearTimeout(timeoutId);
-  }, [formData]);
+  }, [formData, isOpen]);
 
   const clearSavedData = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
