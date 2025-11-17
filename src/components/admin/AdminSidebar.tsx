@@ -53,19 +53,25 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
           {isSuperAdmin ? 'Super Admin' : 'Administração'}
         </h1>
       </div>
-
-      {/* Botão de acesso à cozinha - Destacado no topo */}
-      <div className="p-4 bg-gradient-to-r from-orange-50 to-orange-100 border-b border-orange-200">
-        <Button
-          className="w-full h-12 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200"
-          onClick={handleKitchenAccess}
-        >
-          <ChefHat className="h-5 w-5 mr-2" />
-          Acessar Cozinha
-        </Button>
-      </div>
       
       <nav className="mt-6 flex-1 overflow-y-auto">
+        {/* Botão de Cozinha - Primeiro item com destaque sutil */}
+        <div className="px-3 mb-6">
+          <Button
+            className="w-full h-11 bg-orange-500 hover:bg-orange-600 text-white font-medium shadow-sm hover:shadow-md transition-all"
+            onClick={handleKitchenAccess}
+          >
+            <ChefHat className="h-5 w-5 mr-2" />
+            Cozinha
+          </Button>
+        </div>
+
+        <div className="px-3 mb-2">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+            Gestão
+          </p>
+        </div>
+
         {menuItems.map((item) => {
           const Icon = item.icon;
           return (
