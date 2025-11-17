@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { UserPlus, X } from 'lucide-react';
@@ -26,8 +26,18 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
     hasUnsavedData 
   } = useUserCreationForm({
     onUserCreated,
-    onClose
+    onClose,
+    isOpen
   });
+
+  // Cleanup on unmount if form is not open
+  useEffect(() => {
+    return () => {
+      if (!isOpen) {
+        clearSavedData();
+      }
+    };
+  }, [isOpen, clearSavedData]);
 
   const handleClose = () => {
     if (hasUnsavedData()) {
