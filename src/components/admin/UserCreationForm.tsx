@@ -30,15 +30,6 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
     isOpen
   });
 
-  // Cleanup on unmount if form is not open
-  useEffect(() => {
-    return () => {
-      if (!isOpen) {
-        clearSavedData();
-      }
-    };
-  }, [isOpen, clearSavedData]);
-
   const handleClose = () => {
     if (hasUnsavedData()) {
       setShowCloseAlert(true);

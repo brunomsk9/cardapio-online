@@ -56,15 +56,6 @@ const RestaurantForm = ({ isOpen, onClose, onSubmit, editingRestaurant }: Restau
     enabled: isOpen && !editingRestaurant // Only persist for new restaurants
   });
 
-  // Cleanup on unmount if form is not open
-  React.useEffect(() => {
-    return () => {
-      if (!isOpen && !editingRestaurant) {
-        clearSavedData();
-      }
-    };
-  }, [isOpen, editingRestaurant, clearSavedData]);
-
   React.useEffect(() => {
     if (editingRestaurant) {
       form.reset({
