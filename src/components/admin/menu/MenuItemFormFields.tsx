@@ -96,6 +96,9 @@ const MenuItemFormFields = ({ control }: MenuItemFormFieldsProps) => {
             <FormControl>
               <Input placeholder="https://exemplo.com/imagem.jpg" {...field} />
             </FormControl>
+            <p className="text-sm text-muted-foreground">
+              Dimensões recomendadas: 800 x 600 pixels (4:3) ou 800 x 800 pixels (quadrada)
+            </p>
             <FormMessage />
           </FormItem>
         )}
