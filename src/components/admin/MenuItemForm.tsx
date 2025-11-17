@@ -95,22 +95,22 @@ const MenuItemForm = ({ isOpen, onClose, onSubmit, editingItem }: MenuItemFormPr
     <>
       <Dialog open={isOpen} modal={true}>
         <DialogContent 
-          className="max-w-2xl"
+          className="max-w-2xl max-h-[90vh] overflow-y-auto"
           onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
           onCloseAutoFocus={(e) => e.preventDefault()}
         >
-          <DialogHeader>
-            <DialogTitle>
+          <DialogHeader className="space-y-3 pb-6">
+            <DialogTitle className="text-2xl font-bold">
               {editingItem ? 'Editar Item' : 'Novo Item do Cardápio'}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-base">
               Preencha as informações do item do cardápio.
             </DialogDescription>
           </DialogHeader>
           
           {!editingItem && (
-            <Alert className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+            <Alert className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800 mb-6">
               <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
               <AlertDescription className="text-sm text-blue-800 dark:text-blue-200">
                 Seus dados são salvos automaticamente. Você pode sair e voltar sem perder informações.

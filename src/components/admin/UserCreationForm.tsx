@@ -49,22 +49,22 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
     <>
       <Dialog open={isOpen} modal={true}>
         <DialogContent 
-          className="max-w-md"
+          className="max-w-lg max-h-[90vh] overflow-y-auto"
           onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
           onCloseAutoFocus={(e) => e.preventDefault()}
         >
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <UserPlus className="h-5 w-5" />
+          <DialogHeader className="space-y-3 pb-6">
+            <DialogTitle className="flex items-center gap-2 text-2xl font-bold">
+              <UserPlus className="h-6 w-6" />
               Criar Novo Usuário
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-base">
               Preencha os dados para criar um novo usuário no sistema.
             </DialogDescription>
           </DialogHeader>
 
-          <Alert className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+          <Alert className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800 mb-6">
             <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             <AlertDescription className="text-sm text-blue-800 dark:text-blue-200">
               Seus dados são salvos automaticamente. Você pode sair e voltar sem perder informações.
@@ -73,17 +73,17 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
 
           <UserCreationWarning />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <UserCreationFormFields 
               formData={formData} 
               onInputChange={handleInputChange} 
             />
 
-            <div className="flex gap-2 pt-4">
-              <Button type="submit" disabled={loading} className="flex-1">
+            <div className="flex gap-3 pt-6 border-t">
+              <Button type="submit" disabled={loading} className="flex-1 h-10">
                 {loading ? 'Criando...' : 'Criar Usuário'}
               </Button>
-              <Button type="button" variant="outline" onClick={handleClose}>
+              <Button type="button" variant="outline" onClick={handleClose} className="h-10">
                 <X className="h-4 w-4" />
               </Button>
             </div>
