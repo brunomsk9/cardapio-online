@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Info } from 'lucide-react';
 import { restaurantSchema, RestaurantFormData } from './restaurantSchema';
 import RestaurantFormFields from './RestaurantFormFields';
 import RestaurantFormActions from './RestaurantFormActions';
@@ -107,9 +109,18 @@ const RestaurantForm = ({ isOpen, onClose, onSubmit, editingRestaurant }: Restau
             </DialogTitle>
             <DialogDescription className="text-sm">
               Preencha as informações básicas do restaurante.
-              {!editingRestaurant && ' Seus dados serão salvos automaticamente.'}
             </DialogDescription>
           </DialogHeader>
+          
+          {!editingRestaurant && (
+            <Alert className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800 mb-2">
+              <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <AlertDescription className="text-sm text-blue-800 dark:text-blue-200">
+                Seus dados são salvos automaticamente. Você pode sair e voltar sem perder informações.
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-3">
               <RestaurantFormFields control={form.control} />

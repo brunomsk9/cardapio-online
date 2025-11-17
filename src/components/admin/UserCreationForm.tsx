@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { UserPlus, X } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { UserPlus, X, Info } from 'lucide-react';
 import { useUserCreationForm } from '@/hooks/useUserCreationForm';
 import { UserCreationWarning } from './UserCreationWarning';
 import { UserCreationFormFields } from './UserCreationFormFields';
@@ -58,9 +59,16 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
               Criar Novo Usuário
             </DialogTitle>
             <DialogDescription>
-              Preencha os dados para criar um novo usuário no sistema. Seus dados serão salvos automaticamente.
+              Preencha os dados para criar um novo usuário no sistema.
             </DialogDescription>
           </DialogHeader>
+
+          <Alert className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+            <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <AlertDescription className="text-sm text-blue-800 dark:text-blue-200">
+              Seus dados são salvos automaticamente. Você pode sair e voltar sem perder informações.
+            </AlertDescription>
+          </Alert>
 
           <UserCreationWarning />
 
