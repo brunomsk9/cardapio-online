@@ -47,11 +47,12 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={handleClose} modal={true}>
+      <Dialog open={isOpen} modal={true}>
         <DialogContent 
           className="max-w-md"
           onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
+          onCloseAutoFocus={(e) => e.preventDefault()}
         >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">

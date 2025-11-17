@@ -93,11 +93,12 @@ const MenuItemForm = ({ isOpen, onClose, onSubmit, editingItem }: MenuItemFormPr
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={handleClose} modal={true}>
+      <Dialog open={isOpen} modal={true}>
         <DialogContent 
           className="max-w-2xl"
           onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
+          onCloseAutoFocus={(e) => e.preventDefault()}
         >
           <DialogHeader>
             <DialogTitle>
