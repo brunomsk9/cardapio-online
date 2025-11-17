@@ -52,7 +52,10 @@ export const useFormPersistence = <T extends Record<string, any>>({
 
   // Auto-save on changes
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {
+      // Clear any pending saves when disabled
+      return;
+    }
 
     const timeoutId = setTimeout(() => {
       const dataToSave: any = {};

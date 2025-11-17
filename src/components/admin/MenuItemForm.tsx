@@ -47,6 +47,15 @@ const MenuItemForm = ({ isOpen, onClose, onSubmit, editingItem }: MenuItemFormPr
     enabled: isOpen && !editingItem // Only persist for new items
   });
 
+  // Cleanup on unmount if form is not open
+  React.useEffect(() => {
+    return () => {
+      if (!isOpen && !editingItem) {
+        clearSavedData();
+      }
+    };
+  }, [isOpen, editingItem, clearSavedData]);
+
   React.useEffect(() => {
     if (editingItem) {
       form.reset({
