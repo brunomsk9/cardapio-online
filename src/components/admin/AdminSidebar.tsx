@@ -27,6 +27,7 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
 
   const menuItems = [
     { id: 'menu', label: 'Cardápio', icon: Menu },
+    { id: 'kitchen', label: 'Cozinha', icon: ChefHat, isExternal: true },
     { id: 'categories', label: 'Categorias', icon: ClipboardList },
     { id: 'orders', label: 'Pedidos', icon: ShoppingCart },
     { id: 'tracking', label: 'Acompanhar', icon: Eye },
@@ -42,8 +43,12 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
     { id: 'settings', label: 'Configurações', icon: Settings },
   ];
 
-  const handleKitchenAccess = () => {
-    navigate('/kitchen');
+  const handleMenuClick = (itemId: string) => {
+    if (itemId === 'kitchen') {
+      navigate('/kitchen');
+    } else {
+      onSectionChange(itemId);
+    }
   };
 
   return (
@@ -55,17 +60,6 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
       </div>
       
       <nav className="mt-6 flex-1 overflow-y-auto">
-        {/* Botão Cozinha - Destaque no topo */}
-        <div className="px-3 mb-4">
-          <Button
-            className="w-full h-11 bg-orange-500 hover:bg-orange-600 text-white font-medium shadow-sm hover:shadow-md transition-all"
-            onClick={handleKitchenAccess}
-          >
-            <ChefHat className="h-5 w-5 mr-2" />
-            Cozinha
-          </Button>
-        </div>
-
         <div className="px-3 mb-2">
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
             Gestão
@@ -74,12 +68,15 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
 
         {menuItems.map((item) => {
           const Icon = item.icon;
+          const isKitchen = item.id === 'kitchen';
           return (
             <Button
               key={item.id}
               variant={activeSection === item.id ? "default" : "ghost"}
-              className="w-full justify-start px-6 py-3 text-left mb-1"
-              onClick={() => onSectionChange(item.id)}
+              className={`w-full justify-start px-6 py-3 text-left mb-1 ${
+                isKitchen ? 'text-orange-600 hover:text-orange-700 hover:bg-orange-50' : ''
+              }`}
+              onClick={() => handleMenuClick(item.id)}
             >
               <Icon className="h-5 w-5 mr-3" />
               {item.label}
