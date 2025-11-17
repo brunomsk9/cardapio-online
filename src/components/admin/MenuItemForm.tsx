@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Info } from 'lucide-react';
 import { menuItemSchema, MenuItemFormData } from './menu/menuItemSchema';
 import MenuItemFormFields from './menu/MenuItemFormFields';
 import MenuItemFormActions from './menu/MenuItemFormActions';
@@ -103,9 +105,18 @@ const MenuItemForm = ({ isOpen, onClose, onSubmit, editingItem }: MenuItemFormPr
             </DialogTitle>
             <DialogDescription>
               Preencha as informações do item do cardápio.
-              {!editingItem && ' Seus dados serão salvos automaticamente.'}
             </DialogDescription>
           </DialogHeader>
+          
+          {!editingItem && (
+            <Alert className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+              <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <AlertDescription className="text-sm text-blue-800 dark:text-blue-200">
+                Seus dados são salvos automaticamente. Você pode sair e voltar sem perder informações.
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
               <MenuItemFormFields control={form.control} />
