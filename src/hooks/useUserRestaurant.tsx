@@ -31,25 +31,66 @@ export const useUserRestaurant = () => {
 
         console.log('Fetching restaurants for user:', user.id, 'is super admin:', isSuperAdmin);
 
-        // Com as novas políticas RLS, podemos buscar diretamente
-        // A política já filtra baseado no papel do usuário
-        const { data, error: restaurantError } = await supabase
-          .from('restaurants')
-          .select('*')
-          .eq('is_active', true)
-          .order('name');
+        if (isSuperAdmin) {
+          // Super admin vê todos os restaurantes
+          const { data, error: restaurantError } = await supabase
+            .from('restaurants')
+            .select('*')
+            .eq('is_active', true)
+            .order('name');
 
-        if (restaurantError) {
-          console.error('Error fetching restaurants:', restaurantError);
-          throw restaurantError;
-        }
+          if (restaurantError) {
+            console.error('Error fetching restaurants:', restaurantError);
+            throw restaurantError;
+          }
 
-        console.log('Fetched restaurants:', data?.length || 0);
-        setRestaurants(data || []);
-        
-        // Se há apenas um restaurante, seleciona automaticamente
-        if (data && data.length === 1) {
-          setSelectedRestaurant(data[0]);
+          console.log('Fetched restaurants (super admin):', data?.length || 0);
+          setRestaurants(data || []);
+          
+          // Se há apenas um restaurante, seleciona automaticamente
+          if (data && data.length === 1) {
+            setSelectedRestaurant(data[0]);
+          }
+        } else {
+          // Admin e kitchen veem apenas seus restaurantes associados
+          const { data: userRestaurants, error: userRestError } = await supabase
+            .from('user_restaurants')
+            .select('restaurant_id')
+            .eq('user_id', user.id);
+
+          if (userRestError) {
+            console.error('Error fetching user restaurants:', userRestError);
+            throw userRestError;
+          }
+
+          if (!userRestaurants || userRestaurants.length === 0) {
+            console.log('No restaurants associated with user');
+            setRestaurants([]);
+            setLoading(false);
+            return;
+          }
+
+          const restaurantIds = userRestaurants.map(ur => ur.restaurant_id);
+          
+          const { data, error: restaurantError } = await supabase
+            .from('restaurants')
+            .select('*')
+            .in('id', restaurantIds)
+            .eq('is_active', true)
+            .order('name');
+
+          if (restaurantError) {
+            console.error('Error fetching restaurants:', restaurantError);
+            throw restaurantError;
+          }
+
+          console.log('Fetched restaurants (user):', data?.length || 0);
+          setRestaurants(data || []);
+          
+          // Se há apenas um restaurante, seleciona automaticamente
+          if (data && data.length === 1) {
+            setSelectedRestaurant(data[0]);
+          }
         }
       } catch (err) {
         console.error('Error fetching user restaurants:', err);
