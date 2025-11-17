@@ -9,12 +9,10 @@ import {
   UserCheck,
   ClipboardList,
   Eye,
-  ChefHat,
   BarChart3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUserRole } from '@/hooks/useUserRole';
-import { useNavigate } from 'react-router-dom';
 
 interface AdminSidebarProps {
   activeSection: string;
@@ -23,7 +21,6 @@ interface AdminSidebarProps {
 
 const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => {
   const { isSuperAdmin } = useUserRole();
-  const navigate = useNavigate();
 
   const menuItems = [
     { id: 'menu', label: 'Cardápio', icon: Menu },
@@ -42,10 +39,6 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
     { id: 'settings', label: 'Configurações', icon: Settings },
   ];
 
-  const handleKitchenAccess = () => {
-    navigate('/kitchen');
-  };
-
   return (
     <div className="w-64 bg-white shadow-lg h-screen sticky top-0 flex flex-col">
       <div className="p-6 border-b">
@@ -55,17 +48,6 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
       </div>
       
       <nav className="mt-6 flex-1 overflow-y-auto">
-        {/* Botão de Cozinha - Primeiro item com destaque sutil */}
-        <div className="px-3 mb-6">
-          <Button
-            className="w-full h-11 bg-orange-500 hover:bg-orange-600 text-white font-medium shadow-sm hover:shadow-md transition-all"
-            onClick={handleKitchenAccess}
-          >
-            <ChefHat className="h-5 w-5 mr-2" />
-            Cozinha
-          </Button>
-        </div>
-
         <div className="px-3 mb-2">
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
             Gestão

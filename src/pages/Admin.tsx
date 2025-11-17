@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { LogOut } from 'lucide-react';
+import { LogOut, ChefHat } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
@@ -41,6 +41,10 @@ const Admin = () => {
     } else {
       navigate('/');
     }
+  };
+
+  const handleKitchenAccess = () => {
+    navigate('/kitchen');
   };
 
   const renderContent = () => {
@@ -96,6 +100,15 @@ const Admin = () => {
           {renderContent()}
         </div>
       </div>
+
+      {/* FAB - Floating Action Button para Cozinha */}
+      <Button
+        onClick={handleKitchenAccess}
+        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg hover:shadow-xl bg-orange-500 hover:bg-orange-600 transition-all duration-300 z-50 group"
+        title="Ir para Cozinha"
+      >
+        <ChefHat className="h-6 w-6 text-white group-hover:scale-110 transition-transform" />
+      </Button>
     </div>
   );
 };
