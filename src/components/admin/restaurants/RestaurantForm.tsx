@@ -95,8 +95,12 @@ const RestaurantForm = ({ isOpen, onClose, onSubmit, editingRestaurant }: Restau
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+      <Dialog open={isOpen} onOpenChange={handleClose} modal={true}>
+        <DialogContent 
+          className="max-w-md max-h-[90vh] overflow-y-auto"
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
           <DialogHeader className="pb-2">
             <DialogTitle className="text-lg">
               {editingRestaurant ? 'Editar Restaurante' : 'Novo Restaurante'}

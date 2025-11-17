@@ -46,8 +46,12 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="max-w-md">
+      <Dialog open={isOpen} onOpenChange={handleClose} modal={true}>
+        <DialogContent 
+          className="max-w-md"
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <UserPlus className="h-5 w-5" />
