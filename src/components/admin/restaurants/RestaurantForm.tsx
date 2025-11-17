@@ -99,22 +99,22 @@ const RestaurantForm = ({ isOpen, onClose, onSubmit, editingRestaurant }: Restau
     <>
       <Dialog open={isOpen} modal={true}>
         <DialogContent 
-          className="max-w-md max-h-[90vh] overflow-y-auto"
+          className="max-w-xl max-h-[90vh] overflow-y-auto"
           onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
           onCloseAutoFocus={(e) => e.preventDefault()}
         >
-          <DialogHeader className="pb-2">
-            <DialogTitle className="text-lg">
+          <DialogHeader className="space-y-3 pb-6">
+            <DialogTitle className="text-2xl font-bold">
               {editingRestaurant ? 'Editar Restaurante' : 'Novo Restaurante'}
             </DialogTitle>
-            <DialogDescription className="text-sm">
+            <DialogDescription className="text-base">
               Preencha as informações básicas do restaurante.
             </DialogDescription>
           </DialogHeader>
           
           {!editingRestaurant && (
-            <Alert className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800 mb-2">
+            <Alert className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800 mb-6">
               <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
               <AlertDescription className="text-sm text-blue-800 dark:text-blue-200">
                 Seus dados são salvos automaticamente. Você pode sair e voltar sem perder informações.
