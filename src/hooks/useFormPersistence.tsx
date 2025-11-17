@@ -18,9 +18,15 @@ export const useFormPersistence = <T extends Record<string, any>>({
   const hasRestoredRef = useRef(false);
   const watchedValues = form.watch();
 
-  // Restore saved data on mount
+  // Restore saved data on mount or when enabled changes to true
   useEffect(() => {
-    if (!enabled || hasRestoredRef.current) return;
+    if (!enabled) {
+      // Reset the flag when disabled so it can restore again when re-enabled
+      hasRestoredRef.current = false;
+      return;
+    }
+
+    if (hasRestoredRef.current) return;
 
     const savedData = localStorage.getItem(storageKey);
     if (savedData) {
