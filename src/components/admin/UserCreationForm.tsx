@@ -51,7 +51,6 @@ const UserCreationForm = ({ isOpen, onClose, onUserCreated }: UserCreationFormPr
         <DialogContent 
           className="max-w-md"
           onInteractOutside={(e) => e.preventDefault()}
-          onEscapeKeyDown={(e) => e.preventDefault()}
         >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
