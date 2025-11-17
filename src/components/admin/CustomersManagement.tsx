@@ -36,9 +36,11 @@ const CustomersManagement = () => {
     try {
       setLoading(true);
       
+      // Filtrar pedidos apenas do restaurante selecionado
       const { data, error } = await supabase
         .from('orders')
         .select('customer_name, customer_email, customer_phone, total, created_at')
+        .or(`restaurant_id.eq.${selectedRestaurant.id},restaurant_id.is.null`)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
