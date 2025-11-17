@@ -47,14 +47,25 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
   };
 
   return (
-    <div className="w-64 bg-white shadow-lg h-screen sticky top-0">
+    <div className="w-64 bg-white shadow-lg h-screen sticky top-0 flex flex-col">
       <div className="p-6 border-b">
         <h1 className="text-xl font-bold text-gray-800">
           {isSuperAdmin ? 'Super Admin' : 'Administração'}
         </h1>
       </div>
+
+      {/* Botão de acesso à cozinha - Destacado no topo */}
+      <div className="p-4 bg-gradient-to-r from-orange-50 to-orange-100 border-b border-orange-200">
+        <Button
+          className="w-full h-12 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+          onClick={handleKitchenAccess}
+        >
+          <ChefHat className="h-5 w-5 mr-2" />
+          Acessar Cozinha
+        </Button>
+      </div>
       
-      <nav className="mt-6">
+      <nav className="mt-6 flex-1 overflow-y-auto">
         {menuItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -69,17 +80,6 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
             </Button>
           );
         })}
-        
-        <div className="border-t mt-4 pt-4">
-          <Button
-            variant="ghost"
-            className="w-full justify-start px-6 py-3 text-left mb-1 text-orange-600 hover:text-orange-700 hover:bg-orange-50"
-            onClick={handleKitchenAccess}
-          >
-            <ChefHat className="h-5 w-5 mr-3" />
-            Ir para Cozinha
-          </Button>
-        </div>
       </nav>
     </div>
   );
