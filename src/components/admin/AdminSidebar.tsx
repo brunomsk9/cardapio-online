@@ -26,8 +26,8 @@ const AdminSidebar = ({ activeSection, onSectionChange }: AdminSidebarProps) => 
   const navigate = useNavigate();
 
   const menuItems = [
-    { id: 'menu', label: 'Cardápio', icon: Menu },
     { id: 'kitchen', label: 'Cozinha', icon: ChefHat, isExternal: true },
+    { id: 'menu', label: 'Cardápio', icon: Menu },
     { id: 'categories', label: 'Categorias', icon: ClipboardList },
     { id: 'orders', label: 'Pedidos', icon: ShoppingCart },
     { id: 'tracking', label: 'Acompanhar', icon: Eye },
