@@ -101,6 +101,7 @@ const RestaurantForm = ({ isOpen, onClose, onSubmit, editingRestaurant }: Restau
         <DialogContent 
           className="max-w-md max-h-[90vh] overflow-y-auto"
           onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
         >
           <DialogHeader className="pb-2">
             <DialogTitle className="text-lg">
