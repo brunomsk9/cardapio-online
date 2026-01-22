@@ -5,7 +5,7 @@ import { useMenuItems } from '@/hooks/useMenuItems';
 import { useUserRestaurant } from '@/hooks/useUserRestaurant';
 import MenuItemForm from './MenuItemForm';
 import MenuEmptyState from './MenuEmptyState';
-import MenuHeader from './menu/MenuHeader';
+import MenuHeader from './menu/MenuHeaderButton';
 import MenuCategories from './menu/MenuCategories';
 import MenuEmptyMessage from './menu/MenuEmptyMessage';
 import MenuLoadingState from './menu/MenuLoadingState';
