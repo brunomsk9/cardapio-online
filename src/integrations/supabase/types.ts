@@ -435,7 +435,6 @@ export type Database = {
         }[]
       }
       has_role:
-        | { Args: { role_name: string }; Returns: boolean }
         | {
             Args: {
               _role: Database["public"]["Enums"]["app_role"]
@@ -443,6 +442,7 @@ export type Database = {
             }
             Returns: boolean
           }
+        | { Args: { role_name: string }; Returns: boolean }
       is_admin_or_super: { Args: never; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
     }
