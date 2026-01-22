@@ -42,6 +42,28 @@ const MenuManagement = () => {
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  // Mantém o modal aberto ao trocar de aba (algumas sessões acabam remontando /admin)
+  // e também preserva qual item estava em edição.
+  const DIALOG_OPEN_KEY = 'admin_menu_item_dialog_open';
+  const EDITING_ITEM_KEY = 'admin_menu_item_editing_item';
+
+  // Restore (once)
+  useState(() => {
+    try {
+      const wasOpen = sessionStorage.getItem(DIALOG_OPEN_KEY) === 'true';
+      if (wasOpen) {
+        const raw = sessionStorage.getItem(EDITING_ITEM_KEY);
+        if (raw) {
+          setEditingItem(JSON.parse(raw));
+        }
+        setIsDialogOpen(true);
+      }
+    } catch {
+      // ignore
+    }
+    return null;
+  });
+
   const handleSubmit = async (data: MenuItemFormData) => {
     try {
       if (editingItem) {
@@ -87,6 +109,13 @@ const MenuManagement = () => {
   const handleEdit = (item: MenuItem) => {
     setEditingItem(item);
     setIsDialogOpen(true);
+
+    try {
+      sessionStorage.setItem(DIALOG_OPEN_KEY, 'true');
+      sessionStorage.setItem(EDITING_ITEM_KEY, JSON.stringify(item));
+    } catch {
+      // ignore
+    }
   };
 
   const handleDelete = async (item: MenuItem) => {
@@ -130,11 +159,25 @@ const MenuManagement = () => {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setEditingItem(null);
+
+    try {
+      sessionStorage.removeItem(DIALOG_OPEN_KEY);
+      sessionStorage.removeItem(EDITING_ITEM_KEY);
+    } catch {
+      // ignore
+    }
   };
 
   const handleOpenNewItemDialog = () => {
     setEditingItem(null);
     setIsDialogOpen(true);
+
+    try {
+      sessionStorage.setItem(DIALOG_OPEN_KEY, 'true');
+      sessionStorage.removeItem(EDITING_ITEM_KEY);
+    } catch {
+      // ignore
+    }
   };
 
   if (!selectedRestaurant) {
