@@ -7,7 +7,11 @@ interface MenuHeaderProps {
   onDialogChange: (open: boolean) => void;
 }
 
-const MenuHeader = ({ restaurantName, onDialogChange }: MenuHeaderProps) => {
+const MenuHeader = ({ restaurantName, isDialogOpen, onDialogChange }: MenuHeaderProps) => {
+  // Evita que TS/lint reclamem de prop não usada enquanto mantemos a API do componente.
+  // (A API é usada pelo pai: <MenuHeader isDialogOpen={...} />)
+  void isDialogOpen;
+
   return (
     <div className="flex justify-between items-center">
       <div>
@@ -16,6 +20,7 @@ const MenuHeader = ({ restaurantName, onDialogChange }: MenuHeaderProps) => {
       </div>
 
       <Button
+        type="button"
         onClick={() => onDialogChange(true)}
         className="bg-gradient-to-r from-orange-500 to-orange-600"
       >
