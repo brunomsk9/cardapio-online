@@ -9,6 +9,7 @@ interface MenuItem {
   category: string;
   available: boolean;
   image_url?: string | null;
+  featured?: boolean;
 }
 
 interface MenuCategoriesProps {
@@ -17,6 +18,7 @@ interface MenuCategoriesProps {
   onEdit: (item: MenuItem) => void;
   onDelete: (item: MenuItem) => void;
   onToggleAvailability: (item: MenuItem) => void;
+  onToggleFeatured?: (item: MenuItem) => void;
 }
 
 const MenuCategories = ({ 
@@ -24,7 +26,8 @@ const MenuCategories = ({
   menuItems, 
   onEdit, 
   onDelete, 
-  onToggleAvailability 
+  onToggleAvailability,
+  onToggleFeatured
 }: MenuCategoriesProps) => {
   return (
     <div className="space-y-6">
@@ -41,6 +44,7 @@ const MenuCategories = ({
                   onEdit={onEdit}
                   onDelete={onDelete}
                   onToggleAvailability={onToggleAvailability}
+                  onToggleFeatured={onToggleFeatured}
                 />
               ))}
           </div>

@@ -1,5 +1,5 @@
 
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,19 +10,35 @@ interface MenuCardProps {
   onAddToCart: (item: MenuItem) => void;
   cartQuantity?: number;
   onUpdateQuantity?: (itemId: string, quantity: number) => void;
+  featured?: boolean;
 }
 
-const categoryLabels = {
+const categoryLabels: Record<string, string> = {
   entrada: 'Entrada',
   principal: 'Prato Principal',
   bebida: 'Bebida',
   sobremesa: 'Sobremesa'
 };
 
-const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: MenuCardProps) => {
+const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity, featured }: MenuCardProps) => {
+  const showFeaturedBadge = featured || item.featured;
+  
   return (
-    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-[1.02] relative bg-koombo-grafite border-0 shadow-lg">
+    <Card className={`overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-[1.02] relative bg-koombo-grafite border-0 shadow-lg ${showFeaturedBadge ? 'ring-2 ring-yellow-400' : ''}`}>
+      {/* Featured Badge */}
+      {showFeaturedBadge && (
+        <Badge className="absolute top-3 right-3 bg-yellow-400 text-yellow-900 font-bold text-xs z-10 flex items-center gap-1 shadow-lg">
+          <Star className="h-3 w-3 fill-yellow-900" />
+          Destaque
+        </Badge>
+      )}
+      
       {/* Quantity Badge - appears only when item is in cart */}
+      {cartQuantity > 0 && (
+        <Badge className="absolute top-3 left-3 bg-koombo-laranja text-koombo-branco font-bold text-sm z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-lg">
+          {cartQuantity}
+        </Badge>
+      )}
       {cartQuantity > 0 && (
         <Badge className="absolute top-3 left-3 bg-koombo-laranja text-koombo-branco font-bold text-sm z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-lg">
           {cartQuantity}
@@ -35,8 +51,8 @@ const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity }: Men
           alt={item.name}
           className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
         />
-        <Badge className="absolute top-2 right-2 bg-koombo-laranja text-koombo-branco shadow-lg">
-          {categoryLabels[item.category]}
+        <Badge className="absolute bottom-2 left-2 bg-koombo-laranja text-koombo-branco shadow-lg">
+          {categoryLabels[item.category] || item.category}
         </Badge>
       </div>
       

@@ -38,12 +38,22 @@ const MenuSection = ({ restaurant, menuItems, cart, onAddToCart, onUpdateQuantit
     : menuItems.filter(item => item.category.toLowerCase() === activeCategory.toLowerCase());
 
   // Then filter by search query
-  const filteredItems = searchQuery.trim()
+  const searchFiltered = searchQuery.trim()
     ? categoryFiltered.filter(item =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.description?.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : categoryFiltered;
+
+  // Sort: featured items first, then by name
+  const filteredItems = [...searchFiltered].sort((a, b) => {
+    if (a.featured && !b.featured) return -1;
+    if (!a.featured && b.featured) return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  // Get featured items for highlight section
+  const featuredItems = menuItems.filter(item => item.featured);
 
   // Helper function to get cart quantity for an item
   const getCartQuantity = (itemId: string) => {
@@ -78,6 +88,27 @@ const MenuSection = ({ restaurant, menuItems, cart, onAddToCart, onUpdateQuantit
           activeCategory={activeCategory}
           onCategoryChange={setActiveCategory}
         />
+
+        {/* Featured Section */}
+        {featuredItems.length > 0 && activeCategory === 'all' && !searchQuery && (
+          <div className="mb-12">
+            <h3 className="text-2xl font-bold text-koombo-branco mb-6 flex items-center gap-2">
+              ⭐ Destaques
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+              {featuredItems.map(item => (
+                <MenuCard
+                  key={`featured-${item.id}`}
+                  item={item}
+                  onAddToCart={() => onAddToCart(item)}
+                  cartQuantity={getCartQuantity(item.id)}
+                  onUpdateQuantity={onUpdateQuantity}
+                  featured
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {filteredItems.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">

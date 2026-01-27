@@ -20,6 +20,7 @@ interface MenuItem {
   category: string;
   available: boolean;
   image_url?: string | null;
+  featured?: boolean;
 }
 
 type MenuItemFormData = {
@@ -38,7 +39,8 @@ const MenuManagement = () => {
     createMenuItem, 
     updateMenuItem, 
     deleteMenuItem, 
-    toggleAvailability 
+    toggleAvailability,
+    toggleFeatured
   } = useMenuItems();
   
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
@@ -89,7 +91,8 @@ const MenuManagement = () => {
           price: data.price,
           category: data.category,
           image_url: data.image_url || null,
-          available: true
+          available: true,
+          featured: false
         });
         
         toast({
@@ -153,6 +156,25 @@ const MenuManagement = () => {
       console.error('Error toggling availability:', error);
       toast({
         title: "Erro ao atualizar disponibilidade",
+        description: error.message || "Erro desconhecido",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleToggleFeatured = async (item: MenuItem) => {
+    try {
+      await toggleFeatured(item.id);
+      toast({
+        title: item.featured ? "Destaque removido!" : "Produto destacado!",
+        description: item.featured 
+          ? `"${item.name}" foi removido dos destaques.` 
+          : `"${item.name}" agora aparece em destaque na página inicial.`,
+      });
+    } catch (error: any) {
+      console.error('Error toggling featured:', error);
+      toast({
+        title: "Erro ao atualizar destaque",
         description: error.message || "Erro desconhecido",
         variant: "destructive",
       });
@@ -232,6 +254,7 @@ const MenuManagement = () => {
           onEdit={handleEdit}
           onDelete={handleDelete}
           onToggleAvailability={handleToggleAvailability}
+          onToggleFeatured={handleToggleFeatured}
         />
       ) : searchQuery ? (
         <div className="text-center py-12">
