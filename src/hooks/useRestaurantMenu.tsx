@@ -29,6 +29,7 @@ export const useRestaurantMenu = (restaurant: Restaurant | null) => {
         .select('*')
         .eq('restaurant_id', restaurant.id)
         .eq('available', true)
+        .order('featured', { ascending: false })
         .order('category')
         .order('name');
 

@@ -13,6 +13,7 @@ interface MenuItem {
   category: string;
   image_url: string | null;
   available: boolean;
+  featured: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -144,6 +145,18 @@ export const useMenuItems = () => {
     }
   };
 
+  const toggleFeatured = async (id: string) => {
+    const item = menuItems.find(i => i.id === id);
+    if (!item) return;
+
+    try {
+      await updateMenuItem(id, { featured: !item.featured });
+    } catch (error) {
+      console.error('Error toggling featured:', error);
+      throw error;
+    }
+  };
+
   return {
     menuItems,
     loading,
@@ -152,6 +165,7 @@ export const useMenuItems = () => {
     updateMenuItem,
     deleteMenuItem,
     toggleAvailability,
+    toggleFeatured,
     refetch: fetchMenuItems
   };
 };
