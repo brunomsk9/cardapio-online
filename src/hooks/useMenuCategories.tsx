@@ -32,7 +32,13 @@ export const useMenuCategories = () => {
 
       if (error) throw error;
 
-      setCategories(data || []);
+      // Ensure visible_on_menu is set (for backwards compatibility)
+      const categoriesWithVisibility = (data || []).map(cat => ({
+        ...cat,
+        visible_on_menu: cat.visible_on_menu ?? true
+      }));
+
+      setCategories(categoriesWithVisibility);
     } catch (error: any) {
       console.error('Error fetching categories:', error);
       toast({

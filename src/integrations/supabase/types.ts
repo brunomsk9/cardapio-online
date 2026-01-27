@@ -65,6 +65,7 @@ export type Database = {
           name: string
           restaurant_id: string | null
           updated_at: string | null
+          visible_on_menu: boolean
         }
         Insert: {
           created_at?: string | null
@@ -74,6 +75,7 @@ export type Database = {
           name: string
           restaurant_id?: string | null
           updated_at?: string | null
+          visible_on_menu?: boolean
         }
         Update: {
           created_at?: string | null
@@ -83,6 +85,7 @@ export type Database = {
           name?: string
           restaurant_id?: string | null
           updated_at?: string | null
+          visible_on_menu?: boolean
         }
         Relationships: [
           {
