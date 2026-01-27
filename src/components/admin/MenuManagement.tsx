@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { useMenuItems } from '@/hooks/useMenuItems';
 import { useUserRestaurant } from '@/hooks/useUserRestaurant';
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
 import MenuItemForm from './MenuItemForm';
 import MenuEmptyState from './MenuEmptyState';
 import MenuHeader from './menu/MenuHeaderButton';
@@ -41,6 +43,7 @@ const MenuManagement = () => {
   
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Mantém o modal aberto ao trocar de aba (algumas sessões acabam remontando /admin)
   // e também preserva qual item estava em edição.
@@ -188,7 +191,14 @@ const MenuManagement = () => {
     return <MenuLoadingState />;
   }
 
-  const categories = [...new Set(menuItems.map(item => item.category))];
+  // Filter items based on search query
+  const filteredItems = menuItems.filter(item =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const categories = [...new Set(filteredItems.map(item => item.category))];
 
   return (
     <div className="space-y-6">
@@ -197,6 +207,16 @@ const MenuManagement = () => {
         isDialogOpen={isDialogOpen}
         onDialogChange={setIsDialogOpen}
       />
+
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Buscar itens do cardápio..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
+        />
+      </div>
 
       <MenuItemForm
         isOpen={isDialogOpen}
@@ -208,11 +228,15 @@ const MenuManagement = () => {
       {categories.length > 0 ? (
         <MenuCategories
           categories={categories}
-          menuItems={menuItems}
+          menuItems={filteredItems}
           onEdit={handleEdit}
           onDelete={handleDelete}
           onToggleAvailability={handleToggleAvailability}
         />
+      ) : searchQuery ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Nenhum item encontrado para "{searchQuery}"</p>
+        </div>
       ) : (
         <MenuEmptyState onCreateFirst={handleOpenNewItemDialog} />
       )}
