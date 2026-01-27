@@ -3,8 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2 } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Plus, Trash2, Eye, EyeOff } from 'lucide-react';
 import { useMenuCategories } from '@/hooks/useMenuCategories';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,9 +20,36 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const CategoriesManagement = () => {
-  const { categories, loading, createCategory, deleteCategory } = useMenuCategories();
+  const { categories, loading, createCategory, deleteCategory, refetch } = useMenuCategories();
   const [newCategoryName, setNewCategoryName] = useState('');
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
+
+  const handleToggleVisibility = async (categoryId: string, currentVisibility: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('menu_categories')
+        .update({ visible_on_menu: !currentVisibility })
+        .eq('id', categoryId);
+
+      if (error) throw error;
+
+      toast({
+        title: currentVisibility ? "Categoria oculta" : "Categoria visível",
+        description: currentVisibility 
+          ? "A categoria não aparecerá mais na página inicial." 
+          : "A categoria agora aparece na página inicial.",
+      });
+
+      refetch();
+    } catch (error: any) {
+      console.error('Error toggling visibility:', error);
+      toast({
+        title: "Erro ao alterar visibilidade",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleCreateCategory = async () => {
     if (!newCategoryName.trim()) return;
@@ -71,29 +101,45 @@ const CategoriesManagement = () => {
 
           <div className="space-y-2">
             <h3 className="font-semibold text-sm">Categorias Disponíveis:</h3>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {categories.map((category) => (
                 <div
                   key={category.id}
                   className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors"
                 >
                   <div className="flex items-center gap-2">
-                    <span>{category.name}</span>
+                    <span className={!category.visible_on_menu ? 'text-muted-foreground line-through' : ''}>
+                      {category.name}
+                    </span>
                     {category.is_system_default && (
                       <Badge variant="secondary" className="text-xs">
                         Padrão
                       </Badge>
                     )}
                   </div>
-                  {!category.is_system_default && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteClick(category.id, category.is_system_default)}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      {category.visible_on_menu ? (
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      <Switch
+                        checked={category.visible_on_menu ?? true}
+                        onCheckedChange={() => handleToggleVisibility(category.id, category.visible_on_menu ?? true)}
+                        aria-label={category.visible_on_menu ? 'Ocultar categoria' : 'Mostrar categoria'}
+                      />
+                    </div>
+                    {!category.is_system_default && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteClick(category.id, category.is_system_default)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

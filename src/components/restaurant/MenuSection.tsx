@@ -4,6 +4,7 @@ import { Database } from '@/integrations/supabase/types';
 import MenuCard from '@/components/MenuCard';
 import CategoryFilter from '@/components/CategoryFilter';
 import { MenuItem } from '@/types';
+import { usePublicMenuCategories } from '@/hooks/usePublicMenuCategories';
 
 type Restaurant = Database['public']['Tables']['restaurants']['Row'];
 
@@ -17,18 +18,20 @@ interface MenuSectionProps {
 
 const MenuSection = ({ restaurant, menuItems, cart, onAddToCart, onUpdateQuantity }: MenuSectionProps) => {
   const [activeCategory, setActiveCategory] = useState('all');
+  const { categories: dbCategories, loading: categoriesLoading } = usePublicMenuCategories(restaurant?.id || null);
 
+  // Build categories array from database
   const categories = [
     { key: 'all', label: 'Todos' },
-    { key: 'entrada', label: 'Entradas' },
-    { key: 'principal', label: 'Pratos Principais' },
-    { key: 'bebida', label: 'Bebidas' },
-    { key: 'sobremesa', label: 'Sobremesas' }
+    ...dbCategories.map(cat => ({
+      key: cat.name.toLowerCase(),
+      label: cat.name
+    }))
   ];
 
   const filteredItems = activeCategory === 'all'
     ? menuItems
-    : menuItems.filter(item => item.category === activeCategory);
+    : menuItems.filter(item => item.category.toLowerCase() === activeCategory.toLowerCase());
 
   // Helper function to get cart quantity for an item
   const getCartQuantity = (itemId: string) => {
