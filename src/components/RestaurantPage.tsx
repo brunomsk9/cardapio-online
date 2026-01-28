@@ -7,6 +7,7 @@ import RestaurantHero from '@/components/restaurant/RestaurantHero';
 import MenuSection from '@/components/restaurant/MenuSection';
 import RestaurantModals from '@/components/restaurant/RestaurantModals';
 import { CartItem, MenuItem } from '@/types';
+import { useRestaurantTheme, getRestaurantTheme } from '@/hooks/useRestaurantTheme';
 
 type Restaurant = Database['public']['Tables']['restaurants']['Row'];
 
@@ -47,6 +48,10 @@ const RestaurantPage = ({
   const [showCart, setShowCart] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
 
+  // Apply restaurant theme
+  useRestaurantTheme(restaurant);
+  const theme = getRestaurantTheme(restaurant);
+
   const handleAdminClick = () => {
     setShowAuthModal(true);
     onAdminClick();
@@ -66,7 +71,7 @@ const RestaurantPage = ({
   console.log('Rendering restaurant-specific page');
   
   return (
-    <div className="min-h-screen bg-koombo-grafite">
+    <div className="min-h-screen" style={{ backgroundColor: theme.secondaryColor }}>
       <Header 
         cartItemsCount={getTotalItems()}
         onCartClick={() => setShowCart(true)}
@@ -75,6 +80,7 @@ const RestaurantPage = ({
         onSignOut={onSignOut}
         isAdmin={isAdmin}
         isKitchen={isKitchen}
+        customColors={{ primary: theme.primaryColor, secondary: theme.secondaryColor }}
       />
 
       <RestaurantHero
