@@ -203,6 +203,7 @@ Obrigado pela preferência! 🙏`;
               secondary_color: formData.secondary_color,
               hero_image_url: formData.hero_image_url
             }}
+            restaurantId={selectedRestaurant.id}
             saving={saving}
             onInputChange={handleInputChange}
             onSubmit={handleSubmit}

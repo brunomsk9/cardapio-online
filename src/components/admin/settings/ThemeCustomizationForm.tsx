@@ -1,9 +1,11 @@
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Save, RefreshCw, Palette } from 'lucide-react';
+import { Save, RefreshCw, Palette, Upload, X, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 interface ThemeCustomizationFormProps {
   formData: {
@@ -11,6 +13,7 @@ interface ThemeCustomizationFormProps {
     secondary_color: string;
     hero_image_url: string;
   };
+  restaurantId: string;
   saving: boolean;
   onInputChange: (field: string, value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
@@ -19,10 +22,82 @@ interface ThemeCustomizationFormProps {
 const DEFAULT_PRIMARY_COLOR = '#FF521D';
 const DEFAULT_SECONDARY_COLOR = '#282828';
 
-const ThemeCustomizationForm = ({ formData, saving, onInputChange, onSubmit }: ThemeCustomizationFormProps) => {
+const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange, onSubmit }: ThemeCustomizationFormProps) => {
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const resetToDefaults = () => {
     onInputChange('primary_color', DEFAULT_PRIMARY_COLOR);
     onInputChange('secondary_color', DEFAULT_SECONDARY_COLOR);
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Erro",
+        description: "Por favor, selecione apenas arquivos de imagem.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Erro",
+        description: "A imagem deve ter no máximo 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${restaurantId}/hero-${Date.now()}.${fileExt}`;
+
+      const { data, error } = await supabase.storage
+        .from('restaurant-images')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (error) throw error;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('restaurant-images')
+        .getPublicUrl(data.path);
+
+      onInputChange('hero_image_url', urlData.publicUrl);
+
+      toast({
+        title: "Imagem enviada!",
+        description: "A imagem foi enviada com sucesso.",
+      });
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: "Erro ao enviar imagem",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleRemoveImage = () => {
+    onInputChange('hero_image_url', '');
   };
 
   return (
@@ -111,24 +186,75 @@ const ThemeCustomizationForm = ({ formData, saving, onInputChange, onSubmit }: T
       </div>
 
       {/* Imagem da Home */}
-      <div className="space-y-2">
-        <Label htmlFor="hero_image_url">Imagem da Home (Hero)</Label>
-        <Input
-          id="hero_image_url"
-          type="url"
-          value={formData.hero_image_url || ''}
-          onChange={(e) => onInputChange('hero_image_url', e.target.value)}
-          placeholder="https://exemplo.com/imagem.jpg"
-        />
-        <p className="text-xs text-gray-500">
-          URL da imagem que aparecerá na seção principal da página do restaurante. 
-          Recomendado: 800x600 pixels ou proporção 4:3.
+      <div className="space-y-4">
+        <Label>Imagem da Home (Hero)</Label>
+        
+        {/* Upload Button */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileUpload}
+            className="hidden"
+            id="hero-image-upload"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="flex items-center gap-2"
+          >
+            {uploading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Enviando...
+              </>
+            ) : (
+              <>
+                <Upload className="h-4 w-4" />
+                Fazer Upload de Imagem
+              </>
+            )}
+          </Button>
+          
+          {formData.hero_image_url && (
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              onClick={handleRemoveImage}
+              className="flex items-center gap-2"
+            >
+              <X className="h-4 w-4" />
+              Remover Imagem
+            </Button>
+          )}
+        </div>
+
+        {/* Alternative: URL Input */}
+        <div className="space-y-2">
+          <Label htmlFor="hero_image_url" className="text-sm text-muted-foreground">
+            Ou insira uma URL de imagem:
+          </Label>
+          <Input
+            id="hero_image_url"
+            type="url"
+            value={formData.hero_image_url || ''}
+            onChange={(e) => onInputChange('hero_image_url', e.target.value)}
+            placeholder="https://exemplo.com/imagem.jpg"
+          />
+        </div>
+
+        <p className="text-xs text-muted-foreground">
+          Recomendado: 800x600 pixels ou proporção 4:3. Tamanho máximo: 5MB.
         </p>
         
         {formData.hero_image_url && (
           <div className="mt-3">
-            <p className="text-sm text-gray-600 mb-2">Pré-visualização:</p>
-            <div className="relative w-full max-w-md h-48 rounded-lg overflow-hidden border bg-gray-100">
+            <p className="text-sm text-muted-foreground mb-2">Pré-visualização:</p>
+            <div className="relative w-full max-w-md h-48 rounded-lg overflow-hidden border bg-muted">
               <img 
                 src={formData.hero_image_url} 
                 alt="Preview da imagem hero"
