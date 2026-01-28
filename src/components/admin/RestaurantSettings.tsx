@@ -3,10 +3,11 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Building2, MessageSquare } from 'lucide-react';
+import { Building2, MessageSquare, Palette } from 'lucide-react';
 import { useUserRestaurant } from '@/hooks/useUserRestaurant';
 import RestaurantInfoForm from './settings/RestaurantInfoForm';
 import WhatsAppMessageForm from './settings/WhatsAppMessageForm';
+import ThemeCustomizationForm from './settings/ThemeCustomizationForm';
 import QRCodeGenerator from './QRCodeGenerator';
 
 const RestaurantSettings = () => {
@@ -18,7 +19,10 @@ const RestaurantSettings = () => {
     phone: '',
     email: '',
     subdomain: '',
-    whatsapp_message: ''
+    whatsapp_message: '',
+    primary_color: '#FF521D',
+    secondary_color: '#282828',
+    hero_image_url: ''
   });
   const [saving, setSaving] = useState(false);
 
@@ -43,6 +47,7 @@ Obrigado pela preferência! 🙏`;
 
   useEffect(() => {
     if (selectedRestaurant) {
+      const restaurant = selectedRestaurant as any;
       setFormData({
         name: selectedRestaurant.name || '',
         description: selectedRestaurant.description || '',
@@ -50,7 +55,10 @@ Obrigado pela preferência! 🙏`;
         phone: selectedRestaurant.phone || '',
         email: selectedRestaurant.email || '',
         subdomain: selectedRestaurant.subdomain || '',
-        whatsapp_message: selectedRestaurant.whatsapp_message || defaultWhatsAppMessage
+        whatsapp_message: selectedRestaurant.whatsapp_message || defaultWhatsAppMessage,
+        primary_color: restaurant.primary_color || '#FF521D',
+        secondary_color: restaurant.secondary_color || '#282828',
+        hero_image_url: restaurant.hero_image_url || ''
       });
     }
   }, [selectedRestaurant]);
@@ -90,8 +98,11 @@ Obrigado pela preferência! 🙏`;
           email: formData.email,
           subdomain: formData.subdomain,
           whatsapp_message: formData.whatsapp_message,
+          primary_color: formData.primary_color,
+          secondary_color: formData.secondary_color,
+          hero_image_url: formData.hero_image_url || null,
           updated_at: new Date().toISOString()
-        })
+        } as any)
         .eq('id', selectedRestaurant.id);
 
       if (error) {
@@ -173,6 +184,27 @@ Obrigado pela preferência! 🙏`;
             saving={saving}
             onMessageChange={(value) => handleInputChange('whatsapp_message', value)}
             onResetMessage={resetWhatsAppMessage}
+            onSubmit={handleSubmit}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Palette className="h-5 w-5" />
+            Personalização Visual
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ThemeCustomizationForm
+            formData={{
+              primary_color: formData.primary_color,
+              secondary_color: formData.secondary_color,
+              hero_image_url: formData.hero_image_url
+            }}
+            saving={saving}
+            onInputChange={handleInputChange}
             onSubmit={handleSubmit}
           />
         </CardContent>

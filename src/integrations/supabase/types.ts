@@ -287,11 +287,14 @@ export type Database = {
           created_at: string
           description: string | null
           email: string | null
+          hero_image_url: string | null
           id: string
           is_active: boolean
           logo_url: string | null
           name: string
           phone: string | null
+          primary_color: string | null
+          secondary_color: string | null
           subdomain: string | null
           updated_at: string
           whatsapp_message: string | null
@@ -301,11 +304,14 @@ export type Database = {
           created_at?: string
           description?: string | null
           email?: string | null
+          hero_image_url?: string | null
           id?: string
           is_active?: boolean
           logo_url?: string | null
           name: string
           phone?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
           subdomain?: string | null
           updated_at?: string
           whatsapp_message?: string | null
@@ -315,11 +321,14 @@ export type Database = {
           created_at?: string
           description?: string | null
           email?: string | null
+          hero_image_url?: string | null
           id?: string
           is_active?: boolean
           logo_url?: string | null
           name?: string
           phone?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
           subdomain?: string | null
           updated_at?: string
           whatsapp_message?: string | null
