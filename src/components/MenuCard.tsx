@@ -58,7 +58,7 @@ const MenuCard = ({ item, onAddToCart, cartQuantity = 0, onUpdateQuantity, featu
       
       <CardHeader>
         <CardTitle className="text-lg text-koombo-branco font-bold">{item.name}</CardTitle>
-        <CardDescription className="text-sm text-koombo-branco/70">
+        <CardDescription className="text-sm text-koombo-cream">
           {item.description}
         </CardDescription>
       </CardHeader>
