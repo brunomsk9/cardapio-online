@@ -290,6 +290,7 @@ export type Database = {
           hero_image_url: string | null
           id: string
           is_active: boolean
+          logo_size: number | null
           logo_url: string | null
           name: string
           phone: string | null
@@ -307,6 +308,7 @@ export type Database = {
           hero_image_url?: string | null
           id?: string
           is_active?: boolean
+          logo_size?: number | null
           logo_url?: string | null
           name: string
           phone?: string | null
@@ -324,6 +326,7 @@ export type Database = {
           hero_image_url?: string | null
           id?: string
           is_active?: boolean
+          logo_size?: number | null
           logo_url?: string | null
           name?: string
           phone?: string | null

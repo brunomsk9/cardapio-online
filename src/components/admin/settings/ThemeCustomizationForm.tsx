@@ -3,7 +3,8 @@ import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Save, RefreshCw, Palette, Upload, X, Loader2 } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { Save, RefreshCw, Palette, Upload, X, Loader2, Image } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -12,10 +13,12 @@ interface ThemeCustomizationFormProps {
     primary_color: string;
     secondary_color: string;
     hero_image_url: string;
+    logo_url: string;
+    logo_size: number;
   };
   restaurantId: string;
   saving: boolean;
-  onInputChange: (field: string, value: string) => void;
+  onInputChange: (field: string, value: string | number) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
 
@@ -23,19 +26,20 @@ const DEFAULT_PRIMARY_COLOR = '#FF521D';
 const DEFAULT_SECONDARY_COLOR = '#282828';
 
 const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange, onSubmit }: ThemeCustomizationFormProps) => {
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingHero, setUploadingHero] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const heroFileInputRef = useRef<HTMLInputElement>(null);
+  const logoFileInputRef = useRef<HTMLInputElement>(null);
 
   const resetToDefaults = () => {
     onInputChange('primary_color', DEFAULT_PRIMARY_COLOR);
     onInputChange('secondary_color', DEFAULT_SECONDARY_COLOR);
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleHeroUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       toast({
         title: "Erro",
@@ -45,7 +49,6 @@ const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange,
       return;
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast({
         title: "Erro",
@@ -55,7 +58,7 @@ const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange,
       return;
     }
 
-    setUploading(true);
+    setUploadingHero(true);
 
     try {
       const fileExt = file.name.split('.').pop();
@@ -70,7 +73,6 @@ const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange,
 
       if (error) throw error;
 
-      // Get public URL
       const { data: urlData } = supabase.storage
         .from('restaurant-images')
         .getPublicUrl(data.path);
@@ -79,25 +81,91 @@ const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange,
 
       toast({
         title: "Imagem enviada!",
-        description: "A imagem foi enviada com sucesso.",
+        description: "A imagem hero foi enviada com sucesso.",
       });
     } catch (error: any) {
-      console.error('Error uploading image:', error);
+      console.error('Error uploading hero image:', error);
       toast({
         title: "Erro ao enviar imagem",
         description: error.message,
         variant: "destructive",
       });
     } finally {
-      setUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+      setUploadingHero(false);
+      if (heroFileInputRef.current) {
+        heroFileInputRef.current.value = '';
       }
     }
   };
 
-  const handleRemoveImage = () => {
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate PNG format for transparency
+    if (file.type !== 'image/png') {
+      toast({
+        title: "Formato inválido",
+        description: "Por favor, selecione apenas arquivos PNG para manter a transparência.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        title: "Erro",
+        description: "A logo deve ter no máximo 2MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadingLogo(true);
+
+    try {
+      const fileName = `${restaurantId}/logo-${Date.now()}.png`;
+
+      const { data, error } = await supabase.storage
+        .from('restaurant-images')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (error) throw error;
+
+      const { data: urlData } = supabase.storage
+        .from('restaurant-images')
+        .getPublicUrl(data.path);
+
+      onInputChange('logo_url', urlData.publicUrl);
+
+      toast({
+        title: "Logo enviada!",
+        description: "A logo foi enviada com sucesso.",
+      });
+    } catch (error: any) {
+      console.error('Error uploading logo:', error);
+      toast({
+        title: "Erro ao enviar logo",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingLogo(false);
+      if (logoFileInputRef.current) {
+        logoFileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleRemoveHeroImage = () => {
     onInputChange('hero_image_url', '');
+  };
+
+  const handleRemoveLogo = () => {
+    onInputChange('logo_url', '');
   };
 
   return (
@@ -185,28 +253,132 @@ const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange,
         </div>
       </div>
 
-      {/* Imagem da Home */}
+      {/* Logo do Restaurante */}
       <div className="space-y-4">
-        <Label>Imagem da Home (Hero)</Label>
+        <h3 className="text-sm font-medium text-foreground/80 flex items-center gap-2">
+          <Image className="h-4 w-4" />
+          Logo do Restaurante
+        </h3>
         
-        {/* Upload Button */}
         <div className="flex flex-col sm:flex-row gap-3">
           <input
-            ref={fileInputRef}
+            ref={logoFileInputRef}
+            type="file"
+            accept="image/png"
+            onChange={handleLogoUpload}
+            className="hidden"
+            id="logo-upload"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => logoFileInputRef.current?.click()}
+            disabled={uploadingLogo}
+            className="flex items-center gap-2"
+          >
+            {uploadingLogo ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Enviando...
+              </>
+            ) : (
+              <>
+                <Upload className="h-4 w-4" />
+                Upload Logo PNG
+              </>
+            )}
+          </Button>
+          
+          {formData.logo_url && (
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              onClick={handleRemoveLogo}
+              className="flex items-center gap-2"
+            >
+              <X className="h-4 w-4" />
+              Remover Logo
+            </Button>
+          )}
+        </div>
+
+        <p className="text-xs text-muted-foreground">
+          Use apenas arquivos PNG com fundo transparente. Tamanho máximo: 2MB.
+        </p>
+
+        {/* Slider de Tamanho da Logo */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="logo_size">Tamanho da Logo</Label>
+            <span className="text-sm text-muted-foreground">{formData.logo_size || 120}px</span>
+          </div>
+          <Slider
+            id="logo_size"
+            value={[formData.logo_size || 120]}
+            onValueChange={(value) => onInputChange('logo_size', value[0])}
+            min={40}
+            max={200}
+            step={10}
+            className="w-full"
+          />
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>40px</span>
+            <span>200px</span>
+          </div>
+        </div>
+        
+        {formData.logo_url && (
+          <div className="mt-3">
+            <p className="text-sm text-muted-foreground mb-2">Pré-visualização:</p>
+            <div 
+              className="inline-flex items-center justify-center p-4 rounded-lg border bg-muted/50"
+              style={{ 
+                backgroundImage: 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)',
+                backgroundSize: '20px 20px',
+                backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px'
+              }}
+            >
+              <img 
+                src={formData.logo_url} 
+                alt="Preview da logo"
+                style={{ 
+                  width: `${formData.logo_size || 120}px`,
+                  height: 'auto'
+                }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/placeholder.svg';
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Imagem da Home */}
+      <div className="space-y-4">
+        <h3 className="text-sm font-medium text-foreground/80 flex items-center gap-2">
+          <Upload className="h-4 w-4" />
+          Imagem da Home (Hero)
+        </h3>
+        
+        <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            ref={heroFileInputRef}
             type="file"
             accept="image/*"
-            onChange={handleFileUpload}
+            onChange={handleHeroUpload}
             className="hidden"
             id="hero-image-upload"
           />
           <Button
             type="button"
             variant="outline"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
+            onClick={() => heroFileInputRef.current?.click()}
+            disabled={uploadingHero}
             className="flex items-center gap-2"
           >
-            {uploading ? (
+            {uploadingHero ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Enviando...
@@ -224,7 +396,7 @@ const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange,
               type="button"
               variant="destructive"
               size="sm"
-              onClick={handleRemoveImage}
+              onClick={handleRemoveHeroImage}
               className="flex items-center gap-2"
             >
               <X className="h-4 w-4" />
@@ -233,7 +405,6 @@ const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange,
           )}
         </div>
 
-        {/* Alternative: URL Input */}
         <div className="space-y-2">
           <Label htmlFor="hero_image_url" className="text-sm text-muted-foreground">
             Ou insira uma URL de imagem:

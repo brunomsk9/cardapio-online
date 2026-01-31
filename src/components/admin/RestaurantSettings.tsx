@@ -22,7 +22,9 @@ const RestaurantSettings = () => {
     whatsapp_message: '',
     primary_color: '#FF521D',
     secondary_color: '#282828',
-    hero_image_url: ''
+    hero_image_url: '',
+    logo_url: '',
+    logo_size: 120
   });
   const [saving, setSaving] = useState(false);
 
@@ -58,7 +60,9 @@ Obrigado pela preferência! 🙏`;
         whatsapp_message: selectedRestaurant.whatsapp_message || defaultWhatsAppMessage,
         primary_color: restaurant.primary_color || '#FF521D',
         secondary_color: restaurant.secondary_color || '#282828',
-        hero_image_url: restaurant.hero_image_url || ''
+        hero_image_url: restaurant.hero_image_url || '',
+        logo_url: restaurant.logo_url || '',
+        logo_size: restaurant.logo_size || 120
       });
     }
   }, [selectedRestaurant]);
@@ -101,6 +105,8 @@ Obrigado pela preferência! 🙏`;
           primary_color: formData.primary_color,
           secondary_color: formData.secondary_color,
           hero_image_url: formData.hero_image_url || null,
+          logo_url: formData.logo_url || null,
+          logo_size: formData.logo_size,
           updated_at: new Date().toISOString()
         } as any)
         .eq('id', selectedRestaurant.id);
@@ -131,7 +137,7 @@ Obrigado pela preferência! 🙏`;
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -201,7 +207,9 @@ Obrigado pela preferência! 🙏`;
             formData={{
               primary_color: formData.primary_color,
               secondary_color: formData.secondary_color,
-              hero_image_url: formData.hero_image_url
+              hero_image_url: formData.hero_image_url,
+              logo_url: formData.logo_url,
+              logo_size: formData.logo_size
             }}
             restaurantId={selectedRestaurant.id}
             saving={saving}
