@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { Save, RefreshCw, Palette, Upload, X, Loader2, Image } from 'lucide-react';
+import { Save, RefreshCw, Palette, Upload, X, Loader2, Image, Wand2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { removeBackground } from '@imgly/background-removal';
 
 interface ThemeCustomizationFormProps {
   formData: {
