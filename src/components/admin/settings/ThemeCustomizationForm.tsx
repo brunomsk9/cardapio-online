@@ -347,11 +347,29 @@ const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange,
               <X className="h-4 w-4" />
               Remover Logo
             </Button>
+           )}
+          
+          {formData.logo_url && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => processRemoveBackground(formData.logo_url, 'logo')}
+              disabled={removingBg}
+              className="flex items-center gap-2"
+            >
+              {removingBg ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Wand2 className="h-4 w-4" />
+              )}
+              Remover Fundo
+            </Button>
           )}
         </div>
 
         <p className="text-xs text-muted-foreground">
-          Use apenas arquivos PNG com fundo transparente. Tamanho máximo: 2MB.
+          Envie qualquer imagem. Use o botão "Remover Fundo" para deixar com transparência. Máx: 2MB.
         </p>
 
         {/* Slider de Tamanho da Logo */}
