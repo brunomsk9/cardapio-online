@@ -27,6 +27,7 @@ interface MenuItemFormProps {
   onClose: () => void;
   onSubmit: (data: MenuItemFormData) => void;
   editingItem: MenuItem | null;
+  restaurantId?: string;
 }
 
 const MenuItemForm = ({ isOpen, onClose, onSubmit, editingItem }: MenuItemFormProps) => {
