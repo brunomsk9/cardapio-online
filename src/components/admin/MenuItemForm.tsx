@@ -30,7 +30,7 @@ interface MenuItemFormProps {
   restaurantId?: string;
 }
 
-const MenuItemForm = ({ isOpen, onClose, onSubmit, editingItem }: MenuItemFormProps) => {
+const MenuItemForm = ({ isOpen, onClose, onSubmit, editingItem, restaurantId }: MenuItemFormProps) => {
   const [showCloseAlert, setShowCloseAlert] = React.useState(false);
 
   const form = useForm<MenuItemFormData>({
