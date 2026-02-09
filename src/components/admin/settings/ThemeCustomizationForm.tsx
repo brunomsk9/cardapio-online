@@ -311,7 +311,7 @@ const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange,
           <input
             ref={logoFileInputRef}
             type="file"
-            accept="image/png"
+            accept="image/*"
             onChange={handleLogoUpload}
             className="hidden"
             id="logo-upload"
