@@ -467,6 +467,24 @@ const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange,
               <X className="h-4 w-4" />
               Remover Imagem
             </Button>
+           )}
+
+          {formData.hero_image_url && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => processRemoveBackground(formData.hero_image_url, 'hero')}
+              disabled={removingBg}
+              className="flex items-center gap-2"
+            >
+              {removingBg ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Wand2 className="h-4 w-4" />
+              )}
+              Remover Fundo
+            </Button>
           )}
         </div>
 
