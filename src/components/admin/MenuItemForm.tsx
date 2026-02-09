@@ -27,9 +27,10 @@ interface MenuItemFormProps {
   onClose: () => void;
   onSubmit: (data: MenuItemFormData) => void;
   editingItem: MenuItem | null;
+  restaurantId?: string;
 }
 
-const MenuItemForm = ({ isOpen, onClose, onSubmit, editingItem }: MenuItemFormProps) => {
+const MenuItemForm = ({ isOpen, onClose, onSubmit, editingItem, restaurantId }: MenuItemFormProps) => {
   const [showCloseAlert, setShowCloseAlert] = React.useState(false);
 
   const form = useForm<MenuItemFormData>({
@@ -120,7 +121,7 @@ const MenuItemForm = ({ isOpen, onClose, onSubmit, editingItem }: MenuItemFormPr
           
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-              <MenuItemFormFields control={form.control} />
+              <MenuItemFormFields control={form.control} setValue={form.setValue} restaurantId={restaurantId} />
               <MenuItemFormActions 
                 isEditing={!!editingItem} 
                 onCancel={handleClose} 
