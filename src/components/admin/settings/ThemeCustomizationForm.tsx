@@ -100,15 +100,59 @@ const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange,
     }
   };
 
+  const processRemoveBackground = async (imageUrl: string, target: 'logo' | 'hero') => {
+    setRemovingBg(true);
+    try {
+      toast({
+        title: "Processando...",
+        description: "Removendo fundo da imagem. Isso pode levar alguns segundos.",
+      });
+
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const resultBlob = await removeBackground(blob, {
+        output: { quality: 1, format: 'image/png' },
+      });
+
+      const fileName = `${restaurantId}/${target}-nobg-${Date.now()}.png`;
+      const file = new File([resultBlob], `${target}-nobg.png`, { type: 'image/png' });
+
+      const { data, error } = await supabase.storage
+        .from('restaurant-images')
+        .upload(fileName, file, { cacheControl: '3600', upsert: true });
+
+      if (error) throw error;
+
+      const { data: urlData } = supabase.storage
+        .from('restaurant-images')
+        .getPublicUrl(data.path);
+
+      onInputChange(target === 'logo' ? 'logo_url' : 'hero_image_url', urlData.publicUrl);
+
+      toast({
+        title: "Fundo removido!",
+        description: "A imagem sem fundo foi salva com sucesso.",
+      });
+    } catch (error: any) {
+      console.error('Error removing background:', error);
+      toast({
+        title: "Erro ao remover fundo",
+        description: error.message || "Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setRemovingBg(false);
+    }
+  };
+
   const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate PNG format for transparency
-    if (file.type !== 'image/png') {
+    if (!file.type.startsWith('image/')) {
       toast({
         title: "Formato inválido",
-        description: "Por favor, selecione apenas arquivos PNG para manter a transparência.",
+        description: "Por favor, selecione apenas arquivos de imagem.",
         variant: "destructive",
       });
       return;
@@ -126,7 +170,8 @@ const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange,
     setUploadingLogo(true);
 
     try {
-      const fileName = `${restaurantId}/logo-${Date.now()}.png`;
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${restaurantId}/logo-${Date.now()}.${fileExt}`;
 
       const { data, error } = await supabase.storage
         .from('restaurant-images')
