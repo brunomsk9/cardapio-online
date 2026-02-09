@@ -29,6 +29,7 @@ const DEFAULT_SECONDARY_COLOR = '#282828';
 const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange, onSubmit }: ThemeCustomizationFormProps) => {
   const [uploadingHero, setUploadingHero] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [removingBg, setRemovingBg] = useState(false);
   const heroFileInputRef = useRef<HTMLInputElement>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
 
