@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { Save, RefreshCw, Palette, Upload, X, Loader2, Image } from 'lucide-react';
+import { Save, RefreshCw, Palette, Upload, X, Loader2, Image, Wand2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { removeBackground } from '@imgly/background-removal';
 
 interface ThemeCustomizationFormProps {
   formData: {
@@ -28,6 +29,7 @@ const DEFAULT_SECONDARY_COLOR = '#282828';
 const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange, onSubmit }: ThemeCustomizationFormProps) => {
   const [uploadingHero, setUploadingHero] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [removingBg, setRemovingBg] = useState(false);
   const heroFileInputRef = useRef<HTMLInputElement>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -98,15 +100,59 @@ const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange,
     }
   };
 
+  const processRemoveBackground = async (imageUrl: string, target: 'logo' | 'hero') => {
+    setRemovingBg(true);
+    try {
+      toast({
+        title: "Processando...",
+        description: "Removendo fundo da imagem. Isso pode levar alguns segundos.",
+      });
+
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const resultBlob = await removeBackground(blob, {
+        output: { quality: 1, format: 'image/png' },
+      });
+
+      const fileName = `${restaurantId}/${target}-nobg-${Date.now()}.png`;
+      const file = new File([resultBlob], `${target}-nobg.png`, { type: 'image/png' });
+
+      const { data, error } = await supabase.storage
+        .from('restaurant-images')
+        .upload(fileName, file, { cacheControl: '3600', upsert: true });
+
+      if (error) throw error;
+
+      const { data: urlData } = supabase.storage
+        .from('restaurant-images')
+        .getPublicUrl(data.path);
+
+      onInputChange(target === 'logo' ? 'logo_url' : 'hero_image_url', urlData.publicUrl);
+
+      toast({
+        title: "Fundo removido!",
+        description: "A imagem sem fundo foi salva com sucesso.",
+      });
+    } catch (error: any) {
+      console.error('Error removing background:', error);
+      toast({
+        title: "Erro ao remover fundo",
+        description: error.message || "Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setRemovingBg(false);
+    }
+  };
+
   const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate PNG format for transparency
-    if (file.type !== 'image/png') {
+    if (!file.type.startsWith('image/')) {
       toast({
         title: "Formato inválido",
-        description: "Por favor, selecione apenas arquivos PNG para manter a transparência.",
+        description: "Por favor, selecione apenas arquivos de imagem.",
         variant: "destructive",
       });
       return;
@@ -124,7 +170,8 @@ const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange,
     setUploadingLogo(true);
 
     try {
-      const fileName = `${restaurantId}/logo-${Date.now()}.png`;
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${restaurantId}/logo-${Date.now()}.${fileExt}`;
 
       const { data, error } = await supabase.storage
         .from('restaurant-images')
@@ -264,7 +311,7 @@ const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange,
           <input
             ref={logoFileInputRef}
             type="file"
-            accept="image/png"
+            accept="image/*"
             onChange={handleLogoUpload}
             className="hidden"
             id="logo-upload"
@@ -300,11 +347,29 @@ const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange,
               <X className="h-4 w-4" />
               Remover Logo
             </Button>
+           )}
+          
+          {formData.logo_url && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => processRemoveBackground(formData.logo_url, 'logo')}
+              disabled={removingBg}
+              className="flex items-center gap-2"
+            >
+              {removingBg ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Wand2 className="h-4 w-4" />
+              )}
+              Remover Fundo
+            </Button>
           )}
         </div>
 
         <p className="text-xs text-muted-foreground">
-          Use apenas arquivos PNG com fundo transparente. Tamanho máximo: 2MB.
+          Envie qualquer imagem. Use o botão "Remover Fundo" para deixar com transparência. Máx: 2MB.
         </p>
 
         {/* Slider de Tamanho da Logo */}
@@ -401,6 +466,24 @@ const ThemeCustomizationForm = ({ formData, restaurantId, saving, onInputChange,
             >
               <X className="h-4 w-4" />
               Remover Imagem
+            </Button>
+           )}
+
+          {formData.hero_image_url && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => processRemoveBackground(formData.hero_image_url, 'hero')}
+              disabled={removingBg}
+              className="flex items-center gap-2"
+            >
+              {removingBg ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Wand2 className="h-4 w-4" />
+              )}
+              Remover Fundo
             </Button>
           )}
         </div>
