@@ -121,7 +121,7 @@ const MenuItemForm = ({ isOpen, onClose, onSubmit, editingItem, restaurantId }: 
           
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-              <MenuItemFormFields control={form.control} />
+              <MenuItemFormFields control={form.control} setValue={form.setValue} restaurantId={restaurantId} />
               <MenuItemFormActions 
                 isEditing={!!editingItem} 
                 onCancel={handleClose} 
