@@ -245,6 +245,7 @@ const MenuManagement = () => {
         onClose={handleCloseDialog}
         onSubmit={handleSubmit}
         editingItem={editingItem}
+        restaurantId={selectedRestaurant?.id}
       />
 
       {categories.length > 0 ? (
